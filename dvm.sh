@@ -56,6 +56,15 @@ function DVM () {
 
   }
 
+  function _SWITCH () {
+    sudo rm -f "/usr/local/bin/drush";
+    sudo ln -s "${DRUSHVERDIR}/vendor/bin/drush" "/usr/local/bin/drush";
+    INSTALLED=$(drush --version | cut -d: -f2);
+    INSTALLED=${INSTALLED/  /};
+    INSTALLED=${INSTALLED/ /};
+    echo "Drush is now using ${INSTALLED}";
+  }
+
   function _INSTALL () {
     # for X in "${VERSIONSAVAILABLE[@]}"; do
     #   echo "X: ${X}";
@@ -96,16 +105,12 @@ function DVM () {
             curl -sS https://getcomposer.org/installer | php;
             php composer.phar require "drush/drush:${VERSION}";
           fi
+          _SWITCH;
         fi
       else
         echo "Drush version specified does not exist.";
       fi
     # done
-  }
-
-  function _SWITCH () {
-    rm -f "/usr/local/bin/drush";
-    ln -s "${DRUSHVERDIR}/vendor/bin/drush" "/usr/local/bin/drush";
   }
 
   function _FETCH_REMOTE () {
@@ -146,7 +151,7 @@ function DVM () {
     echo " ";
     echo " Usage:";
     echo "   dvm help                                  Show this message.";
-    echo "   dvm install <version>                     Download and install a <version>.";
+    echo "   dvm install <version>                     Download and install <version>.";
     echo "   dvm reinstall <version>                   Reinstall a version.";
     echo "   dvm uninstall <version>                   Uninstall a version.";
     echo "   dvm use <version>                         Change the drush symlink to use another version.";
@@ -155,7 +160,7 @@ function DVM () {
     echo "   dvm ls-local                              List installed versions.";
     echo "   dvm ls-local <version>                    List installed versions matching a search criteria";
     echo "   dvm ls-remote                             List remote versions available for install";
-    echo "   dvm ls-remote <version                    List remote versions matching a search criteria";
+    echo "   dvm ls-remote <version>                   List remote versions matching a search criteria";
     echo " ";
     echo " Example:";
     echo "   dvm install 7.0.0                         Install a specific version number";
