@@ -28,12 +28,14 @@ function DVM () {
     DRUSHDIR="${HOME}/drush";
     if [[ "${*}" == *"reinstall"* ]]; then STATE="reinstall"; fi
     if [[ "${*}" == *"uninstall"* ]]; then STATE="uninstall"; fi
+    if [[ "${*}" == *"exec"* ]]; then STATE="exec"; fi
     CLEANARG="${*}";
     CLEANARG=${CLEANARG/uninstall/};
     CLEANARG=${CLEANARG/reinstall/};
     CLEANARG=${CLEANARG/install/};
     CLEANARG=${CLEANARG/update/};
     CLEANARG=${CLEANARG/use/};
+    CLEANARG=${CLEANARG/exec/};
     CLEANARG=${CLEANARG/ls-local/};
     CLEANARG=${CLEANARG/ls-remote/};
     CLEANARG=${CLEANARG/ /};
@@ -63,6 +65,22 @@ function DVM () {
     INSTALLED=${INSTALLED/  /};
     INSTALLED=${INSTALLED/ /};
     echo "Drush is now using ${INSTALLED}";
+  }
+
+  function _EXEC () {
+    # dvm exec <version> <command>
+    CLEANARG=$(echo "${CLEANARG}" | cut -d\  -f1);
+    if [[ "${VERSION}" == *"*"* ]]; then
+      DRUSHVERDIR="${DRUSHDIR}/versions/drush-${BASEVERSION}-master";
+    else
+      DRUSHVERDIR="${DRUSHDIR}/versions/drush-${CLEANARG}";
+    fi
+    COMMAND="${ARGUMENTS[*]}";
+    COMMAND=${COMMAND/exec/};
+    COMMAND=${COMMAND/${CLEANARG}/};
+    COMMAND=${COMMAND/  / };
+    echo "${DRUSHVERDIR}/vendor/bin/drush ${COMMAND}";
+    eval "${DRUSHVERDIR}/vendor/bin/drush ${COMMAND}";
   }
 
   function _INSTALL () {
@@ -155,6 +173,7 @@ function DVM () {
     echo "   dvm reinstall <version>                   Reinstall a version.";
     echo "   dvm uninstall <version>                   Uninstall a version.";
     echo "   dvm use <version>                         Change the drush symlink to use another version.";
+    echo "   dvm exec <version> <command>              Change the drush symlink to use another version.";
     echo "   dvm current                               Display currently activated version.";
     echo "   dvm status                                Display current status.";
     echo "   dvm ls-local                              List installed versions.";
@@ -165,6 +184,7 @@ function DVM () {
     echo " Example:";
     echo "   dvm install 7.0.0                         Install a specific version number";
     echo "   dvm use 7.0.0                             Tells the system to use drush 7.0.0";
+    echo "   dvm exec 7.0.0 status                     Use Drush 7.0.0 to execute the status command";
   }
 
   if [[ "${*}" == *"help"* ]] || [[ -z "${*}" ]]; then
@@ -172,13 +192,15 @@ function DVM () {
     exit 0;
   fi
 
+  ARGUMENTS="${*}";
   _SETVARS "${*}";
   _PRERUN;
   case "${*}" in
-    *"current"*)       drush --version; ;;
-    *"status"*)        drush status; ;;
+    *"current"*)       if [[ "${STATE}" != "exec" ]]; then drush --version; else _EXEC; fi ;;
+    *"status"*)        if [[ "${STATE}" != "exec" ]]; then drush status; else _EXEC; fi ;;
     *"install"*)       _INSTALL; ;;
     *"use"*)           _SWITCH; ;;
+    *"exec"*)          _EXEC ;;
     *"ls-remote"*)     _FETCH_REMOTE; ;;
     *"ls-local"*)      _FETCH_LOCAL; ;;
     *"initialize"*) ;;
