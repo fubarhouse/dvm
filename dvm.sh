@@ -74,7 +74,6 @@ function DVM () {
           echo "You cannot uninstall a currently installed version."
         fi
       fi
-      exit 0;
       if [[ "${VALIDVERSION}" == true ]]; then
         if [[ ! -d "${DRUSHVERDIR}" ]] && [[ "${STATE}" == "install" ]]; then
           echo "Drush v${CLEANARG} has already been installed.";
@@ -95,7 +94,7 @@ function DVM () {
             mkdir -p "${DRUSHVERDIR}";
             cd "${DRUSHVERDIR}";
             curl -sS https://getcomposer.org/installer | php;
-            composer.phar require "drush/drush:${VERSION}";
+            php composer.phar require "drush/drush:${VERSION}";
           fi
         fi
       else
@@ -177,6 +176,7 @@ function DVM () {
     *"use"*)           _SWITCH; ;;
     *"ls-remote"*)     _FETCH_REMOTE; ;;
     *"ls-local"*)      _FETCH_LOCAL; ;;
+    *"initialize"*) ;;
   esac
 }
 
