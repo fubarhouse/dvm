@@ -15,7 +15,7 @@ It was made and tested on a OSX El Capitan system for a Debian environment for u
 
 To install or update dvm, you can use Wget:
 
-  wget -O /usr/local/bin https://raw.githubusercontent.com/fubarhouse/dvm/master/dvm
+  wget -O /usr/local/bin/dvm https://raw.githubusercontent.com/fubarhouse/dvm/master/dvm
 
 ### Manual install
 
