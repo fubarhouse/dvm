@@ -15,7 +15,7 @@ It was made and tested on a OSX El Capitan system for a Debian environment for u
 
 To install or update dvm, you can use Wget:
 
-  wget -O /usr/local/bin/dvm https://raw.githubusercontent.com/fubarhouse/dvm/master/dvm
+    `wget -O /usr/local/bin/dvm https://raw.githubusercontent.com/fubarhouse/dvm/master/dvm`
 
 ### Manual install
 
@@ -45,11 +45,9 @@ Only OSX and Ubuntu (CLI) systems are supported at this time.
 
 ### Drush
 
-So far, Drush versions `3.3.0` and later are successfully working without errors.
+So far, Drush versions `2.0.0` and later are successfully working without errors.
 
 For use with Drush v1,2,3,4 & 5, the script will use wget based on an array with all the information and all other versions will use composer to get the live versions available.
-
-I am planning on building in compatibility for prior versions but there is no practical application for that feature.
 
 ## License
 
