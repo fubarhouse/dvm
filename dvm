@@ -29,7 +29,6 @@ function DVM () {
         sudo php -d detect_unicode=0 go-pear.phar;
         echo "export PATH=\"$PATH:$HOME/pear/bin\"" >> ~/.bash_profile;
         rm -f go-pear.phar;
-        sudo pear uninstall Console_Table-1.1.4 --alldeps;
       fi
     }
     __GETCOMPOSER;
@@ -75,6 +74,9 @@ function _RUN () {
           fi
           sudo rm -f "/usr/local/bin/drush";
           sudo ln -s "${DRUSHVERDIR}/drush" "/usr/local/bin/drush";
+          cd "${DRUSHVERDIR}";
+          wget http://download.pear.php.net/package/Console_Table-1.1.4.tgz;
+          tar -zxvf Console_Table-1.1.4.tgz;
           if [[ -e "${HOME}/pear/share/pear/Console/Table.php" ]]; then
             sudo cp "${HOME}/pear/share/pear/Console/Table.php" "${DRUSHVERDIR}/includes/table.inc";
           fi
