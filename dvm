@@ -75,10 +75,13 @@ function _RUN () {
           sudo rm -f "/usr/local/bin/drush";
           sudo ln -s "${DRUSHVERDIR}/drush" "/usr/local/bin/drush";
           cd "${DRUSHVERDIR}";
-          wget http://download.pear.php.net/package/Console_Table-1.1.4.tgz;
-          tar -zxvf Console_Table-1.1.4.tgz;
           if [[ -e "${HOME}/pear/share/pear/Console/Table.php" ]]; then
             sudo cp "${HOME}/pear/share/pear/Console/Table.php" "${DRUSHVERDIR}/includes/table.inc";
+          else
+            wget http://download.pear.php.net/package/Console_Table-1.1.4.tgz;
+            tar -zxvf Console_Table-1.1.4.tgz;
+            cp ./Console_Table-1.1.4/Table.php ./includes/table.inc
+            rm -rf ./Console_Table-1.1.4;
           fi
         elif [[ -e "${DRUSHVERDIR}/drush.php" ]]; then
           grep -v "alias drush" ~/.bash_profile >> ~/.bash_profile;
