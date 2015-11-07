@@ -37,6 +37,20 @@ Or you can just run a command using a specific version of drush using:
 
     dvm exec 8.0.0-rc3 --version
 
+## Compatibility
+
+### Drush version Manager
+
+Only OSX and Ubuntu (CLI) systems are supported at this time.
+
+### Drush
+
+So far, Drush versions `3.3.0` and later are successfully working without errors.
+
+For use with Drush v1,2,3,4 & 5, the script will use wget based on an array with all the information and all other versions will use composer to get the live versions available.
+
+I am planning on building in compatibility for prior versions but there is no practical application for that feature.
+
 ## License
 
 nvm is released under the MIT license.
