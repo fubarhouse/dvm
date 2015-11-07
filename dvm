@@ -84,7 +84,7 @@ function _RUN () {
           echo "alias drush='cd ${DRUSHVERDIR}/ && php modules/drush/drush.php'" >> ~/.bash_profile;
         fi
         if [[ -n $(which drush) ]]; then
-          INSTALLED=$(drush --version | cut -d: -f2);
+          INSTALLED=$(drush status | grep "version" | cut -d: -f2);
           INSTALLED=${INSTALLED/  /};
           INSTALLED=${INSTALLED/ /};
           if [[ -n "${INSTALLED}" ]]; then
