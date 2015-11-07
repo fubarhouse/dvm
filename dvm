@@ -23,7 +23,17 @@ function DVM () {
         sudo apt-get install unzip
       fi
     }
+    function __PEAR () {
+      if [[ -z $(which pear) ]]; then
+        curl -O  http://pear.php.net/go-pear.phar;
+        sudo php -d detect_unicode=0 go-pear.phar;
+        echo "export PATH=\"$PATH:$HOME/pear/bin\"" >> ~/.bash_profile;
+        rm -f go-pear.phar;
+        sudo pear uninstall Console_Table-1.1.4 --alldeps;
+      fi
+    }
     __GETCOMPOSER;
+    __PEAR;
   }
 
   function _PRERUN () {
@@ -39,8 +49,8 @@ function _RUN () {
     case "${*}" in
       *"use"*)        _SWITCH; ;;
       *"exec"*)       _EXEC ;;
-      *"current"*)    drush --version | cut -d: -f2; ;;
-      *"status"*)     drush status; ;;
+      *"current"*)    if [[ -n $(which drush) ]]; then drush status | grep "version" | cut -d: -f2; fi ;;
+      *"status"*)     if [[ -n $(which drush) ]]; then drush status; fi ;;
       *"install"*)    _INSTALL; ;;
       *"ls-local"*)   _FETCH_LOCAL; ;;
       *"ls-remote"*)  _FETCH_REMOTE; ;;
@@ -50,27 +60,32 @@ function _RUN () {
 
   function _SWITCH () {
     if [[ -n "${CLEANARG}" ]]; then
-      CLEANARG=${CLEANARG/+/-};
-      DRUSHVERDIR=${DRUSHVERDIR/+/-};
       if [[ -d "${DRUSHVERDIR}" ]]; then
         echo "  Changing to v${CLEANARG}";
         echo "  Password may be required..."
         if [[ -e "${DRUSHVERDIR}/vendor/bin/drush" ]]; then
-          unalias drush;
+          grep -v "alias drush" ~/.bash_profile >> ~/.bash_profile;
           sudo rm -f "/usr/local/bin/drush";
           sudo ln -s "${DRUSHVERDIR}/vendor/bin/drush" "/usr/local/bin/drush";
-        fi
-        if [[ -e "${DRUSHVERDIR}/drush.bat" ]]; then
-          unalias drush;
+        elif [[ -e "${DRUSHVERDIR}/drush" ]]; then
+          grep -v "alias drush" ~/.bash_profile >> ~/.bash_profile;
           sudo rm -f "/usr/local/bin/drush";
-          alias drush="cd ${DRUSHVERDIR} && php drush.php ${*}";
+          sudo ln -s "${DRUSHVERDIR}/drush" "/usr/local/bin/drush";
+          sudo cp "$HOME/pear/share/pear/Console/Table.php" "${DRUSHVERDIR}/includes/table.inc";
+        elif [[ -e "${DRUSHVERDIR}/drush.php" ]]; then
+          grep -v "alias drush" ~/.bash_profile >> ~/.bash_profile;
+          sudo rm -f "/usr/local/bin/drush";
+          echo "alias drush='cd ${DRUSHVERDIR}/ && php modules/drush/drush.php'" >> ~/.bash_profile;
         fi
-        INSTALLED=$(drush --version | cut -d: -f2);
-        INSTALLED=${INSTALLED/  /};
-        INSTALLED=${INSTALLED/ /};
-        if [[ -n "${INSTALLED}" ]]; then
-          echo "  Drush is now using ${INSTALLED}";
-        else
+        if [[ -n $(which drush) ]]; then
+          INSTALLED=$(drush --version | cut -d: -f2);
+          INSTALLED=${INSTALLED/  /};
+          INSTALLED=${INSTALLED/ /};
+          if [[ -n "${INSTALLED}" ]]; then
+            echo "  Drush is now using ${INSTALLED}";
+          fi
+        fi
+        if [[ -z "${INSTALLED}" ]]; then
           echo "  Drush is now using ${CLEANARG}";
         fi
       else
@@ -83,16 +98,22 @@ function _RUN () {
   }
 
   function _EXEC () {
-    CLEANARG=$(echo "${CLEANARG}" | cut -d\  -f1);
+    CLEANARG=$(echo "${CLEANARG}" | cut -d ' ' -f1);
     DRUSHVERDIR="${DRUSHDIR}/versions/drush-${CLEANARG}";
     if [[ -n "${CLEANARG}" ]]; then
-      if [[ -e "${DRUSHVERDIR}/vendor/bin/drush" ]]; then
+      if [[ $(which drush) ]]; then
         COMMAND="${ARGUMENTS[*]}";
         COMMAND=${COMMAND/exec/};
         COMMAND=${COMMAND/${CLEANARG}/};
         COMMAND=${COMMAND/  / };
-        echo "${DRUSHVERDIR}/vendor/bin/drush ${COMMAND}";
-        eval "${DRUSHVERDIR}/vendor/bin/drush ${COMMAND}";
+        cd "${DRUSHVERDIR}";
+        if [[ -e "./vendor/bin/drush" ]]; then
+          EXECUTABLE="vendor/bin/drush";
+        else
+          EXECUTABLE=$(find . -type f | grep -v "drush/" | grep -v "drush." | grep drush);
+          EXECUTABLE=${EXECUTABLE/.\//};
+        fi
+        eval "${DRUSHVERDIR}/${EXECUTABLE} ${COMMAND}";
       else
         echo "  Drush v${CLEANARG} is not installed."
       fi
@@ -136,6 +157,7 @@ function _RUN () {
                               cd "${DRUSHVERDIR}";
                               curl -sS https://getcomposer.org/installer | php;
                               php composer.phar require "drush/drush:${VERSION}";
+                              cd "${DRUSHDIR}/versions" && rm -rf "./${CLEANARG}";
                               ;;
       esac
     }
@@ -195,6 +217,7 @@ function _RUN () {
   }
 
   function _FETCH_REMOTE () {
+    cd "${DRUSHDIR}";
     declare -a AVAILABLEVERSIONS=($(composer show drush/drush | grep versions | tr ", " "\n"));
     declare -a LEGACIES=("1.1.0+drupal5" "1.0.0+drupal5" "1.0.0-rc3+drupal5" "1.0.0-rc2+drupal5" "1.0.0-rc1+drupal5" "1.0.0-beta4+drupal5"
     "1.0.0-beta3+drupal5" "1.0.0-beta2+drupal5" "1.0.0-beta1+drupal5" "2.0.0-alpha1+drupal5" "1.2.0+drupal6" "1.4.0+drupal5" "" "1.1.0+drupal6"
