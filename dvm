@@ -88,11 +88,10 @@ function _RUN () {
           INSTALLED=${INSTALLED/  /};
           INSTALLED=${INSTALLED/ /};
           if [[ -n "${INSTALLED}" ]]; then
-            echo "  Drush is now using ${INSTALLED}";
+            echo "  Drush is now using v${INSTALLED}";
           fi
-        fi
-        if [[ -z "${INSTALLED}" ]]; then
-          echo "  Drush is now using ${CLEANARG}";
+        elif [[ -z "${INSTALLED}" ]]; then
+          echo "  Drush is now using v${CLEANARG}";
         fi
       else
         echo "  Drush v${CLEANARG} is not installed."
