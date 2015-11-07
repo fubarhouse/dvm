@@ -138,12 +138,15 @@ function _RUN () {
             if [[ "${CLEANARG}" == "${X}" ]]; then
               VALIDVERSION=true;
               echo "  Version ${CLEANARG} was found.";
-            else
-              VALIDVERSION=false;
-              echo "  Version ${CLEANARG} was not found.";
             fi
           done
         fi
+      else
+        _NOARG;
+      fi
+      if [[ "${VALIDVERSION}" != true ]]; then
+        VALIDVERSION=false;
+        echo "  Version ${CLEANARG} was not found.";
       fi
     }
     function __INSTALL_ACTION () {
