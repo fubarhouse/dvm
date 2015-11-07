@@ -92,10 +92,7 @@ function _RUN () {
         fi
         if [[ -n $(which drush) ]]; then
           if [[ -n $(drush status | grep "version") ]]; then
-            INSTALLED=$(drush status | grep "version" | cut -d: -f2);
-            INSTALLED=${INSTALLED/  /};
-            INSTALLED=${INSTALLED/ /};
-            echo "  Drush is now using v${INSTALLED}";
+            echo "  Drush is now using v${CLEANARG}";
           elif [[ $(drush status) == *"Could not find a valid Drupal installation"* ]]; then
             INSTALLSTATUS=$(drush status);
             echo "  Drush is now using v${CLEANARG}";
