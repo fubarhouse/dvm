@@ -98,7 +98,9 @@ function _RUN () {
             echo "  Drush is now using v${INSTALLED}";
           elif [[ -n $(drush status) ]]; then
             INSTALLED=$(drush status);
-            echo "  Drush is now using v${CLEANARG}";
+            if [[ -z $(drush status | grep "version") ]]; then
+              echo "  Drush is now using v${CLEANARG}";
+            fi
             echo "  ${INSTALLED}";
           else
             echo "  There was an error in installation.";
