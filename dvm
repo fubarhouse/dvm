@@ -71,7 +71,9 @@ function _RUN () {
           grep -v "alias drush" ~/.bash_profile >> ~/.bash_profile;
           sudo rm -f "/usr/local/bin/drush";
           sudo ln -s "${DRUSHVERDIR}/drush" "/usr/local/bin/drush";
-          sudo cp "$HOME/pear/share/pear/Console/Table.php" "${DRUSHVERDIR}/includes/table.inc";
+          if [[ -e "${HOME}/pear/share/pear/Console/Table.php" ]]; then
+            sudo cp "${HOME}/pear/share/pear/Console/Table.php" "${DRUSHVERDIR}/includes/table.inc";
+          fi
         elif [[ -e "${DRUSHVERDIR}/drush.php" ]]; then
           grep -v "alias drush" ~/.bash_profile >> ~/.bash_profile;
           sudo rm -f "/usr/local/bin/drush";
