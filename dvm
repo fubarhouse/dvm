@@ -70,7 +70,7 @@ function _RUN () {
           sudo ln -s "${DRUSHVERDIR}/vendor/bin/drush" "/usr/local/bin/drush";
         elif [[ -e "${DRUSHVERDIR}/drush" ]]; then
           if [[ -n $(cat "${HOME}/.bash_profile" | grep "alias drush") ]]; then
-            grep -v "alias drush" ~/.bash_profile >> ~/.bash_profile;
+            grep -vwE "alias drush" ~/.bash_profile > ~/.bash_profile;
           fi
           sudo rm -f "/usr/local/bin/drush";
           sudo ln -s "${DRUSHVERDIR}/drush" "/usr/local/bin/drush";
@@ -86,7 +86,7 @@ function _RUN () {
             fi
           fi
         elif [[ -e "${DRUSHVERDIR}/drush.php" ]]; then
-          grep -v "alias drush" ~/.bash_profile >> ~/.bash_profile;
+          grep -vwE "alias drush" ~/.bash_profile > ~/.bash_profile;
           sudo rm -f "/usr/local/bin/drush";
           echo "alias drush='cd ${DRUSHVERDIR}/ && php modules/drush/drush.php'" >> ~/.bash_profile;
         fi
