@@ -75,13 +75,15 @@ function _RUN () {
           sudo rm -f "/usr/local/bin/drush";
           sudo ln -s "${DRUSHVERDIR}/drush" "/usr/local/bin/drush";
           cd "${DRUSHVERDIR}";
-          if [[ -e "${HOME}/pear/share/pear/Console/Table.php" ]]; then
-            sudo cp "${HOME}/pear/share/pear/Console/Table.php" "${DRUSHVERDIR}/includes/table.inc";
-          else
-            wget http://download.pear.php.net/package/Console_Table-1.1.4.tgz;
-            tar -zxvf Console_Table-1.1.4.tgz;
-            cp ./Console_Table-1.1.4/Table.php ./includes/table.inc
-            rm -rf ./Console_Table-1.1.4;
+          if [[ ! -e "./includes/table.inc" ]]; then
+            if [[ -e "${HOME}/pear/share/pear/Console/Table.php" ]]; then
+              sudo cp "${HOME}/pear/share/pear/Console/Table.php" "${DRUSHVERDIR}/includes/table.inc";
+            else
+              wget http://download.pear.php.net/package/Console_Table-1.1.4.tgz;
+              tar -zxvf Console_Table-1.1.4.tgz;
+              cp ./Console_Table-1.1.4/Table.php ./includes/table.inc;
+              rm -rf ./Console_Table-1.1.4;
+            fi
           fi
         elif [[ -e "${DRUSHVERDIR}/drush.php" ]]; then
           grep -v "alias drush" ~/.bash_profile >> ~/.bash_profile;
@@ -89,14 +91,17 @@ function _RUN () {
           echo "alias drush='cd ${DRUSHVERDIR}/ && php modules/drush/drush.php'" >> ~/.bash_profile;
         fi
         if [[ -n $(which drush) ]]; then
-          INSTALLED=$(drush status | grep "version" | cut -d: -f2);
-          INSTALLED=${INSTALLED/  /};
-          INSTALLED=${INSTALLED/ /};
-          if [[ -n "${INSTALLED}" ]]; then
+          if [[ -n $(drush status | grep "version") ]]; then
+            INSTALLED=$(drush status | grep "version" | cut -d: -f2);
+            INSTALLED=${INSTALLED/  /};
+            INSTALLED=${INSTALLED/ /};
             echo "  Drush is now using v${INSTALLED}";
+          elif [[ -n $(drush status) ]]; then
+            INSTALLED=$(drush status);
+            echo "  Drush is now using v${INSTALLED}";
+          else
+            echo "  There was an error in installation.";
           fi
-        elif [[ -z "${INSTALLED}" ]]; then
-          echo "  Drush is now using v${CLEANARG}";
         fi
       else
         echo "  Drush v${CLEANARG} is not installed."
