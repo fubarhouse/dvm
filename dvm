@@ -101,6 +101,7 @@ function _RUN () {
               echo "  ${INSTALLSTATUS}";
             else
             echo "  Drush is now using v${INSTALLED}";
+          fi
           else
             echo "  There was an error in installation.";
           fi
