@@ -222,6 +222,10 @@ function _RUN () {
   }
 
   function _FETCH_LOCAL () {
+    declare -a VERSIONSINSTALLED=();
+    for ITEM in $(find "${DRUSHDIR}/versions" -maxdepth 1 -type d | cut -d/ -f6 | grep "drush-" | grep -v "master"); do
+      VERSIONSINSTALLED+=("${ITEM}");
+    done
     INSTALLED=$(drush --version | cut -d: -f2);
     INSTALLED=${INSTALLED/  /};
     INSTALLED=${INSTALLED/ /};
