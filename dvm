@@ -50,15 +50,29 @@ function _RUN () {
 
   function _SWITCH () {
     if [[ -n "${CLEANARG}" ]]; then
-      if [[ -e "${DRUSHVERDIR}/vendor/bin/drush" ]]; then
+      CLEANARG=${CLEANARG/+/-};
+      DRUSHVERDIR=${DRUSHVERDIR/+/-};
+      if [[ -d "${DRUSHVERDIR}" ]]; then
         echo "  Changing to v${CLEANARG}";
         echo "  Password may be required..."
-        sudo rm -f "/usr/local/bin/drush";
-        sudo ln -s "${DRUSHVERDIR}/vendor/bin/drush" "/usr/local/bin/drush";
+        if [[ -e "${DRUSHVERDIR}/vendor/bin/drush" ]]; then
+          unalias drush;
+          sudo rm -f "/usr/local/bin/drush";
+          sudo ln -s "${DRUSHVERDIR}/vendor/bin/drush" "/usr/local/bin/drush";
+        fi
+        if [[ -e "${DRUSHVERDIR}/drush.bat" ]]; then
+          unalias drush;
+          sudo rm -f "/usr/local/bin/drush";
+          alias drush="cd ${DRUSHVERDIR} && php drush.php ${*}";
+        fi
         INSTALLED=$(drush --version | cut -d: -f2);
         INSTALLED=${INSTALLED/  /};
         INSTALLED=${INSTALLED/ /};
-        echo "  Drush is now using ${INSTALLED}";
+        if [[ -n "${INSTALLED}" ]]; then
+          echo "  Drush is now using ${INSTALLED}";
+        else
+          echo "  Drush is now using ${CLEANARG}";
+        fi
       else
         echo "  Drush v${CLEANARG} is not installed."
       fi
@@ -96,30 +110,34 @@ function _RUN () {
           VALIDVERSION=true;
           echo "  Version ${CLEANARG} was found.";
         else
-          VALIDVERSION=false;
-          echo "  Version ${CLEANARG} was not found.";
+          if [[ "${CLEANARG}" == *"${LEGACIES[@]}"* ]]; then
+            VALIDVERSION=true;
+            echo "  Version ${CLEANARG} was found.";
+          else
+            VALIDVERSION=false;
+            echo "  Version ${CLEANARG} was not found.";
+          fi
         fi
       fi
     }
     function __INSTALL_ACTION () {
-      echo "||||||";
-      if [[ "${BASEVERSION}" == "5" ]]; then
-        mkdir -p "${DRUSHDIR}/versions/${X}";
-        cd "${DRUSHDIR}/versions/";
-        wget "https://github.com/drush-ops/drush/archive/${CLEANARG}.zip"
-        unzip "${CLEANARG}.zip"
-        rm -f "${CLEANARG}.zip";
-        sudo mv -f "./drush-${CLEANARG}" ./drush5
-        if [[ -d "${CLEANARG}" ]]; then
-          rm -rf "${CLEANARG}";
-        fi
-      fi
-      if [[ "${BASEVERSION}" == "6" ]] || [[ "${BASEVERSION}" == "7" ]] || [[ "${BASEVERSION}" == "8" ]]; then
-        mkdir -p "${DRUSHVERDIR}";
-        cd "${DRUSHVERDIR}";
-        curl -sS https://getcomposer.org/installer | php;
-        php composer.phar require "drush/drush:${VERSION}";
-      fi
+      case "${BASEVERSION}" in
+        "1"|"2"|"3"|"4"|"5")  if [[ "${CLEANARG}" == *"${LEGACIES[@]}"* ]]; then
+                                mkdir -p "${DRUSHDIR}/versions/${CLEANARG}";
+                                cd "${DRUSHDIR}/versions/";
+                                wget "https://github.com/drush-ops/drush/archive/${CLEANARG}.zip";
+                                unzip "${CLEANARG}.zip"
+                                rm -f "${CLEANARG}.zip";
+                              else
+                                echo "  Drush v${CLEANARG} does not exist.";
+                              fi
+                              ;;
+        "6"|"7"|"8")          mkdir -p "${DRUSHVERDIR}";
+                              cd "${DRUSHVERDIR}";
+                              curl -sS https://getcomposer.org/installer | php;
+                              php composer.phar require "drush/drush:${VERSION}";
+                              ;;
+      esac
     }
     function __INSTALL () {
       if [[ -n "${CLEANARG}" ]]; then
@@ -127,7 +145,9 @@ function _RUN () {
           echo "Drush v${CLEANARG} has already been installed.";
         else
           __GETVERSIONS;
-          __INSTALL_ACTION;
+          if [[ "${VALIDVERSION}" == true ]]; then
+            __INSTALL_ACTION;
+          fi
         fi
       else
         _NOARG;
@@ -137,7 +157,9 @@ function _RUN () {
       if [[ -n "${CLEANARG}" ]]; then
         if [[ ! -d "${DRUSHVERDIR}" ]]; then
           __GETVERSIONS;
-          __INSTALL_ACTION;
+          if [[ "${VALIDVERSION}" == true ]]; then
+            __INSTALL_ACTION;
+          fi
         else
           echo "Drush v${CLEANARG} has already been installed.";
           exit 0;
@@ -173,27 +195,29 @@ function _RUN () {
   }
 
   function _FETCH_REMOTE () {
-    function _GETVERSIONS () {
-      echo "  Checking version number...";
-      if [[ -n "${CLEANARG}" ]]; then
-        if [[ -n $(cd "${DRUSHDIR}" && composer show drush/drush | grep versions | grep "${CLEANARG}") ]]; then
-          VALIDVERSION=true;
-          echo "  Version ${CLEANARG} was found.";
-        else
-          VALIDVERSION=false;
-          echo "  Version ${CLEANARG} was not found.";
-        fi
-      fi
-    }
-    _GETVERSIONS;
     declare -a AVAILABLEVERSIONS=($(composer show drush/drush | grep versions | tr ", " "\n"));
+    declare -a LEGACIES=("1.1.0+drupal5" "1.0.0+drupal5" "1.0.0-rc3+drupal5" "1.0.0-rc2+drupal5" "1.0.0-rc1+drupal5" "1.0.0-beta4+drupal5"
+    "1.0.0-beta3+drupal5" "1.0.0-beta2+drupal5" "1.0.0-beta1+drupal5" "2.0.0-alpha1+drupal5" "1.2.0+drupal6" "1.4.0+drupal5" "" "1.1.0+drupal6"
+    "1.0.0+drupal6" "1.0.0-rc2+drupal6" "1.3.0+drupal5" "1.2.0+drupal5" "1.0.0-rc1+drupal6" "1.0.0-rc11+drupal6" "3.0.0-beta1" "3.0.0-alpha1"
+    "2.1.0" "2.0.0" "2.0.0-rc1" "2.0.0-alpha2+drupal7" "2.0.0-alpha2+drupal5" "2.0.0-alpha2+drupal6" "2.0.0-alpha1+drupal6" "2.0.0-alpha1+drupal7"
+    "1.0.0-rc2+drupal7" "4.0.0-rc1" "3.3.0" "3.2.0" "3.1.0" "3.0.0" "3.0.0-rc43.0.0-rc3" "3.0.0-rc2" "3.0.0-rc1" "4.1.0" "4.0.0" "4.0.0-rc10"
+    "4.0.0-rc9" "4.0.0-rc8" "4.0.0-rc7" "4.0.0-rc6" "4.0.0-rc5" "4.0.0-rc4" "4.0.0-rc3" "debian/4.5-2" "4.5.0" "4.5.0-rc1" "debian/4.4-2"
+    "debian/5.0dev-1" "debian/4.4-1" "4.4.0" "debian/4.3-1" "4.3.0" "4.2.0" "4.6.0" "5.3.0" "5.2.0" "5.1.0" "5.0.0" "5.0.0-rc5" "5.0.0-rc4"
+    "5.0.0-rc3" "5.0.0-rc2" "5.0.0-rc1" "5.9.0" "5.8.0" "5.7.0" "5.6.0" "5.5.0" "5.4.0");
     if [[ -z "${CLEANARG}" ]]; then
+      for X in "${LEGACIES[@]}"; do          echo "      ${X}" | grep "1."; done
+      for X in "${LEGACIES[@]}"; do          echo "      ${X}" | grep "2."; done
+      for X in "${LEGACIES[@]}"; do          echo "      ${X}" | grep "3."; done
+      for X in "${LEGACIES[@]}"; do          echo "      ${X}" | grep "4."; done
+      for X in "${LEGACIES[@]}"; do          echo "      ${X}" | grep "5."; done
       for X in "${AVAILABLEVERSIONS[@]}"; do echo "      ${X}" | grep "6."; done
       for X in "${AVAILABLEVERSIONS[@]}"; do echo "      ${X}" | grep "7."; done
       for X in "${AVAILABLEVERSIONS[@]}"; do echo "      ${X}" | grep "8."; done
     else
+      for X in "${LEGACIES[@]}"; do          echo "      ${X}" | grep "${CLEANARG}"; done
       for X in "${AVAILABLEVERSIONS[@]}"; do echo "      ${X}" | grep "${CLEANARG}"; done
     fi
+    echo "${LEGACIES[@]}" | sort | uniq > out.data;
     exit 0;
   }
 
@@ -271,6 +295,10 @@ function SETVARS () {
   CLEANARG=${CLEANARG/ /};
 
   case "${CLEANARG}" in
+    1*)  VERSION="${CLEANARG}"; ;;
+    2*)  VERSION="${CLEANARG}"; ;;
+    3*)  VERSION="${CLEANARG}"; ;;
+    4*)  VERSION="${CLEANARG}"; ;;
     5*)  VERSION="${CLEANARG}"; ;;
     6*)  VERSION="${CLEANARG}"; ;;
     7*)  VERSION="${CLEANARG}"; ;;
@@ -280,6 +308,15 @@ function SETVARS () {
   DRUSHDIR="${HOME}/drush";
   BASEVERSION=${VERSION::1};
   DRUSHVERDIR="${DRUSHDIR}/versions/drush-${VERSION}";
+
+  declare -a LEGACIES=("1.1.0+drupal5" "1.0.0+drupal5" "1.0.0-rc3+drupal5" "1.0.0-rc2+drupal5" "1.0.0-rc1+drupal5" "1.0.0-beta4+drupal5"
+  "1.0.0-beta3+drupal5" "1.0.0-beta2+drupal5" "1.0.0-beta1+drupal5" "2.0.0-alpha1+drupal5" "1.2.0+drupal6" "1.4.0+drupal5" "" "1.1.0+drupal6"
+  "1.0.0+drupal6" "1.0.0-rc2+drupal6" "1.3.0+drupal5" "1.2.0+drupal5" "1.0.0-rc1+drupal6" "1.0.0-rc11+drupal6" "3.0.0-beta1" "3.0.0-alpha1"
+  "2.1.0" "2.0.0" "2.0.0-rc1" "2.0.0-alpha2+drupal7" "2.0.0-alpha2+drupal5" "2.0.0-alpha2+drupal6" "2.0.0-alpha1+drupal6" "2.0.0-alpha1+drupal7"
+  "1.0.0-rc2+drupal7" "4.0.0-rc1" "3.3.0" "3.2.0" "3.1.0" "3.0.0" "3.0.0-rc43.0.0-rc3" "3.0.0-rc2" "3.0.0-rc1" "4.1.0" "4.0.0" "4.0.0-rc10"
+  "4.0.0-rc9" "4.0.0-rc8" "4.0.0-rc7" "4.0.0-rc6" "4.0.0-rc5" "4.0.0-rc4" "4.0.0-rc3" "debian/4.5-2" "4.5.0" "4.5.0-rc1" "debian/4.4-2"
+  "debian/5.0dev-1" "debian/4.4-1" "4.4.0" "debian/4.3-1" "4.3.0" "4.2.0" "4.6.0" "5.3.0" "5.2.0" "5.1.0" "5.0.0" "5.0.0-rc5" "5.0.0-rc4"
+  "5.0.0-rc3" "5.0.0-rc2" "5.0.0-rc1" "5.9.0" "5.8.0" "5.7.0" "5.6.0" "5.5.0" "5.4.0");
 
   declare -a VERSIONSINSTALLED=();
   for ITEM in $(find "${DRUSHDIR}/versions" -maxdepth 1 -type d | cut -d/ -f6 | grep "drush-" | grep -v "master"); do
