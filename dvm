@@ -134,13 +134,15 @@ function _RUN () {
           VALIDVERSION=true;
           echo "  Version ${CLEANARG} was found.";
         else
-          if [[ "${CLEANARG}" == *"${LEGACIES[@]}"* ]]; then
-            VALIDVERSION=true;
-            echo "  Version ${CLEANARG} was found.";
-          else
-            VALIDVERSION=false;
-            echo "  Version ${CLEANARG} was not found.";
-          fi
+          for X in "${LEGACIES[@]}"; do
+            if [[ "${CLEANARG}" == "${X}" ]]; then
+              VALIDVERSION=true;
+              echo "  Version ${CLEANARG} was found.";
+            else
+              VALIDVERSION=false;
+              echo "  Version ${CLEANARG} was not found.";
+            fi
+          done
         fi
       fi
     }
