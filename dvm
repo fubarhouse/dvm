@@ -163,39 +163,43 @@ function _RUN () {
     }
     function __DOWNLOAD () {
       __PREP;
-      if [[ "${ARGUMENTS}" == *"reinstall"* ]]; then
-        if [[ -d "${HOME}/.drush/${PACKAGESEARCH}" ]]; then
-          echo "  Uninstalling ${PACKAGESEARCH}...";
-          rm -rf "${HOME}/.drush/${PACKAGESEARCH}"; fi
-          echo "  Done!";
-          if [[ $(which drush) ]]; then
-          echo "  Installing ${PACKAGESEARCH}";
-          cd "${HOME}/.drush" && drush dl "${PACKAGESEARCH}";
-          echo "  Done!";
-        else
-          echo "  Drush was not found."
-        fi
-      elif [[ "${ARGUMENTS}" == *"uninstall"* ]]; then
-        if [[ ! -d "${HOME}/.drush/${PACKAGESEARCH}" ]]; then
-          echo "  ${PACKAGESEARCH} could not be found on this system.";
-        else
-          echo "  Uninstalling ${PACKAGESEARCH}...";
-          rm -rf "${HOME}/.drush/${PACKAGESEARCH}";
-          echo "  Done!";
-        fi
-      elif [[ ! "${ARGUMENTS}" == *"uninstall"* ]] && [[ ! "${ARGUMENTS}" == *"reinstall"* ]]; then
-        if [[ -d "${HOME}/.drush/${PACKAGESEARCH}" ]]; then
-          echo "  ${PACKAGESEARCH} was found on this system and cannot install.";
-        else
-          if [[ $(which drush) ]]; then
-            echo "  Installing ${PACKAGESEARCH}";
-            cd "${HOME}/.drush" && drush dl "${PACKAGESEARCH}";
+      if [[ -n "${PACKAGESEARCH}" ]]; then
+        if [[ "${ARGUMENTS}" == *"reinstall"* ]]; then
+          if [[ -d "${HOME}/.drush/${PACKAGESEARCH}" ]]; then
+            echo "  Uninstalling ${PACKAGESEARCH}...";
+            rm -rf "${HOME}/.drush/${PACKAGESEARCH}"; fi
             echo "  Done!";
+            if [[ $(which drush) ]]; then
+              echo "  Installing ${PACKAGESEARCH}";
+              cd "${HOME}/.drush" && drush dl "${PACKAGESEARCH}";
+              echo "  Done!";
+            else
+              echo "  Drush was not found."
+            fi
+        elif [[ "${ARGUMENTS}" == *"uninstall"* ]]; then
+          if [[ ! -d "${HOME}/.drush/${PACKAGESEARCH}" ]]; then
+            echo "  ${PACKAGESEARCH} could not be found on this system.";
           else
-            echo "  Drush was not found."
+            echo "  Uninstalling ${PACKAGESEARCH}...";
+            rm -rf "${HOME}/.drush/${PACKAGESEARCH}";
+            echo "  Done!";
+          fi
+        elif [[ ! "${ARGUMENTS}" == *"uninstall"* ]] && [[ ! "${ARGUMENTS}" == *"reinstall"* ]]; then
+          if [[ -d "${HOME}/.drush/${PACKAGESEARCH}" ]]; then
+            echo "  ${PACKAGESEARCH} was found on this system and cannot install.";
+          else
+            if [[ $(which drush) ]]; then
+              echo "  Installing ${PACKAGESEARCH}";
+              cd "${HOME}/.drush" && drush dl "${PACKAGESEARCH}";
+              echo "  Done!";
+            else
+              echo "  Drush was not found."
+            fi
           fi
         fi
-      fi
+        else
+          echo "  Missing argument <name>";
+        fi
     }
     if [[ "${ARGUMENTS}" == *"show"* ]]; then __SHOW; fi
     if [[ "${ARGUMENTS}" == *"install"* ]]; then __DOWNLOAD; fi
