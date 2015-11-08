@@ -1,9 +1,13 @@
 # Drush Version Manager
 
+DVM was inspired from NVM, RVM and PyEnv in that where so many versions of Drush and there's no convenient way to simply switch version in the way NVM, RVM and PyEnv have endeavored to achieve. With DVM joining the pack, the release of Drupal 8 and the popularity of a server configuration management tool Ansible I've essentially made this happen where there's no alternative program publicly available.
+
+It's usage was intended for myself, but with a tool this convenient and cool there was no way I could keep it to myself.
+
 ## Installation
 
-This script uses UNIX commands and such requires a UNIX-based system.
-It was made and tested on a OSX El Capitan system for a Debian environment for use with Vagrant
+This script uses UNIX commands via Bash for ultimate compatibility and such requires a UNIX-based system.
+It was made, tested and used on a OSX El Capitan system for intended use on a Debian environment for use with Vagrant.
 
 ### Ansible role
 
