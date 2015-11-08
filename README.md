@@ -11,11 +11,25 @@ It was made and tested on a OSX El Capitan system for a Debian environment for u
 
   This role can be found on the Galaxy at https://galaxy.ansible.com/detail#/role/5868
 
+  This role was produced to work along-side [Jeff Geerling](https://twitter.com/geerlingguy)s' [DrupalVM](http://www.drupalvm.com/) and it works well for that purpose.
+
 ### Install script
 
 To install or update dvm, you can use Wget:
 
     `wget -O /usr/local/bin/dvm https://raw.githubusercontent.com/fubarhouse/dvm/master/dvm`
+
+And then you can ensure all the dependencies (composer, unzip etc) are installed using:
+
+    `dvm initialize`
+
+Dependencies include a default Drush installation (installed at ~/drush/) using composer, but it won't take long.
+
+Dependencies not installed via the initialization argument (currently) include:
+
+* pear
+* wget
+* unzip
 
 ### Manual install
 
@@ -23,19 +37,41 @@ For manual install create a folder somewhere in your filesystem with the `dvm` f
 
 Once you have this file, move it somewhere available to the `$PATH` variable.
 
+Run `dvm initialize` to get started.
+
 ## Usage
 
-To download, install, and set the default version to v7.0.0 release of node, do this:
+To get a list of available versions:
 
+    ````
+    dvm ls-remote
+    ````
+
+Or to search for a version, type an argument to ls-remote to do a basic query string on the same set of commands:
+
+    ````
+    dvm ls-remove 8.0.0
+    ````
+
+To download and install version v7.0.0 and v8.0.0-rc3, do this:
+
+    ````
     dvm install 7.0.0
+    dvm install 8.0.0-rc3
+    ````
 
 You can switch between installed versions:
 
+    ````
+    dvm use 7.0.0
     dvm use 8.0.0-rc3
+    ````
 
-Or you can just run a command using a specific version of drush using:
+Or you can just run a command using a specific version of Drush using:
 
-    dvm exec 8.0.0-rc3 --version
+    ````
+    dvm exec 7.0.0 --version
+    ````
 
 ## Compatibility
 
@@ -46,6 +82,8 @@ Only OSX and Ubuntu (CLI) systems are supported at this time.
 ### Drush
 
 So far, Drush versions `2.0.0` and later are successfully working without errors.
+
+There's a desire to make Drush v1 work, but there's no practical reasoning to it - so this may come later.
 
 For use with Drush v1,2,3,4 & 5, the script will use wget based on an array with all the information and all other versions will use composer to get the live versions available.
 
