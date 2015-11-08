@@ -48,6 +48,7 @@ function _RUN () {
     case "${*}" in
       *"use"*)        _SWITCH; ;;
       *"exec"*)       _EXEC ;;
+      *"show"*)       _GETPKG; ;;
       *"current"*)    if [[ -n $(which drush) ]]; then drush status | grep "version" | cut -d: -f2; fi ;;
       *"status"*)     if [[ -n $(which drush) ]]; then drush status; fi ;;
       *"install"*)    _INSTALL; ;;
@@ -126,14 +127,57 @@ function _RUN () {
     exit 0;
   }
 
+  function _GETPKG () {
+    function __SHOW {
+      PACKAGESEARCH=${ARGUMENTS};
+      PACKAGESEARCH=${PACKAGESEARCH/show/};
+      PACKAGESEARCH=${PACKAGESEARCH/  / };
+      PACKAGESEARCH=${PACKAGESEARCH/ /};
+      if [[ -n ${PACKAGESEARCH} ]]; then
+        declare -a PACKAGES=($(find "${HOME}/.drush" -maxdepth 1 -type d | grep -v cache | cut -d/ -f5 | grep "${PACKAGESEARCH}"))
+      else
+        declare -a PACKAGES=($(find "${HOME}/.drush" -maxdepth 1 -type d | grep -v cache | cut -d/ -f5));
+      fi
+      if [[ -n "${PACKAGES[@]}" ]]; then
+        echo "  The following drush packages are installed:";
+        for X in "${PACKAGES[@]}"; do
+          if [[ -n "${X}" ]]; then
+            echo "    ${X}";
+          fi
+        done
+      else
+        if [[ -n "${PACKAGESEARCH}" ]]; then
+          echo "  Package search has returned no results.";
+        else
+          echo "  No drush packages are installed.";
+        fi
+      fi
+      exit 0;
+    }
+    __SHOW;
+  }
+
   function _INSTALL () {
     function __GETVERSIONS () {
       echo "  Checking version number...";
       if [[ -n "${CLEANARG}" ]]; then
-        if [[ -n $(cd "${DRUSHDIR}" && composer show drush/drush | grep versions | grep "${CLEANARG}") ]]; then
-          VALIDVERSION=true;
-          echo "  Version ${CLEANARG} was found.";
-        else
+        if [[ "${BASEVERSION}" == "6" ]] || [[ "${BASEVERSION}" == "7" ]] || [[ "${BASEVERSION}" == "8" ]]; then
+          declare -a AVAILABLEVERSIONS=($(composer show drush/drush | grep versions | tr ", " "\n"));
+          for X in "${AVAILABLEVERSIONS[@]}"; do
+            if [[ "${CLEANARG}" == "${X}" ]]; then
+              VALIDVERSION=true;
+              echo "  Version ${CLEANARG} was found.";
+            fi
+          done
+        elif [[ "${BASEVERSION}" == "1" ]] || [[ "${BASEVERSION}" == "2" ]] || [[ "${BASEVERSION}" == "3" ]] || [[ "${BASEVERSION}" == "4" ]] || [[ "${BASEVERSION}" == "5" ]]; then
+          declare -a LEGACIES=("1.1.0+drupal5" "1.0.0+drupal5" "1.0.0-rc3+drupal5" "1.0.0-rc2+drupal5" "1.0.0-rc1+drupal5" "1.0.0-beta4+drupal5"
+          "1.0.0-beta3+drupal5" "1.0.0-beta2+drupal5" "1.0.0-beta1+drupal5" "2.0.0-alpha1+drupal5" "1.2.0+drupal6" "1.4.0+drupal5" "" "1.1.0+drupal6"
+          "1.0.0+drupal6" "1.0.0-rc2+drupal6" "1.3.0+drupal5" "1.2.0+drupal5" "1.0.0-rc1+drupal6" "1.0.0-rc11+drupal6" "3.0.0-beta1" "3.0.0-alpha1"
+          "2.1.0" "2.0.0" "2.0.0-rc1" "2.0.0-alpha2+drupal7" "2.0.0-alpha2+drupal5" "2.0.0-alpha2+drupal6" "2.0.0-alpha1+drupal6" "2.0.0-alpha1+drupal7"
+          "1.0.0-rc2+drupal7" "4.0.0-rc1" "3.3.0" "3.2.0" "3.1.0" "3.0.0" "3.0.0-rc43.0.0-rc3" "3.0.0-rc2" "3.0.0-rc1" "4.1.0" "4.0.0" "4.0.0-rc10"
+          "4.0.0-rc9" "4.0.0-rc8" "4.0.0-rc7" "4.0.0-rc6" "4.0.0-rc5" "4.0.0-rc4" "4.0.0-rc3" "debian/4.5-2" "4.5.0" "4.5.0-rc1" "debian/4.4-2"
+          "debian/5.0dev-1" "debian/4.4-1" "4.4.0" "debian/4.3-1" "4.3.0" "4.2.0" "4.6.0" "5.3.0" "5.2.0" "5.1.0" "5.0.0" "5.0.0-rc5" "5.0.0-rc4"
+          "5.0.0-rc3" "5.0.0-rc2" "5.0.0-rc1" "5.9.0" "5.8.0" "5.7.0" "5.6.0" "5.5.0" "5.4.0");
           for X in "${LEGACIES[@]}"; do
             if [[ "${CLEANARG}" == "${X}" ]]; then
               VALIDVERSION=true;
@@ -185,13 +229,11 @@ function _RUN () {
     }
     function __REINSTALL () {
       if [[ -n "${CLEANARG}" ]]; then
-        if [[ ! -d "${DRUSHVERDIR}" ]]; then
-          __GETVERSIONS;
-          if [[ "${VALIDVERSION}" == true ]]; then
-            __INSTALL_ACTION;
-          fi
+        if [[ -d "${DRUSHVERDIR}" ]]; then
+          VALIDVERSION=true;
+          __INSTALL_ACTION;
         else
-          echo "Drush v${CLEANARG} has already been installed.";
+          echo "Drush v${CLEANARG} has't previously been installed.";
           exit 0;
         fi
       else
@@ -226,7 +268,7 @@ function _RUN () {
 
   function _FETCH_REMOTE () {
     cd "${DRUSHDIR}";
-    declare -a AVAILABLEVERSIONS=($(composer show drush/drush | grep versions | tr ", " "\n"));
+    declare -a AVAILABLEVERSIONS=($(cd "${DRUSHDIR}" && composer show drush/drush | grep versions | tr ", " "\n"));
     declare -a LEGACIES=("1.1.0+drupal5" "1.0.0+drupal5" "1.0.0-rc3+drupal5" "1.0.0-rc2+drupal5" "1.0.0-rc1+drupal5" "1.0.0-beta4+drupal5"
     "1.0.0-beta3+drupal5" "1.0.0-beta2+drupal5" "1.0.0-beta1+drupal5" "2.0.0-alpha1+drupal5" "1.2.0+drupal6" "1.4.0+drupal5" "" "1.1.0+drupal6"
     "1.0.0+drupal6" "1.0.0-rc2+drupal6" "1.3.0+drupal5" "1.2.0+drupal5" "1.0.0-rc1+drupal6" "1.0.0-rc11+drupal6" "3.0.0-beta1" "3.0.0-alpha1"
@@ -236,19 +278,20 @@ function _RUN () {
     "debian/5.0dev-1" "debian/4.4-1" "4.4.0" "debian/4.3-1" "4.3.0" "4.2.0" "4.6.0" "5.3.0" "5.2.0" "5.1.0" "5.0.0" "5.0.0-rc5" "5.0.0-rc4"
     "5.0.0-rc3" "5.0.0-rc2" "5.0.0-rc1" "5.9.0" "5.8.0" "5.7.0" "5.6.0" "5.5.0" "5.4.0");
     if [[ -z "${CLEANARG}" ]]; then
-      for X in "${LEGACIES[@]}"; do          echo "      ${X}" | grep "1."; done
-      for X in "${LEGACIES[@]}"; do          echo "      ${X}" | grep "2."; done
-      for X in "${LEGACIES[@]}"; do          echo "      ${X}" | grep "3."; done
-      for X in "${LEGACIES[@]}"; do          echo "      ${X}" | grep "4."; done
-      for X in "${LEGACIES[@]}"; do          echo "      ${X}" | grep "5."; done
-      for X in "${AVAILABLEVERSIONS[@]}"; do echo "      ${X}" | grep "6."; done
-      for X in "${AVAILABLEVERSIONS[@]}"; do echo "      ${X}" | grep "7."; done
-      for X in "${AVAILABLEVERSIONS[@]}"; do echo "      ${X}" | grep "8."; done
+      if [[ "${BASEVERSION}" == "1" ]] || [[ "${BASEVERSION}" == "2" ]] || [[ "${BASEVERSION}" == "3" ]] || [[ "${BASEVERSION}" == "4" ]] || [[ "${BASEVERSION}" == "5" ]]; then
+        for X in "${LEGACIES[@]}"; do          echo "      ${X}" | grep "${BASEVERSION}"; done
+      fi
+      if [[ "${BASEVERSION}" == "6" ]] || [[ "${BASEVERSION}" == "7" ]] || [[ "${BASEVERSION}" == "8" ]]; then
+        for X in "${LEGACIES[@]}"; do          echo "      ${X}" | grep "${BASEVERSION}."; done
+      fi
     else
-      for X in "${LEGACIES[@]}"; do          echo "      ${X}" | grep "${CLEANARG}"; done
-      for X in "${AVAILABLEVERSIONS[@]}"; do echo "      ${X}" | grep "${CLEANARG}"; done
+      if [[ "${BASEVERSION}" == "1" ]] || [[ "${BASEVERSION}" == "2" ]] || [[ "${BASEVERSION}" == "3" ]] || [[ "${BASEVERSION}" == "4" ]] || [[ "${BASEVERSION}" == "5" ]]; then
+        for X in "${LEGACIES[@]}"; do          echo "      ${X}" | grep "${CLEANARG}"; done
+      fi
+      if [[ "${BASEVERSION}" == "6" ]] || [[ "${BASEVERSION}" == "7" ]] || [[ "${BASEVERSION}" == "8" ]]; then
+        for X in "${AVAILABLEVERSIONS[@]}"; do echo "      ${X}" | grep "${CLEANARG}"; done
+      fi
     fi
-    echo "${LEGACIES[@]}" | sort | uniq > out.data;
     exit 0;
   }
 
@@ -289,6 +332,8 @@ function _RUN () {
     echo "   dvm exec <version> <command>              Change the drush symlink to use another version.";
     echo "   dvm current                               Display currently activated version.";
     echo "   dvm status                                Display current status.";
+    echo "   dvm show                                  List installed extensions.";
+    echo "   dvm show <version>                        List installed extensions matching a search criteria";
     echo "   dvm ls-local                              List installed versions.";
     echo "   dvm ls-local <version>                    List installed versions matching a search criteria";
     echo "   dvm ls-remote                             List remote versions available for install";
@@ -324,6 +369,7 @@ function SETVARS () {
   CLEANARG=${CLEANARG/update/};
   CLEANARG=${CLEANARG/use/};
   CLEANARG=${CLEANARG/exec/};
+  CLEANARG=${CLEANARG/show/};
   CLEANARG=${CLEANARG/ls-local/};
   CLEANARG=${CLEANARG/ls-remote/};
   CLEANARG=${CLEANARG/  /};
