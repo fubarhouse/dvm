@@ -390,6 +390,7 @@ function _RUN () {
     echo "   dvm ls-local <version>                    List installed versions matching a search criteria";
     echo "   dvm ls-remote                             List remote versions available for install";
     echo "   dvm ls-remote <version>                   List remote versions matching a search criteria";
+    echo "   dvm initialize                            Install any required dependencies";
     echo " ";
     echo " Example:";
     echo "   dvm install 7.0.0                         Install a specific version number";
