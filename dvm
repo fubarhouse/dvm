@@ -45,10 +45,10 @@ function DVM () {
 
 function _RUN () {
 
-    case "${*}" in
+    case "${ARGUMENTS}" in
       *"use"*)        _SWITCH; ;;
       *"exec"*)       _EXEC ;;
-      *"show"*)       _GETPKG; ;;
+      *"pkg"*)        _GETPKG; ;;
       *"current"*)    if [[ -n $(which drush) ]]; then drush status | grep "version" | cut -d: -f2; fi ;;
       *"status"*)     if [[ -n $(which drush) ]]; then drush status; fi ;;
       *"install"*)    _INSTALL; ;;
@@ -128,11 +128,19 @@ function _RUN () {
   }
 
   function _GETPKG () {
-    function __SHOW {
+    function __PREP () {
       PACKAGESEARCH=${ARGUMENTS};
+      PACKAGESEARCH=${PACKAGESEARCH/pkg/};
       PACKAGESEARCH=${PACKAGESEARCH/show/};
+      PACKAGESEARCH=${PACKAGESEARCH/download/};
+      PACKAGESEARCH=${PACKAGESEARCH/reinstall/};
+      PACKAGESEARCH=${PACKAGESEARCH/uninstall/};
       PACKAGESEARCH=${PACKAGESEARCH/  / };
       PACKAGESEARCH=${PACKAGESEARCH/ /};
+      PACKAGESEARCH=${PACKAGESEARCH/install/};
+    }
+    function __SHOW {
+      __PREP;
       if [[ -n ${PACKAGESEARCH} ]]; then
         declare -a PACKAGES=($(find "${HOME}/.drush" -maxdepth 1 -type d | grep -v cache | cut -d/ -f5 | grep "${PACKAGESEARCH}"))
       else
@@ -152,9 +160,46 @@ function _RUN () {
           echo "  No drush packages are installed.";
         fi
       fi
-      exit 0;
     }
-    __SHOW;
+    function __DOWNLOAD () {
+      __PREP;
+      if [[ "${ARGUMENTS}" == *"reinstall"* ]]; then
+        if [[ -d "${HOME}/.drush/${PACKAGESEARCH}" ]]; then
+          echo "  Uninstalling ${PACKAGESEARCH}...";
+          rm -rf "${HOME}/.drush/${PACKAGESEARCH}"; fi
+          echo "  Done!";
+          if [[ $(which drush) ]]; then
+          echo "  Installing ${PACKAGESEARCH}";
+          cd "${HOME}/.drush" && drush dl "${PACKAGESEARCH}";
+          echo "  Done!";
+        else
+          echo "  Drush was not found."
+        fi
+      elif [[ "${ARGUMENTS}" == *"uninstall"* ]]; then
+        if [[ ! -d "${HOME}/.drush/${PACKAGESEARCH}" ]]; then
+          echo "  ${PACKAGESEARCH} could not be found on this system.";
+        else
+          echo "  Uninstalling ${PACKAGESEARCH}...";
+          rm -rf "${HOME}/.drush/${PACKAGESEARCH}";
+          echo "  Done!";
+        fi
+      elif [[ ! "${ARGUMENTS}" == *"uninstall"* ]] && [[ ! "${ARGUMENTS}" == *"reinstall"* ]]; then
+        if [[ -d "${HOME}/.drush/${PACKAGESEARCH}" ]]; then
+          echo "  ${PACKAGESEARCH} was found on this system and cannot install.";
+        else
+          if [[ $(which drush) ]]; then
+            echo "  Installing ${PACKAGESEARCH}";
+            cd "${HOME}/.drush" && drush dl "${PACKAGESEARCH}";
+            echo "  Done!";
+          else
+            echo "  Drush was not found."
+          fi
+        fi
+      fi
+    }
+    if [[ "${ARGUMENTS}" == *"show"* ]]; then __SHOW; fi
+    if [[ "${ARGUMENTS}" == *"install"* ]]; then __DOWNLOAD; fi
+      exit 0;
   }
 
   function _INSTALL () {
@@ -332,8 +377,11 @@ function _RUN () {
     echo "   dvm exec <version> <command>              Change the drush symlink to use another version.";
     echo "   dvm current                               Display currently activated version.";
     echo "   dvm status                                Display current status.";
-    echo "   dvm show                                  List installed extensions.";
-    echo "   dvm show <version>                        List installed extensions matching a search criteria";
+    echo "   dvm pkg show                              List installed extensions.";
+    echo "   dvm pkg show <name>                       List installed extensions matching a search criteria";
+    echo "   dvm pkg install <name>                    Install an extension matching <name>";
+    echo "   dvm pkg reinstall <name>                  Reinstall an extension matching <name>";
+    echo "   dvm pkg uninstall <name>                  Uninstall an extension matching <name>";
     echo "   dvm ls-local                              List installed versions.";
     echo "   dvm ls-local <version>                    List installed versions matching a search criteria";
     echo "   dvm ls-remote                             List remote versions available for install";
@@ -369,7 +417,9 @@ function SETVARS () {
   CLEANARG=${CLEANARG/update/};
   CLEANARG=${CLEANARG/use/};
   CLEANARG=${CLEANARG/exec/};
+  CLEANARG=${CLEANARG/pkg/};
   CLEANARG=${CLEANARG/show/};
+  CLEANARG=${CLEANARG/download/};
   CLEANARG=${CLEANARG/ls-local/};
   CLEANARG=${CLEANARG/ls-remote/};
   CLEANARG=${CLEANARG/  /};
