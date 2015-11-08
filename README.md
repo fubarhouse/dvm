@@ -47,7 +47,7 @@ To get a list of available versions:
 
 Or to search for a version, type an argument to ls-remote to do a basic query string on the same set of commands:
 
-    dvm ls-remove 8.0.0
+    dvm ls-remote 8.0.0
 
 To download and install version v7.0.0 and v8.0.0-rc3, do this:
 
