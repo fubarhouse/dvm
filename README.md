@@ -17,11 +17,11 @@ It was made and tested on a OSX El Capitan system for a Debian environment for u
 
 To install or update dvm, you can use Wget:
 
-    `wget -O /usr/local/bin/dvm https://raw.githubusercontent.com/fubarhouse/dvm/master/dvm`
+    wget -O /usr/local/bin/dvm https://raw.githubusercontent.com/fubarhouse/dvm/master/dvm
 
 And then you can ensure all the dependencies (composer, unzip etc) are installed using:
 
-    `dvm initialize`
+    dvm initialize
 
 Dependencies include a default Drush installation (installed at ~/drush/) using composer, but it won't take long.
 
@@ -43,35 +43,25 @@ Run `dvm initialize` to get started.
 
 To get a list of available versions:
 
-    ````
     dvm ls-remote
-    ````
 
 Or to search for a version, type an argument to ls-remote to do a basic query string on the same set of commands:
 
-    ````
     dvm ls-remove 8.0.0
-    ````
 
 To download and install version v7.0.0 and v8.0.0-rc3, do this:
 
-    ````
     dvm install 7.0.0
     dvm install 8.0.0-rc3
-    ````
 
 You can switch between installed versions:
 
-    ````
     dvm use 7.0.0
     dvm use 8.0.0-rc3
-    ````
 
 Or you can just run a command using a specific version of Drush using:
 
-    ````
     dvm exec 7.0.0 --version
-    ````
 
 ## Compatibility
 
@@ -89,8 +79,7 @@ For use with Drush v1,2,3,4 & 5, the script will use wget based on an array with
 
 ## License
 
-nvm is released under the MIT license.
-
+dvm is released under the MIT license.
 
 Copyright (C) 2015-2020 Karl Hepworth
 
