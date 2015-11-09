@@ -359,8 +359,8 @@ function _RUN () {
         else
           echo "      ${X}" | grep ${CLEANARG};
         fi
+        tput sgr0;
       fi
-      if [[ "${X}" == "${INSTALLED}" ]]; then tput sgr0; fi
     done
     exit 0;
   }
