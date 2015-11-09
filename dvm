@@ -326,13 +326,11 @@ function _RUN () {
     "4.0.0-rc9" "4.0.0-rc8" "4.0.0-rc7" "4.0.0-rc6" "4.0.0-rc5" "4.0.0-rc4" "4.0.0-rc3" "debian/4.5-2" "4.5.0" "4.5.0-rc1" "debian/4.4-2"
     "debian/5.0dev-1" "debian/4.4-1" "4.4.0" "debian/4.3-1" "4.3.0" "4.2.0" "4.6.0" "5.3.0" "5.2.0" "5.1.0" "5.0.0" "5.0.0-rc5" "5.0.0-rc4"
     "5.0.0-rc3" "5.0.0-rc2" "5.0.0-rc1" "5.9.0" "5.8.0" "5.7.0" "5.6.0" "5.5.0" "5.4.0");
+    LEGACIES=($(printf '%s\n' "${LEGACIES[@]}" | sort | uniq | grep -e '^[1|2|3|4|5].'));
+    AVAILABLEVERSIONS=($(printf '%s\n' "${AVAILABLEVERSIONS[@]}" | sort | uniq | grep -e '^[6|7|8|9].'));
+    ALLVERSIONS=("${LEGACIES[@]}" "${AVAILABLEVERSIONS[@]}");
     if [[ -z "${CLEANARG}" ]]; then
-      if [[ "${BASEVERSION}" == "1" ]] || [[ "${BASEVERSION}" == "2" ]] || [[ "${BASEVERSION}" == "3" ]] || [[ "${BASEVERSION}" == "4" ]] || [[ "${BASEVERSION}" == "5" ]]; then
-        for X in "${LEGACIES[@]}"; do          echo "      ${X}" | grep "${BASEVERSION}"; done
-      fi
-      if [[ "${BASEVERSION}" == "6" ]] || [[ "${BASEVERSION}" == "7" ]] || [[ "${BASEVERSION}" == "8" ]]; then
-        for X in "${LEGACIES[@]}"; do          echo "      ${X}" | grep "${BASEVERSION}."; done
-      fi
+      for X in "${ALLVERSIONS[@]}"; do          echo "      ${X}"; done
     else
       if [[ "${BASEVERSION}" == "1" ]] || [[ "${BASEVERSION}" == "2" ]] || [[ "${BASEVERSION}" == "3" ]] || [[ "${BASEVERSION}" == "4" ]] || [[ "${BASEVERSION}" == "5" ]]; then
         for X in "${LEGACIES[@]}"; do          echo "      ${X}" | grep "${CLEANARG}"; done
@@ -346,7 +344,7 @@ function _RUN () {
 
   function _FETCH_LOCAL () {
     declare -a VERSIONSINSTALLED=();
-    for ITEM in $(find "${DRUSHDIR}/versions" -maxdepth 1 -type d | cut -d/ -f6 | grep "drush-" | grep -v "master"); do
+    for ITEM in $(find "${DRUSHDIR}/versions" -maxdepth 1 -type d | cut -d/ -f6 | grep "drush-" | grep -v "master" | sort | uniq); do
       VERSIONSINSTALLED+=("${ITEM}");
     done
     INSTALLED=$(drush --version | cut -d: -f2);
@@ -355,6 +353,7 @@ function _RUN () {
     for X in "${VERSIONSINSTALLED[@]}"; do
       if [[ "${X}" == "drush-${INSTALLED}" ]]; then tput setaf 2; fi
       if [[ "${X}" = *"drush-${BASEVERSION}"* ]]; then
+        X=${X/drush-/};
         if [[ -z "${CLEANARG}" ]]; then
           echo "      ${X}";
         else
