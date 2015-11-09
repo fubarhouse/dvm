@@ -351,15 +351,14 @@ function _RUN () {
     INSTALLED=${INSTALLED/  /};
     INSTALLED=${INSTALLED/ /};
     for X in "${VERSIONSINSTALLED[@]}"; do
-      X=${X/drush-/};
-      if [[ "${X}" == "${INSTALLED}" ]]; then tput setaf 2; fi
+      if [[ "${X}" == "drush-${INSTALLED}" ]]; then tput setaf 2; fi
       if [[ "${X}" = *"${BASEVERSION}"* ]]; then
         if [[ -z "${CLEANARG}" ]]; then
-          echo "      ${X}";
+          echo "      ${X/drush-/}";
         else
-          echo "      ${X}" | grep ${CLEANARG};
+          echo "      ${X/drush}" | grep ${CLEANARG};
         fi
-        tput sgr0;
+        if [[ "${X}" == "drush-${INSTALLED}" ]]; then tput sgr0; fi
       fi
     done
     exit 0;
