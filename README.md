@@ -45,7 +45,7 @@ Run `dvm initialize` to get started.
 
 ## Configuring
 
-To escape the dependencies of the sudo, there's one variable you may need to configure at the beginning of the `_SETVARS` function. Change the value to a directory which the default account has full read, write and executable access, otherwise the script may fail when changing to use the default versions.
+To escape the dependencies of the sudo, there's one variable you may need to configure at the beginning of the `_SETVARS` function. Change the value to a directory which the default account has full read, write and executable access, otherwise the script may fail when changing to use the default versions. DVM can be used with sudo correctly even if this isn't set up properly.
 
     LINKDIR="/usr/local/bin";
 
