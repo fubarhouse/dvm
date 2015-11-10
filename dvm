@@ -67,7 +67,7 @@ function _RUN () {
           if [[ -n "${LINKFILE}" ]]; then
             rm -f "${LINKFILE}";
           fi
-          ln -s "${DRUSHVERDIR}/vendor/bin/drush" "${LINKDIR}/drush";
+          sudo ln -s "${DRUSHVERDIR}/vendor/bin/drush" "${LINKDIR}/drush";
           if [[ "$?" -eq "1" ]]; then
             echo "  DVM has failed.";
             echo "   - Try again with sudo";
@@ -78,7 +78,7 @@ function _RUN () {
           if [[ -n "${LINKFILE}" ]]; then
             rm -f "${LINKFILE}";
           fi
-          ln -s "${DRUSHVERDIR}/drush" "${LINKDIR}/drush";
+          sudo ln -s "${DRUSHVERDIR}/drush" "${LINKDIR}/drush";
           if [[ "$?" -eq "1" ]]; then
             echo "  dvm failed. try with sudo?";
             exit 0;
@@ -424,18 +424,18 @@ function _RUN () {
 
 function SETVARS () {
 
-  if [[ -z "${DVMLINKDIR}" ]]; then
-    # LINKDIR="/usr/local/bin";
-    echo "  The LINKDIR file has not been set up."
-    echo "  "
-    echo "  You can set this up by typing:";
-    echo "  echo \"export DVMLINKDIR='usr/local/bin'\" >> ~/.bash_profile;";
-    echo "  Where /usr/local/bin is a directory ${USER} has full access."
-    echo "  After doing this, reset the agent by typing \"source ~/.bash_profile\"";
-    exit 0;
-  else
-    LINKDIR="${DVMLINKDIR}";
-  fi
+  # if [[ -z "${DVMLINKDIR}" ]]; then
+  #   # LINKDIR="/usr/local/bin";
+  #   echo "  The LINKDIR file has not been set up."
+  #   echo "  "
+  #   echo "  You can set this up by typing:";
+  #   echo "  echo \"export DVMLINKDIR='usr/local/bin'\" >> ~/.bash_profile;";
+  #   echo "  Where /usr/local/bin is a directory ${USER} has full access."
+  #   echo "  After doing this, reset the agent by typing \"source ~/.bash_profile\"";
+  #   exit 0;
+  # else
+    LINKDIR="/usr/local/bin";
+  # fi
   if [[ ! -e "${LINKDIR}" ]]; then mkdir -p "${LINKDIR}"; fi
   if [[ "${*}" == *"reinstall"* ]]; then STATE="reinstall"; fi
   if [[ "${*}" == *"uninstall"* ]]; then STATE="uninstall"; fi
