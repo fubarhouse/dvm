@@ -43,6 +43,12 @@ Once you have this file, move it somewhere available to the `$PATH` variable.
 
 Run `dvm initialize` to get started.
 
+## Configuring
+
+To escape the dependencies of the sudo, there's one variable you may need to configure at the beginning of the `_SETVARS` function. Change the value to a directory which the default account has full read, write and executable access, otherwise the script may fail when changing to use the default versions.
+
+    LINKDIR="/usr/local/bin";
+
 ## Usage
 
 To get a list of available versions:

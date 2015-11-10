@@ -14,7 +14,7 @@ function DVM () {
       if [[ -z $(which composer) ]]; then
         echo "Installing composer";
         curl -sS https://getcomposer.org/installer | php
-        mv composer.phar /usr/local/bin/composer
+        mv composer.phar "${LINKDIR}/composer"
       fi
     }
     function __UNZIP () {
@@ -61,18 +61,22 @@ function _RUN () {
   function _SWITCH () {
     if [[ -n "${CLEANARG}" ]]; then
       if [[ -d "${DRUSHVERDIR}" ]]; then
+        LINKFILE=$(which drush);
         echo "  Changing to v${CLEANARG}";
-        echo "  Password may be required..."
         if [[ -e "${DRUSHVERDIR}/vendor/bin/drush" ]]; then
-          sudo rm -f "/usr/local/bin/drush";
-          sudo ln -s "${DRUSHVERDIR}/vendor/bin/drush" "/usr/local/bin/drush";
+          if [[ -n "${LINKFILE}" ]]; then
+            rm -f "${LINKFILE}";
+          fi
+          ln -s "${DRUSHVERDIR}/vendor/bin/drush" "${LINKDIR}/drush";
         elif [[ -e "${DRUSHVERDIR}/drush" ]]; then
-          sudo rm -f "/usr/local/bin/drush";
-          sudo ln -s "${DRUSHVERDIR}/drush" "/usr/local/bin/drush";
+          if [[ -n "${LINKFILE}" ]]; then
+            rm -f "${LINKFILE}";
+          fi
+          ln -s "${DRUSHVERDIR}/drush" "${LINKDIR}/drush";
           cd "${DRUSHVERDIR}";
           if [[ ! -e "./includes/table.inc" ]]; then
             if [[ -e "${HOME}/pear/share/pear/Console/Table.php" ]]; then
-              sudo cp "${HOME}/pear/share/pear/Console/Table.php" "${DRUSHVERDIR}/includes/table.inc";
+              cp "${HOME}/pear/share/pear/Console/Table.php" "${DRUSHVERDIR}/includes/table.inc";
             else
               wget http://download.pear.php.net/package/Console_Table-1.1.4.tgz;
               tar -zxvf Console_Table-1.1.4.tgz;
@@ -80,6 +84,8 @@ function _RUN () {
               rm -rf ./Console_Table-1.1.4;
             fi
           fi
+        else
+          rm -f "${LINKFILE}";
         fi
         if [[ -n $(which drush) ]]; then
           if [[ -n $(drush status | grep "version") ]]; then
@@ -408,6 +414,7 @@ function _RUN () {
 
 function SETVARS () {
 
+  LINKDIR="/usr/local/bin";
   if [[ "${*}" == *"reinstall"* ]]; then STATE="reinstall"; fi
   if [[ "${*}" == *"uninstall"* ]]; then STATE="uninstall"; fi
   if [[ "${*}" == *"install"* ]] && [[ "${STATE}" != "reinstall" ]] && [[ "${STATE}" != "uninstall" ]]; then STATE="install"; fi
