@@ -69,10 +69,7 @@ function _RUN () {
           fi
           ln -s "${DRUSHVERDIR}/vendor/bin/drush" "${LINKDIR}/drush";
           if [[ "$?" -eq 1 ]]; then
-            echo "  DVM has failed.";
-            echo "   - Try again with sudo";
-            echo "   - Change the LINKDIR variable.";
-            exit 0;
+            sudo ln -s "${DRUSHVERDIR}/vendor/bin/drush" "${LINKDIR}/drush";
           fi
         elif [[ -e "${DRUSHVERDIR}/drush" ]]; then
           if [[ -n "${LINKFILE}" ]]; then
@@ -80,10 +77,7 @@ function _RUN () {
           fi
           ln -s "${DRUSHVERDIR}/drush" "${LINKDIR}/drush";
           if [[ "$?" -eq 1 ]]; then
-            echo "  DVM has failed.";
-            echo "   - Try again with sudo";
-            echo "   - Change the LINKDIR variable.";
-            exit 0;
+            sudo ln -s "${DRUSHVERDIR}/drush" "${LINKDIR}/drush";
           fi
           cd "${DRUSHVERDIR}";
           if [[ ! -e "./includes/table.inc" ]]; then
