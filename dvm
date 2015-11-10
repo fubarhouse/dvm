@@ -424,7 +424,18 @@ function _RUN () {
 
 function SETVARS () {
 
-  LINKDIR="/usr/local/bin";
+  if [[ -z "${DVMLINKDIR}" ]]; then
+    # LINKDIR="/usr/local/bin";
+    echo "  The LINKDIR file has not been set up."
+    echo "  "
+    echo "  You can set this up by typing:";
+    echo "  echo \"export DVMLINKDIR='usr/local/bin'\" >> ~/.bash_profile;";
+    echo "  Where /usr/local/bin is a directory ${USER} has full access."
+    echo "  After doing this, reset the agent by typing \"source ~/.bash_profile\"";
+    exit 0;
+  else
+    LINKDIR="${DVMLINKDIR}";
+  fi
   if [[ ! -e "${LINKDIR}" ]]; then mkdir -p "${LINKDIR}"; fi
   if [[ "${*}" == *"reinstall"* ]]; then STATE="reinstall"; fi
   if [[ "${*}" == *"uninstall"* ]]; then STATE="uninstall"; fi
