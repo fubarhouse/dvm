@@ -68,11 +68,21 @@ function _RUN () {
             rm -f "${LINKFILE}";
           fi
           ln -s "${DRUSHVERDIR}/vendor/bin/drush" "${LINKDIR}/drush";
+          if [[ "$?" -eq "1" ]]; then
+            echo "  DVM has failed.";
+            echo "   - Try again with sudo";
+            echo "   - Change the LINKDIR variable.";
+            exit 0;
+          fi
         elif [[ -e "${DRUSHVERDIR}/drush" ]]; then
           if [[ -n "${LINKFILE}" ]]; then
             rm -f "${LINKFILE}";
           fi
           ln -s "${DRUSHVERDIR}/drush" "${LINKDIR}/drush";
+          if [[ "$?" -eq "1" ]]; then
+            echo "  dvm failed. try with sudo?";
+            exit 0;
+          fi
           cd "${DRUSHVERDIR}";
           if [[ ! -e "./includes/table.inc" ]]; then
             if [[ -e "${HOME}/pear/share/pear/Console/Table.php" ]]; then
