@@ -415,6 +415,7 @@ function _RUN () {
 function SETVARS () {
 
   LINKDIR="/usr/local/bin";
+  if [[ ! -e "${LINKDIR}" ]]; then mkdir -p "${LINKDIR}"; fi
   if [[ "${*}" == *"reinstall"* ]]; then STATE="reinstall"; fi
   if [[ "${*}" == *"uninstall"* ]]; then STATE="uninstall"; fi
   if [[ "${*}" == *"install"* ]] && [[ "${STATE}" != "reinstall" ]] && [[ "${STATE}" != "uninstall" ]]; then STATE="install"; fi
