@@ -49,7 +49,7 @@ function _RUN () {
       *"use"*)        _SWITCH; ;;
       *"exec"*)       _EXEC ;;
       *"pkg"*)        _GETPKG; ;;
-      *"current"*)    if [[ -n $(which drush) ]]; then drush status | grep "version" | cut -d: -f2; fi ;;
+      *"current"*)    if [[ -n $(which drush) ]]; then drush status | grep "Drush version" | cut -d: -f2; fi ;;
       *"status"*)     if [[ -n $(which drush) ]]; then drush status; fi ;;
       *"install"*)    _INSTALL; ;;
       *"ls-local"*)   _FETCH_LOCAL; ;;
