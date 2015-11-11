@@ -19,7 +19,14 @@ It was made, tested and used on a OSX El Capitan system for intended use on a De
 
 ### Installation
 
-To install or update dvm, simply clone this repository:
+The preferred method is to use the `$PATH` variable and `git`
+
+  git clone https://github.com/fubarhouse/dvm.git ~/.dvm
+  echo "export PATH=\$PATH:$HOME/.dvm" >> ~/.bash_profile;
+  dvm install 7.0.0
+  dvm use 7.0.0
+
+Alternatively you can combine `alias` and `git`:
 
     git clone https://github.com/fubarhouse/dvm.git ~/.dvm
     alias dvm="${HOME}/.dvm/dvm" >> ~/.bash_profile;
@@ -27,7 +34,7 @@ To install or update dvm, simply clone this repository:
     dvm install 7.0.0
     dvm use 7.0.0
 
-or you can use Wget:
+If you prefer to have a fixed install not using `git`, you can use any choice of the above including wget:
 
     mkdir "${HOME}/.dvm"
     wget -O ~/.dvm https://raw.githubusercontent.com/fubarhouse/dvm/master/dvm
