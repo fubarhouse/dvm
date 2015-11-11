@@ -362,7 +362,7 @@ function _RUN () {
         if [[ -z "${CLEANARG}" ]]; then
           echo "      ${X/drush-/}";
         else
-          echo "      ${X/drush}" | grep ${CLEANARG};
+          echo "      ${X/drush-/}" | grep ${CLEANARG};
         fi
         if [[ "${X}" == "drush-${INSTALLED}" ]]; then tput sgr0; fi
       fi
