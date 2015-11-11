@@ -55,6 +55,7 @@ function _RUN () {
       *"ls-local"*)   _FETCH_LOCAL; ;;
       *"ls-remote"*)  _FETCH_REMOTE; ;;
       *"initialize"*) _INITIALIZE; ;;
+      *"upgrade"*)    cd "${DRUSHDIR}" && git pull; ;;
     esac
   }
 
@@ -394,6 +395,7 @@ function _RUN () {
     echo "   dvm ls-remote                             List remote versions available for install";
     echo "   dvm ls-remote <version>                   List remote versions matching a search criteria";
     echo "   dvm initialize                            Install any required dependencies";
+    echo "   dvm upgrade                               Gets the latest version of dvm";
     echo " ";
     echo " Example:";
     echo "   dvm install 7.0.0                         Install a specific version number";
@@ -421,6 +423,7 @@ function SETVARS () {
   if [[ "${*}" == *"uninstall"* ]]; then STATE="uninstall"; fi
   if [[ "${*}" == *"install"* ]] && [[ "${STATE}" != "reinstall" ]] && [[ "${STATE}" != "uninstall" ]]; then STATE="install"; fi
   if [[ "${*}" == *"exec"* ]]; then STATE="exec"; fi
+  if [[ "${*}" == *"upgrade"* ]]; then STATE="upgrade"; fi
 
   CLEANARG="${*}";
   CLEANARG=${CLEANARG/uninstall/};
@@ -434,6 +437,7 @@ function SETVARS () {
   CLEANARG=${CLEANARG/download/};
   CLEANARG=${CLEANARG/ls-local/};
   CLEANARG=${CLEANARG/ls-remote/};
+  CLEANARG=${CLEANARG/upgrade/};
   CLEANARG=${CLEANARG/  /};
   CLEANARG=${CLEANARG/ /};
   VERSION="${CLEANARG}";
