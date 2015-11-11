@@ -61,24 +61,10 @@ function _RUN () {
   function _SWITCH () {
     if [[ -n "${CLEANARG}" ]]; then
       if [[ -d "${DRUSHVERDIR}" ]]; then
-        LINKFILE=$(which drush);
-        echo "  Changing to v${CLEANARG}";
         if [[ -e "${DRUSHVERDIR}/vendor/bin/drush" ]]; then
-          if [[ -n "${LINKFILE}" ]]; then
-            rm -f "${LINKFILE}";
-          fi
-          ln -s "${DRUSHVERDIR}/vendor/bin/drush" "${LINKDIR}/drush";
-          if [[ "$?" -eq 1 ]]; then
-            sudo ln -s "${DRUSHVERDIR}/vendor/bin/drush" "${LINKDIR}/drush";
-          fi
+          ln -sF "${DRUSHVERDIR}/vendor/bin/drush" "${LINKDIR}/drush";
         elif [[ -e "${DRUSHVERDIR}/drush" ]]; then
-          if [[ -n "${LINKFILE}" ]]; then
-            rm -f "${LINKFILE}";
-          fi
-          ln -s "${DRUSHVERDIR}/drush" "${LINKDIR}/drush";
-          if [[ "$?" -eq 1 ]]; then
-            sudo ln -s "${DRUSHVERDIR}/drush" "${LINKDIR}/drush";
-          fi
+          ln -sF "${DRUSHVERDIR}/drush" "${LINKDIR}/drush";
           cd "${DRUSHVERDIR}";
           if [[ ! -e "./includes/table.inc" ]]; then
             if [[ -e "${HOME}/pear/share/pear/Console/Table.php" ]]; then
@@ -90,14 +76,12 @@ function _RUN () {
               rm -rf ./Console_Table-1.1.4;
             fi
           fi
-        else
-          rm -f "${LINKFILE}";
         fi
-        if [[ -n $(which drush) ]]; then
-          if [[ -n $(drush status | grep "version") ]]; then
+        if [[ -e "${DRUSHDIR}/drush" ]]; then
+          if [[ -n $("${DRUSHDIR}/drush" status | grep "version") ]]; then
             echo "  Drush is now using v${CLEANARG}";
-          elif [[ $(drush status) == *"Could not find a valid Drupal installation"* ]]; then
-            INSTALLSTATUS=$(drush status);
+          elif [[ $("${DRUSHDIR}/drush" status) == *"Could not find a valid Drupal installation"* ]]; then
+            INSTALLSTATUS=$("${DRUSHDIR}/drush" status);
             echo "  Drush is now using v${CLEANARG}";
             echo "  ${INSTALLSTATUS}";
           else
@@ -117,7 +101,7 @@ function _RUN () {
     CLEANARG=$(echo "${CLEANARG}" | cut -d ' ' -f1);
     DRUSHVERDIR="${DRUSHDIR}/versions/drush-${CLEANARG}";
     if [[ -n "${CLEANARG}" ]]; then
-      if [[ $(which drush) ]]; then
+      if [[ -e "${DRUSHDIR}/drush" ]]; then
         COMMAND="${ARGUMENTS[*]}";
         COMMAND=${COMMAND/exec/};
         COMMAND=${COMMAND/${CLEANARG}/};
@@ -303,7 +287,7 @@ function _RUN () {
     }
     function __UNINSTALL () {
       if [[ -n "${CLEANARG}" ]]; then
-        INSTALLED=$(drush --version | cut -d: -f2);
+        INSTALLED=$("${DRUSHDIR}/drush" --version | cut -d: -f2);
         INSTALLED=${INSTALLED/  /};
         INSTALLED=${INSTALLED/ /};
         TOUNINSTALL=$(_FETCH_LOCAL);
@@ -359,7 +343,7 @@ function _RUN () {
     for ITEM in $(find "${DRUSHDIR}/versions" -maxdepth 1 -type d | cut -d/ -f6 | grep "drush-" | grep -v "master" | sort | uniq); do
       VERSIONSINSTALLED+=("${ITEM}");
     done
-    INSTALLED=$(drush --version | cut -d: -f2);
+    INSTALLED=$("${DRUSHDIR}/drush" --version | cut -d: -f2);
     INSTALLED=${INSTALLED/  /};
     INSTALLED=${INSTALLED/ /};
     for X in "${VERSIONSINSTALLED[@]}"; do
@@ -420,8 +404,10 @@ function _RUN () {
 
 function SETVARS () {
 
-  LINKDIR="/usr/local/bin";
-  if [[ ! -e "${LINKDIR}" ]]; then mkdir -p "${LINKDIR}"; fi
+  LINKDIR="${HOME}/.dvm";
+  DRUSHDIR="${HOME}/.dvm";
+  if [[ ! -d "${DRUSHDIR}" ]]; then mkdir -p "${DRUSHDIR}"; fi
+  if [[ ! -d "${LINKDIR}" ]]; then mkdir -p "${LINKDIR}"; fi
   if [[ "${*}" == *"reinstall"* ]]; then STATE="reinstall"; fi
   if [[ "${*}" == *"uninstall"* ]]; then STATE="uninstall"; fi
   if [[ "${*}" == *"install"* ]] && [[ "${STATE}" != "reinstall" ]] && [[ "${STATE}" != "uninstall" ]]; then STATE="install"; fi
@@ -441,19 +427,8 @@ function SETVARS () {
   CLEANARG=${CLEANARG/ls-remote/};
   CLEANARG=${CLEANARG/  /};
   CLEANARG=${CLEANARG/ /};
+  VERSION="${CLEANARG}";
 
-  case "${CLEANARG}" in
-    1*)  VERSION="${CLEANARG}"; ;;
-    2*)  VERSION="${CLEANARG}"; ;;
-    3*)  VERSION="${CLEANARG}"; ;;
-    4*)  VERSION="${CLEANARG}"; ;;
-    5*)  VERSION="${CLEANARG}"; ;;
-    6*)  VERSION="${CLEANARG}"; ;;
-    7*)  VERSION="${CLEANARG}"; ;;
-    8*)  VERSION="${CLEANARG}"; ;;
-  esac
-
-  DRUSHDIR="${HOME}/drush";
   BASEVERSION=${VERSION::1};
   DRUSHVERDIR="${DRUSHDIR}/versions/drush-${VERSION}";
 
