@@ -86,15 +86,15 @@ Or you can just run a command using a specific version of Drush using:
 
 ### Drush version Manager
 
-Only OSX and Ubuntu (CLI) systems are supported at this time.
+Only OSX and Ubuntu (CLI) systems are supported at this time, but any UNIX system should support it.
 
 ### Drush
 
-So far, Drush versions `2.0.0` and later are successfully working without errors.
+Versions `2.x.x*` and later are successfully working without errors using DVM.
 
-There's a desire to make Drush v1 work, but there's no practical reasoning to it - so this may come later.
+Versions `2.x.x+*` and `2.x.x` do not support global functionality, so it's recommended to use `3.x.x` at a minimum.
 
-For use with Drush v1,2,3,4 & 5, the script will use wget based on an array with all the information and all other versions will use composer to get the live versions available.
+Versions `1.x.x+x` will not be officially supported as these versions do not support global functionality.
 
 ## License
 
