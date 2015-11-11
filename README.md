@@ -21,11 +21,11 @@ It was made, tested and used on a OSX El Capitan system for intended use on a De
 
 The preferred method is to use the `$PATH` variable and `git`
 
-  git clone https://github.com/fubarhouse/dvm.git ~/.dvm
-  echo "export PATH=\$PATH:$HOME/.dvm" >> ~/.bash_profile;
-  source ~/.bash_profile
-  dvm install 7.0.0
-  dvm use 7.0.0
+    git clone https://github.com/fubarhouse/dvm.git ~/.dvm
+    echo "export PATH=\$PATH:$HOME/.dvm" >> ~/.bash_profile;
+    source ~/.bash_profile
+    dvm install 7.0.0
+    dvm use 7.0.0
 
 Alternatively you can combine `alias` and `git`:
 
