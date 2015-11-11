@@ -62,9 +62,9 @@ function _RUN () {
     if [[ -n "${CLEANARG}" ]]; then
       if [[ -d "${DRUSHVERDIR}" ]]; then
         if [[ -e "${DRUSHVERDIR}/vendor/bin/drush" ]]; then
-          ln -sF "${DRUSHVERDIR}/vendor/bin/drush" "${LINKDIR}/drush";
+          ln -sF "${DRUSHVERDIR}/vendor/bin/drush" "${LINKDIR}/drush" &> /dev/null;
         elif [[ -e "${DRUSHVERDIR}/drush" ]]; then
-          ln -sF "${DRUSHVERDIR}/drush" "${LINKDIR}/drush";
+          ln -sF "${DRUSHVERDIR}/drush" "${LINKDIR}/drush" &> /dev/null;
           cd "${DRUSHVERDIR}";
           if [[ ! -e "./includes/table.inc" ]]; then
             if [[ -e "${HOME}/pear/share/pear/Console/Table.php" ]]; then
@@ -207,7 +207,16 @@ function _RUN () {
       echo "  Checking version number...";
       if [[ -n "${CLEANARG}" ]]; then
         if [[ "${BASEVERSION}" == "6" ]] || [[ "${BASEVERSION}" == "7" ]] || [[ "${BASEVERSION}" == "8" ]]; then
-          declare -a AVAILABLEVERSIONS=($(composer show drush/drush | grep versions | tr ", " "\n"));
+          if [[ -n $(which composer) ]]; then
+            declare -a AVAILABLEVERSIONS=($(composer show drush/drush | grep versions | tr ", " "\n"));
+          else
+            if [[ ! -e "${DRUSHDIR}/composer.phar" ]]; then
+              cd "${DRUSHDIR}" && php -r "readfile('https://getcomposer.org/installer');" | php5
+            fi
+            if [[ -e "${DRUSHDIR}/composer.phar" ]]; then
+              declare -a AVAILABLEVERSIONS=($(cd "${DRUSHDIR}" && php composer.phar show drush/drush | grep versions | tr ", " "\n"));
+            fi
+          fi
           for X in "${AVAILABLEVERSIONS[@]}"; do
             if [[ "${CLEANARG}" == "${X}" ]]; then
               VALIDVERSION=true;
