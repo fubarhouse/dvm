@@ -58,14 +58,6 @@ Dependencies not installed via the initialization argument (currently) include:
 * wget
 * unzip
 
-### Manual install
-
-For manual install create a folder somewhere in your filesystem with the `dvm` file inside it.
-
-Once you have this file, move it somewhere available to the `$PATH` variable.
-
-Run `dvm initialize` to get any dependencies you don't have.
-
 ## Usage
 
 To get a list of available versions:
