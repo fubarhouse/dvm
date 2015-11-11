@@ -17,11 +17,24 @@ It was made, tested and used on a OSX El Capitan system for intended use on a De
 
   This role was produced to work along-side [Jeff Geerling](https://twitter.com/geerlingguy)s' [DrupalVM](http://www.drupalvm.com/) and it works well for that purpose.
 
-### Install script
+### Installation
 
-To install or update dvm, you can use Wget:
+To install or update dvm, simply clone this repository:
 
-    wget -O /usr/local/bin/dvm https://raw.githubusercontent.com/fubarhouse/dvm/master/dvm
+    git clone https://github.com/fubarhouse/dvm.git ~/.dvm
+    alias dvm="${HOME}/.dvm/dvm" >> ~/.bash_profile;
+    alias drush="${HOME}/.dvm/drush" >> ~/.bash_profile;
+    dvm install 7.0.0
+    dvm use 7.0.0
+
+or you can use Wget:
+
+    mkdir "${HOME}/.dvm"
+    wget -O ~/.dvm https://raw.githubusercontent.com/fubarhouse/dvm/master/dvm
+    alias dvm="${HOME}/.dvm/dvm" >> ~/.bash_profile;
+    alias drush="${HOME}/.dvm/drush" >> ~/.bash_profile;
+    dvm install 7.0.0
+    dvm use 7.0.0
 
 And then you can ensure all the dependencies (composer, unzip etc) are installed using:
 
@@ -41,13 +54,7 @@ For manual install create a folder somewhere in your filesystem with the `dvm` f
 
 Once you have this file, move it somewhere available to the `$PATH` variable.
 
-Run `dvm initialize` to get started.
-
-## Configuring
-
-To escape the dependencies of the sudo, there's one variable you may need to configure at the beginning of the `_SETVARS` function. Change the value to a directory which the default account has full read, write and executable access, otherwise the script may fail when changing to use the default versions. DVM can be used with sudo correctly even if this isn't set up properly.
-
-    echo \"export DVMLINKDIR='usr/local/bin'\" >> ~/.bash_profile;"
+Run `dvm initialize` to get any dependencies you don't have.
 
 ## Usage
 
