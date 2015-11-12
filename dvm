@@ -75,7 +75,7 @@ function DVM () {
       if [[ "${X}" != "master" ]]; then DVMVERSIONLATEST="${X}"; fi
     done
     if [[ -n "${CLEANARG}" ]]; then
-      if [[ ! "${DVMVERSIONS[@]}" == *[${CLEANARG}]* ]]; then _NOARG; exit 0; fi
+      if [[ ! "${DVMVERSIONS[@]}" =~ [${CLEANARG}] ]]; then _NOARG; exit 0; fi
       case "${CLEANARG}" in
         "master"              ) cd "${DRUSHDIR}"; git pull origin "${CLEANARG}"; ;;
         "${DVMVERSION}"       ) echo "  You're already using ${CLEANARG}"; ;;
