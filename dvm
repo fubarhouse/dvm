@@ -72,15 +72,14 @@ function DVM () {
 
   function _UPGRADE () {
     for X in "${DVMVERSIONS[@]}"; do
-      if [[ "${X}" =~ ^[1..50]. ]]; then
-        DVMVERSIONLATEST="${X}"
-        CLEANARG="${DVMVERSIONLATEST}";
-      fi
+        if [[ "${X}" != "master" ]]; then
+          DVMVERSIONLATEST="${X}"
+        fi
     done
     if [[ -n "${CLEANARG}" ]]; then
       if [[ "${CLEANARG}" == "${DVMVERSION}" ]] || [[ "${DVMVERSION}" == "${DVMVERSIONLATEST}" ]]; then
         if [[ "${DVMVERSION}" == "${DVMVERSIONLATEST}" ]]; then
-          echo "  You're using the latest version";
+          echo "  You're already using the latest version";
         fi
         if [[ "${CLEANARG}" == "${DVMVERSION}" ]]; then
           echo "  You're already using DVM v${CLEANARG}";
@@ -92,7 +91,7 @@ function DVM () {
           done
         fi
       else
-        if [[ "${DVMVERSIONS[@]}" =~ ^[${CLEANARG}] ]]; then
+        if [[ "${DVMVERSIONS[@]}" =~ ^[${CLEANARG}]$ ]]; then
           cd "${DRUSHDIR}";
           git checkout "${CLEANARG}";
           git pull origin "${CLEANARG}";
@@ -101,6 +100,7 @@ function DVM () {
         fi
       fi
     else
+      DVMVERSIONLATEST="master";
       cd "${DRUSHDIR}";
       git checkout "${DVMVERSIONLATEST}";
       git pull origin "${DVMVERSIONLATEST}";
