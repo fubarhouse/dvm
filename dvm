@@ -452,7 +452,7 @@ function _RUN () {
 
 function SETVARS () {
 
-  DVMVERSION="1.1";
+  DVMVERSION="master";
   LINKDIR="${HOME}/.dvm";
   DRUSHDIR="${HOME}/.dvm";
   if [[ ! -d "${DRUSHDIR}" ]]; then mkdir -p "${DRUSHDIR}"; fi
