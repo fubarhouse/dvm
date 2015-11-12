@@ -4,6 +4,7 @@ function DVM () {
 
   function _SETARRAYS () {
     DRUSHDIR="${HOME}/.dvm";
+    DVMVERSIONS=($(cd "${DRUSHDIR}" && git ls-remote --heads | cut -d/ -f3));
     PACKAGES=($(find "${HOME}/.drush" -maxdepth 1 -type d | grep -v cache | cut -d/ -f5));
     LEGACIES=("1.1.0+drupal5" "1.0.0+drupal5" "1.0.0-rc3+drupal5" "1.0.0-rc2+drupal5" "1.0.0-rc1+drupal5" "1.0.0-beta4+drupal5"
     "1.0.0-beta3+drupal5" "1.0.0-beta2+drupal5" "1.0.0-beta1+drupal5" "2.0.0-alpha1+drupal5" "1.2.0+drupal6" "1.4.0+drupal5" "" "1.1.0+drupal6"
@@ -69,6 +70,37 @@ function DVM () {
     fi
   }
 
+  function _UPGRADE () {
+    for X in "${DVMVERSIONS[@]}"; do
+      if [[ "${X}" =~ ^[1..50]. ]]; then
+        DVMVERSIONLATEST="${X}"
+      fi
+    done
+    if [[ -n "${CLEANARG}" ]]; then
+      if [[ "${CLEANARG}" == "${DVMVERSION}"  ]]; then
+        echo "  You're already using DVM v${CLEANARG}";
+        echo "  Acceptable versions: "
+        for X in "${DVMVERSIONS[@]}"; do
+          if [[ "${X}" =~ ^[1..50]. ]]; then
+            echo "    ${X}";
+          fi
+        done
+      else
+        if [[ "${DVMVERSIONS[@]}" =~ ^[${CLEANARG}] ]]; then
+          cd "${DRUSHDIR}";
+          git checkout "${CLEANARG}";
+          git pull origin "${CLEANARG}";
+        else
+          echo " DVM v${CLEANARG} does not exist."
+        fi
+      fi
+    else
+      cd "${DRUSHDIR}";
+      git checkout "${DVMVERSIONLATEST}";
+      git pull origin "${DVMVERSIONLATEST}";
+    fi
+  }
+
 function _RUN () {
 
     case "${ARGUMENTS}" in
@@ -81,7 +113,7 @@ function _RUN () {
       *"ls-local"*)   _FETCH_LOCAL; ;;
       *"ls-remote"*)  _FETCH_REMOTE; ;;
       *"initialize"*) _INITIALIZE; ;;
-      *"upgrade"*)    cd "${DRUSHDIR}" && git pull; ;;
+      *"upgrade"*)    _UPGRADE; ;;
     esac
   }
 
@@ -414,6 +446,7 @@ function _RUN () {
 
 function SETVARS () {
 
+  DVMVERSION="1.1";
   LINKDIR="${HOME}/.dvm";
   DRUSHDIR="${HOME}/.dvm";
   if [[ ! -d "${DRUSHDIR}" ]]; then mkdir -p "${DRUSHDIR}"; fi
