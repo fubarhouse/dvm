@@ -448,7 +448,7 @@ function SETVARS () {
   LINKDIR="${HOME}/.dvm";
   DRUSHDIR="${HOME}/.dvm";
   DVMVERSIONS=($(cd "${DRUSHDIR}" && git ls-remote --heads | cut -d/ -f3));
-  DVMVERSION=$(git rev-parse --abbrev-ref HEAD);
+  DVMVERSION=$(cd "${DRUSHDIR}" && git rev-parse --abbrev-ref HEAD);
   if [[ ! -d "${DRUSHDIR}" ]]; then mkdir -p "${DRUSHDIR}"; fi
   if [[ ! -d "${LINKDIR}" ]]; then mkdir -p "${LINKDIR}"; fi
   if [[ "${*}" == *"reinstall"* ]]; then STATE="reinstall"; fi
