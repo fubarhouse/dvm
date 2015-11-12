@@ -43,6 +43,35 @@ function DVM () {
     fi
   }
 
+  function _UPGRADE () {
+    for X in "${DVMVERSIONS[@]}"; do
+      if [[ "${X}" != "master" ]]; then DVMVERSIONLATEST="${X}"; fi
+    done
+    if [[ -n "${CLEANARG}" ]]; then
+      if [[ ! "${DVMVERSIONS[@]}" =~ [${CLEANARG}] ]]; then _NOARG; exit 0; fi
+      case "${CLEANARG}" in
+        "master"              ) cd "${DRUSHDIR}"; git checkout master; git pull origin "${CLEANARG}"; ;;
+        "${DVMVERSION}"       ) echo "  You're already using ${CLEANARG}"; ;;
+        "${DVMVERSIONLATEST}" ) cd "${DRUSHDIR}"; git checkout "${CLEANARG}"; git pull origin "${CLEANARG}"; ;;
+        *                     ) if [[ "${DVMVERSIONS[@]}" == *"${CLEANARG}"* ]]; then
+                                  cd "${DRUSHDIR}"; git checkout "${CLEANARG}"; git pull origin "${CLEANARG}";
+                                else
+                                  echo "  DVM ${CLEANARG} does not exist.";
+                                  echo "  Available versions include:";
+                                  for X in "${DVMVERSIONS[@]}"; do
+                                    echo "    ${X}";
+                                  done
+                                fi
+                                ;;
+      esac
+    else
+      case "${DVMVERSION}" in
+        "master"              ) cd "${DRUSHDIR}"; git checkout master; git pull origin "${DVMVERSION}"; ;;
+        *                     ) cd "${DRUSHDIR}"; git checkout "${DVMVERSIONLATEST}"; git pull origin "${DVMVERSIONLATEST}"; ;;
+      esac
+    fi
+  }
+
 function _RUN () {
 
     case "${ARGUMENTS}" in
@@ -55,7 +84,7 @@ function _RUN () {
       *"ls-local"*)   _FETCH_LOCAL; ;;
       *"ls-remote"*)  _FETCH_REMOTE; ;;
       *"initialize"*) _INITIALIZE; ;;
-      *"upgrade"*)    cd "${DRUSHDIR}" && git pull; ;;
+      *"upgrade"*)    _UPGRADE; ;;
     esac
   }
 
@@ -395,7 +424,8 @@ function _RUN () {
     echo "   dvm ls-remote                             List remote versions available for install";
     echo "   dvm ls-remote <version>                   List remote versions matching a search criteria";
     echo "   dvm initialize                            Install any required dependencies";
-    echo "   dvm upgrade                               Gets the latest version of dvm";
+    echo "   dvm upgrade                               Updates DVM to the latest available version/branch";
+    echo "   dvm upgrade <version>                     Changes DVM to version <version>";
     echo " ";
     echo " Example:";
     echo "   dvm install 7.0.0                         Install a specific version number";
@@ -417,6 +447,8 @@ function SETVARS () {
 
   LINKDIR="${HOME}/.dvm";
   DRUSHDIR="${HOME}/.dvm";
+  DVMVERSIONS=($(cd "${DRUSHDIR}" && git ls-remote --heads | cut -d/ -f3));
+  DVMVERSION=$(git rev-parse --abbrev-ref HEAD);
   if [[ ! -d "${DRUSHDIR}" ]]; then mkdir -p "${DRUSHDIR}"; fi
   if [[ ! -d "${LINKDIR}" ]]; then mkdir -p "${LINKDIR}"; fi
   if [[ "${*}" == *"reinstall"* ]]; then STATE="reinstall"; fi
