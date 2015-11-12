@@ -74,17 +74,23 @@ function DVM () {
     for X in "${DVMVERSIONS[@]}"; do
       if [[ "${X}" =~ ^[1..50]. ]]; then
         DVMVERSIONLATEST="${X}"
+        CLEANARG="${DVMVERSIONLATEST}";
       fi
     done
     if [[ -n "${CLEANARG}" ]]; then
-      if [[ "${CLEANARG}" == "${DVMVERSION}"  ]]; then
-        echo "  You're already using DVM v${CLEANARG}";
-        echo "  Acceptable versions: "
-        for X in "${DVMVERSIONS[@]}"; do
-          if [[ "${X}" =~ ^[1..50]. ]]; then
-            echo "    ${X}";
-          fi
-        done
+      if [[ "${CLEANARG}" == "${DVMVERSION}" ]] || [[ "${DVMVERSION}" == "${DVMVERSIONLATEST}" ]]; then
+        if [[ "${DVMVERSION}" == "${DVMVERSIONLATEST}" ]]; then
+          echo "  You're using the latest version";
+        fi
+        if [[ "${CLEANARG}" == "${DVMVERSION}" ]]; then
+          echo "  You're already using DVM v${CLEANARG}";
+          echo "  Acceptable versions: "
+          for X in "${DVMVERSIONS[@]}"; do
+            if [[ "${X}" =~ ^[1..50]. ]]; then
+              echo "    ${X}";
+            fi
+          done
+        fi
       else
         if [[ "${DVMVERSIONS[@]}" =~ ^[${CLEANARG}] ]]; then
           cd "${DRUSHDIR}";
