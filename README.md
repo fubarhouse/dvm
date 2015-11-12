@@ -50,13 +50,11 @@ And then you can ensure all the dependencies (composer, unzip etc) are installed
 
     dvm initialize
 
-Dependencies include a default Drush installation (installed at ~/drush/) using composer, but it won't take long.
+Initialization must use sudo and dependencies include a default Drush installation (installed at ~/dvm/) using composer, but it won't take long.
 
 Dependencies not installed via the initialization argument (currently) include:
 
-* pear
 * wget
-* unzip
 
 ## Usage
 
