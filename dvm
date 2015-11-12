@@ -77,14 +77,23 @@ function DVM () {
     if [[ -n "${CLEANARG}" ]]; then
       if [[ ! "${DVMVERSIONS[@]}" =~ [${CLEANARG}] ]]; then _NOARG; exit 0; fi
       case "${CLEANARG}" in
-        "master"              ) cd "${DRUSHDIR}"; git pull origin "${CLEANARG}"; ;;
+        "master"              ) cd "${DRUSHDIR}"; git checkout master; git pull origin "${CLEANARG}"; ;;
         "${DVMVERSION}"       ) echo "  You're already using ${CLEANARG}"; ;;
         "${DVMVERSIONLATEST}" ) cd "${DRUSHDIR}"; git checkout "${CLEANARG}"; git pull origin "${CLEANARG}"; ;;
-        *                     ) cd "${DRUSHDIR}"; git checkout "${CLEANARG}"; git pull origin "${CLEANARG}"; ;;
+        *                     ) if [[ "${DVMVERSIONS[@]}" == *"${CLEANARG}"* ]]; then
+                                  cd "${DRUSHDIR}"; git checkout "${CLEANARG}"; git pull origin "${CLEANARG}";
+                                else
+                                  echo "  DVM ${CLEANARG} does not exist.";
+                                  echo "  Available versions include:";
+                                  for X in "${DVMVERSIONS[@]}"; do
+                                    echo "    ${X}";
+                                  done
+                                fi
+                                ;;
       esac
     else
       case "${DVMVERSION}" in
-        "master"              ) cd "${DRUSHDIR}"; git pull origin "${DVMVERSION}"; ;;
+        "master"              ) cd "${DRUSHDIR}"; git checkout master; git pull origin "${DVMVERSION}"; ;;
         *                     ) cd "${DRUSHDIR}"; git checkout "${DVMVERSIONLATEST}"; git pull origin "${DVMVERSIONLATEST}"; ;;
       esac
     fi
