@@ -452,7 +452,7 @@ function _RUN () {
 
 function SETVARS () {
 
-  DVMVERSION="master";
+  DVMVERSION=$(git rev-parse --abbrev-ref HEAD);
   LINKDIR="${HOME}/.dvm";
   DRUSHDIR="${HOME}/.dvm";
   if [[ ! -d "${DRUSHDIR}" ]]; then mkdir -p "${DRUSHDIR}"; fi
