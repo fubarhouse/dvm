@@ -296,7 +296,7 @@ function _RUN () {
     }
     function __INSTALL_ACTION () {
       case "${BASEVERSION}" in
-        "1"|"2"|"3"|"4"|"5")  if [[ "${CLEANARG}" == *"${LEGACIES[@]}"* ]]; then
+        "1"|"2"|"3"|"4"|"5")  if [[ "${LEGACIES[@]}" =~ [${CLEANARG}] ]]; then
                                 mkdir -p "${DRUSHDIR}/versions/${CLEANARG}";
                                 cd "${DRUSHDIR}/versions/";
                                 wget "https://github.com/drush-ops/drush/archive/${CLEANARG}.zip";
