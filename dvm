@@ -301,22 +301,22 @@ function _RUN () {
     }
     function __INSTALL_ACTION () {
       case "${BASEVERSION}" in
-        "1"|"2"|"3"|"4"|"5")  if [[ "${LEGACIES[@]}" =~ [${CLEANARG}] ]]; then
-                                mkdir -p "${DRUSHDIR}/versions/${CLEANARG}";
-                                cd "${DRUSHDIR}/versions/";
-                                wget "https://github.com/drush-ops/drush/archive/${CLEANARG}.zip";
-                                unzip "${CLEANARG}.zip"
-                                rm -f "${CLEANARG}.zip";
-                              else
-                                echo "  Drush v${CLEANARG} does not exist.";
-                              fi
-                              ;;
-        "6"|"7"|"8")          mkdir -p "${DRUSHVERDIR}";
-                              cd "${DRUSHVERDIR}";
-                              curl -sS https://getcomposer.org/installer | php;
-                              php composer.phar require "drush/drush:${VERSION}";
-                              cd "${DRUSHDIR}/versions" && rm -rf "./${CLEANARG}";
-                              ;;
+        ^[1|2|3|4|5]$)  if [[ "${LEGACIES[@]}" =~ [${CLEANARG}] ]]; then
+                          mkdir -p "${DRUSHDIR}/versions/${CLEANARG}";
+                          cd "${DRUSHDIR}/versions/";
+                          wget "https://github.com/drush-ops/drush/archive/${CLEANARG}.zip";
+                          unzip "${CLEANARG}.zip"
+                          rm -f "${CLEANARG}.zip";
+                        else
+                          echo "  Drush v${CLEANARG} does not exist.";
+                        fi
+                        ;;
+        ^[6|7|8|9]$)    mkdir -p "${DRUSHVERDIR}";
+                        cd "${DRUSHVERDIR}";
+                        curl -sS https://getcomposer.org/installer | php;
+                        php composer.phar require "drush/drush:${VERSION}";
+                        cd "${DRUSHDIR}/versions" && rm -rf "./${CLEANARG}";
+                        ;;
       esac
     }
     function __INSTALL () {
