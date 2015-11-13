@@ -4,7 +4,16 @@ function DVM () {
 
   function _SETARRAYS () {
     DRUSHDIR="${HOME}/.dvm";
-    DVMVERSIONS=($(cd "${DRUSHDIR}" && git ls-remote --heads | cut -d/ -f3));
+    DVMVERSIONS=();
+    DVMVERSIONSTEMP=($(cd "${DRUSHDIR}" && git remote show origin | grep tracked));
+    for X in "${DVMVERSIONSTEMP[@]}"; do
+      X=${X/  /};
+      X=${X/ /};
+      X=${X/tracked/};
+      if [[ -n "${X}" ]]; then
+        DVMVERSIONS+=("${X}");
+      fi
+    done
     PACKAGES=($(find "${HOME}/.drush" -maxdepth 1 -type d | grep -v cache | cut -d/ -f5));
     LEGACIES=("1.1.0+drupal5" "1.0.0+drupal5" "1.0.0-rc3+drupal5" "1.0.0-rc2+drupal5" "1.0.0-rc1+drupal5" "1.0.0-beta4+drupal5"
     "1.0.0-beta3+drupal5" "1.0.0-beta2+drupal5" "1.0.0-beta1+drupal5" "2.0.0-alpha1+drupal5" "1.2.0+drupal6" "1.4.0+drupal5" "" "1.1.0+drupal6"
