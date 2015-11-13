@@ -17,7 +17,7 @@ It was made, tested and used on a OSX El Capitan system for intended use on a De
 
   This role was produced to work along-side [Jeff Geerling](https://twitter.com/geerlingguy)s' [DrupalVM](http://www.drupalvm.com/) and it works well for that purpose.
 
-### Installation
+### Methods
 
 The preferred method is to use the `$PATH` variable and `git`
 
@@ -55,6 +55,23 @@ Initialization must use sudo and dependencies include a default Drush installati
 Dependencies not installed via the initialization argument (currently) include:
 
 * wget
+
+### Upgrading/updating
+
+There's a convenient way of moving between versions of DVM without having to simply use git commands.
+
+Upgrading will move you to the latest version and perform a git pull if you aren't on the latest version and it will perform a git pull if you're using the master copy.
+
+    dvm upgrade
+
+To interchange versions of DVM, you can use the following examples to demonstrate how you can do that:
+
+    dvm upgrade 1.1
+    dvm upgrade master
+
+If you feel the need to switch between branches, you can simply use the following and substitute `master` for the version number
+
+    cd ~/.dvm && git checkout master && git pull;
 
 ## Usage
 
