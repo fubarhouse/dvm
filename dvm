@@ -132,6 +132,9 @@ function _RUN () {
   function _SWITCH () {
     if [[ -n "${CLEANARG}" ]]; then
       if [[ -d "${DRUSHVERDIR}" ]]; then
+        if [[ -e "${LINKDIR}/drush" ]]; then
+          rm -f "${LINKDIR}/drush";
+        fi
         if [[ -e "${DRUSHVERDIR}/vendor/bin/drush" ]]; then
           ln -sF "${DRUSHVERDIR}/vendor/bin/drush" "${LINKDIR}/drush" &> /dev/null;
         elif [[ -e "${DRUSHVERDIR}/drush" ]]; then
