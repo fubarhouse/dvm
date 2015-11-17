@@ -28,8 +28,8 @@ function DVM () {
     "7.0.0-alpha2" "7.0.0-alpha1" "6.x-dev" "6.6.0" "6.5.0" "6.4.0" "6.3.0" "6.2.0" "6.1.0" "6.1.0-rc1" "6.0.0" "6.0.0-rc4" "6.0.0-rc3" "6.0.0-rc2"
     "6.0.0-rc1" "dev-php-5.5.9");
     AVAILABLEVERSIONS=();
-    AVAILABLEVERSIONS+=($(printf '%s\n' "${LEGACIES[@]}" | sort | uniq | grep -e '^[1-5][.]'));
-    AVAILABLEVERSIONS+=($(printf '%s\n' "${COMPOSERVERSIONS[@]}" | sort | uniq | grep -e '^[6-9][.]'));
+    AVAILABLEVERSIONS+=($(printf '%s\n' "${LEGACIES[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[1-5][.]'));
+    AVAILABLEVERSIONS+=($(printf '%s\n' "${COMPOSERVERSIONS[@]}" | sort | grep -v "x-dev"| uniq | grep -e '^[6-9][.]'));
     VERSIONSINSTALLED=();
     for ITEM in $(find "${DRUSHDIR}/versions" -maxdepth 1 -type d | cut -d/ -f6 | grep "drush-" | grep -v "master"); do
       VERSIONSINSTALLED+=("${ITEM}");
@@ -343,7 +343,7 @@ function _RUN () {
           VALIDVERSION=false;
           echo "  Version ${CLEANARG} was not found.";
           echo "  ${CLEANARG} was not found in list, so DVM will search remotely...";
-          declare -a AVAILABLEVERSIONS=($(cd "${DRUSHDIR}" && composer show drush/drush -q | grep versions | tr ", " "\n"));
+          declare -a AVAILABLEVERSIONS=($(cd "${DRUSHDIR}" && composer show drush/drush -q | grep -v "x-dev"| grep versions | tr ", " "\n"));
           for X in "${AVAILABLEVERSIONS[@]}"; do
             if [[ "${CLEANARG}" == "${X}" ]]; then
               VALIDVERSION=true;
@@ -439,8 +439,8 @@ function _RUN () {
     function __REMOTE () {
       cd "${DRUSHDIR}";
       declare -a AVAILABLEVERSIONS=($(cd "${DRUSHDIR}" && composer show drush/drush | sort | uniq | grep versions | tr ", " "\n"));
-      declare -a LEGACIES=($(printf '%s\n' "${LEGACIES[@]}" | sort | uniq | grep -e '^[1-5][.]'));
-      declare -a AVAILABLEVERSIONS=($(printf '%s\n' "${AVAILABLEVERSIONS[@]}" | sort | uniq | grep -e '^[6-9][.]'));
+      declare -a LEGACIES=($(printf '%s\n' "${LEGACIES[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[1-5][.]'));
+      declare -a AVAILABLEVERSIONS=($(printf '%s\n' "${AVAILABLEVERSIONS[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[6-9][.]'));
       ALLVERSIONS=("${LEGACIES[@]}" "${AVAILABLEVERSIONS[@]}");
       if [[ -z "${CLEANARG}" ]]; then
         for X in "${ALLVERSIONS[@]}"; do          echo "      ${X}"; done
