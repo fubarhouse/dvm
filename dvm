@@ -178,7 +178,7 @@ function _RUN () {
           fi
         fi
       else
-        echo "  Drush v${CLEANARG} is not installed."
+        echo "  Drush ${CLEANARG} is not installed."
       fi
     else
       _NOARG;
@@ -204,7 +204,7 @@ function _RUN () {
         fi
         eval "${DRUSHVERDIR}/${EXECUTABLE} ${COMMAND}";
       else
-        echo "  Drush v${CLEANARG} is not installed."
+        echo "  Drush ${CLEANARG} is not installed."
       fi
     else
       _NOARG;
@@ -326,7 +326,7 @@ function _RUN () {
                   unzip "${CLEANARG}.zip"
                   rm -f "${CLEANARG}.zip";
                 else
-                  echo "  Drush v${CLEANARG} does not exist.";
+                  echo "  Drush ${CLEANARG} does not exist.";
                 fi
                 ;;
         ^[6-9]) mkdir -p "${DRUSHVERDIR}";
@@ -340,7 +340,7 @@ function _RUN () {
     function __INSTALL () {
       if [[ -n "${CLEANARG}" ]]; then
         if [[ -d "${DRUSHVERDIR}" ]]; then
-          echo "Drush v${CLEANARG} has already been installed.";
+          echo "Drush ${CLEANARG} has already been installed.";
         else
           __GETVERSIONS;
           if [[ "${VALIDVERSION}" == true ]]; then
@@ -357,7 +357,7 @@ function _RUN () {
           VALIDVERSION=true;
           __INSTALL_ACTION;
         else
-          echo "Drush v${CLEANARG} has't previously been installed.";
+          echo "Drush ${CLEANARG} has't previously been installed.";
           exit 0;
         fi
       else
@@ -374,7 +374,7 @@ function _RUN () {
         TOUNINSTALL=${TOUNINSTALL/ /};
         if [[ ! "${TOUNINSTALL}" == *"${INSTALLED}"* ]]; then
           rm -rf "${DRUSHDIR}/versions/drush-${CLEANARG}";
-          echo "Drush v${CLEANARG} has been uninstalled.";
+          echo "Drush ${CLEANARG} has been uninstalled.";
         else
           echo "You cannot uninstall a currently active version."
           exit 0;
