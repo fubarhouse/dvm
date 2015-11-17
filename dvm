@@ -126,7 +126,7 @@ function _RUN () {
                     exit 0;
                     ;;
       "current")    if [[ -n $(which drush) ]]; then
-                      if [[ ! $(which drush) == "${LINKDIR}/drush" ]]; then
+                      if [[ $(which drush) == "${LINKDIR}/drush" ]]; then
                         drush status | grep "Drush version" | cut -d: -f2;
                       else
                         echo "  DVM is not using a version.";
