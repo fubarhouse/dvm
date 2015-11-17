@@ -115,7 +115,7 @@ function DVM () {
 
 function _RUN () {
 
-    case "${ARGUMENTS}" in
+    case "${ARGUMENTS[0]}" in
       *[use]*)        _SWITCH;
                       exit 0;
                       ;;
@@ -490,10 +490,10 @@ function _RUN () {
     exit 0;
   fi
 
-  ARGUMENTS="${*}";
+  declare -a ARGUMENTS=("${*}");
   _PRERUN "${*}";
   _SETARRAYS;
-  _RUN "${ARGUMENTS}";
+  _RUN;
 }
 
 function SETVARS () {
