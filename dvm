@@ -155,6 +155,10 @@ function _RUN () {
       *[upgrade])*    _UPGRADE;
                       exit 0;
                       ;;
+      *)              echo "  Input was invalid.";
+                      echo "  Type in 'nvm' for usage.";
+                      exit 0;
+                      ;;
     esac
   }
 
