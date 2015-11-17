@@ -343,8 +343,8 @@ function _RUN () {
       fi
     }
     function __INSTALL_ACTION () {
-      case "${CLEANARG}" in
-        ^[1-5]) if [[ "${LEGACIES[@]}" =~ [${CLEANARG}] ]]; then
+      case "${BASEVERSION}" in
+        [1-5])  if [[ "${LEGACIES[@]}" =~ [${CLEANARG}] ]]; then
                   mkdir -p "${DRUSHDIR}/versions/${CLEANARG}";
                   cd "${DRUSHDIR}/versions/";
                   wget "https://github.com/drush-ops/drush/archive/${CLEANARG}.zip";
@@ -355,15 +355,13 @@ function _RUN () {
                 fi
                 exit 0;
                 ;;
-              esac
-        # ^[6-9]) echo "ddd";
-                mkdir -p "${DRUSHVERDIR}";
+        [6-9])  mkdir -p "${DRUSHVERDIR}";
                 cd "${DRUSHVERDIR}";
                 curl -sS https://getcomposer.org/installer | php;
                 php composer.phar require "drush/drush:${VERSION}";
                 cd "${DRUSHDIR}/versions" && rm -rf "./${CLEANARG}";
-                # ;;
-      # esac
+                ;;
+      esac
     }
     function __INSTALL () {
       if [[ -n "${CLEANARG}" ]]; then
