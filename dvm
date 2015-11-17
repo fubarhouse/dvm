@@ -116,16 +116,16 @@ function DVM () {
 function _RUN () {
   FIRSTARGUMENT=$(echo "${ARGUMENTS}" | cut -d " " -f 1);
     case "${FIRSTARGUMENT}" in
-      *use*)        _SWITCH;
+      "use")        _SWITCH;
                     exit 0;
                     ;;
-      *exec*)       _EXEC;
+      "exec")       _EXEC;
                     exit 0;
                     ;;
-      *pkg*)        _GETPKG;
+      "pkg")        _GETPKG;
                     exit 0;
                     ;;
-      *current*)    if [[ -n $(which drush) ]]; then
+      "current")    if [[ -n $(which drush) ]]; then
                       if [[ ! $(which drush) == "${LINKDIR}/drush" ]]; then
                         drush status | grep "Drush version" | cut -d: -f2;
                       else
@@ -135,24 +135,33 @@ function _RUN () {
                     fi
                     exit 0;
                     ;;
-      *status*)     if [[ -n $(which drush) ]]; then
+      "status")     if [[ -n $(which drush) ]]; then
                       drush status;
                     fi
                     exit 0;
                     ;;
-      *install*)    _INSTALL;
+      "uninstall")  _INSTALL uninstall;
                     exit 0;
                     ;;
-      *ls-local)*   _FETCH_LOCAL;
+      "reinstall")  _INSTALL reinstall;
                     exit 0;
                     ;;
-      *ls-remote)*  _FETCH_REMOTE;
+       "install")   _INSTALL install;
                     exit 0;
                     ;;
-      *initialize)  *_INITIALIZE;
+      # "ls-local")   _FETCH_LOCAL;
+      #               exit 0;
+      #               ;;
+      "ls-local")   _FETCH_LOCAL;
                     exit 0;
                     ;;
-      *upgrade)*    _UPGRADE;
+      "ls-remote")  _FETCH_REMOTE;
+                    exit 0;
+                    ;;
+      "initialize") *_INITIALIZE;
+                    exit 0;
+                    ;;
+      "upgrade")    _UPGRADE;
                     exit 0;
                     ;;
       *)            echo "  Input was invalid.";
