@@ -116,10 +116,16 @@ function DVM () {
 function _RUN () {
 
     case "${ARGUMENTS}" in
-      *"use"*)        _SWITCH; ;;
-      *"exec"*)       _EXEC ;;
-      *"pkg"*)        _GETPKG; ;;
-      *"current"*)    if [[ -n $(which drush) ]]; then
+      *[use]*)        _SWITCH;
+                      exit 0;
+                      ;;
+      *[exec]*)       _EXEC;
+                      exit 0;
+                      ;;
+      *[pkg]*)        _GETPKG;
+                      exit 0;
+                      ;;
+      *[current]*)    if [[ -n $(which drush) ]]; then
                         if [[ ! $(which drush) == "${LINKDIR}/drush" ]]; then
                           drush status | grep "Drush version" | cut -d: -f2;
                         else
@@ -127,13 +133,28 @@ function _RUN () {
                           echo "  Type in dvm use <version> to fix.";
                         fi
                       fi
+                      exit 0;
                       ;;
-      *"status"*)     if [[ -n $(which drush) ]]; then drush status; fi ;;
-      *"install"*)    _INSTALL; ;;
-      *"ls-local"*)   _FETCH_LOCAL; ;;
-      *"ls-remote"*)  _FETCH_REMOTE; ;;
-      *"initialize"*) _INITIALIZE; ;;
-      *"upgrade"*)    _UPGRADE; ;;
+      *[status]*)     if [[ -n $(which drush) ]]; then
+                        drush status;
+                      fi
+                      exit 0;
+                      ;;
+      *[install]*)    _INSTALL;
+                      exit 0;
+                      ;;
+      *[ls-local])*   _FETCH_LOCAL;
+                      exit 0;
+                      ;;
+      *[ls-remote])*  _FETCH_REMOTE;
+                      exit 0;
+                      ;;
+      *[initialize])  *_INITIALIZE;
+                      exit 0;
+                      ;;
+      *[upgrade])*    _UPGRADE;
+                      exit 0;
+                      ;;
     esac
   }
 
