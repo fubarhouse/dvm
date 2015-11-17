@@ -490,7 +490,7 @@ function _RUN () {
     exit 0;
   fi
 
-  declare -a ARGUMENTS=("${*}");
+  ARGUMENTS=("${*}");
   _PRERUN "${*}";
   _SETARRAYS;
   _RUN;
