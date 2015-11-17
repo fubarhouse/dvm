@@ -149,13 +149,16 @@ function _RUN () {
        "install")   _INSTALL install;
                     exit 0;
                     ;;
-      # "ls-local")   _FETCH_LOCAL;
-      #               exit 0;
-      #               ;;
-      "ls-local")   _FETCH_LOCAL;
+       "ls")        _FETCH;
+                     exit 0;
+                     ;;
+       "ll")        _FETCH;
+                     exit 0;
+                     ;;
+      "ls-local")   _FETCH "local";
                     exit 0;
                     ;;
-      "ls-remote")  _FETCH_REMOTE;
+      "ls-remote")  _FETCH "remote";
                     exit 0;
                     ;;
       "initialize") *_INITIALIZE;
@@ -404,12 +407,16 @@ function _RUN () {
         INSTALLED=$("${DRUSHDIR}/drush" --version | cut -d: -f2);
         INSTALLED=${INSTALLED/  /};
         INSTALLED=${INSTALLED/ /};
-        TOUNINSTALL=$(_FETCH_LOCAL);
+        TOUNINSTALL=$(_FETCH "local");
         TOUNINSTALL=${TOUNINSTALL/  /};
         TOUNINSTALL=${TOUNINSTALL/ /};
         if [[ ! "${TOUNINSTALL}" == *"${INSTALLED}"* ]]; then
-          rm -rf "${DRUSHDIR}/versions/drush-${CLEANARG}";
-          echo "Drush ${CLEANARG} has been uninstalled.";
+          if [[ -d "${DRUSHDIR}/versions/drush-${CLEANARG}" ]]; then
+            rm -rf "${DRUSHDIR}/versions/drush-${CLEANARG}";
+            echo "  Drush ${CLEANARG} has been uninstalled.";
+          else
+            echo "  Drush ${CLEANARG} is not installed.";
+          fi
         else
           echo "You cannot uninstall a currently active version."
           exit 0;
@@ -418,50 +425,66 @@ function _RUN () {
         _NOARG;
       fi
     }
-    case "${STATE}" in
-      "install" )   __INSTALL; ;;
-      "reinstall" ) __REINSTALL; ;;
-      "uninstall" ) __UNINSTALL; ;;
-    esac
-  }
-
-  function _FETCH_REMOTE () {
-    cd "${DRUSHDIR}";
-    declare -a AVAILABLEVERSIONS=($(cd "${DRUSHDIR}" && composer show drush/drush | sort | uniq | grep versions | tr ", " "\n"));
-    AVAILABLEVERSIONS=($(printf '%s\n' "${AVAILABLEVERSIONS[@]}" | sort | uniq | grep -e '^[6-9][.]'));
-    ALLVERSIONS=("${LEGACIES[@]}" "${AVAILABLEVERSIONS[@]}");
-    if [[ -z "${CLEANARG}" ]]; then
-      for X in "${ALLVERSIONS[@]}"; do          echo "      ${X}"; done
+    if [[ "${#}" -gt 0 ]]; then
+      if [[ "${1}" == "install" ]]; then __INSTALL; exit 0;
+      elif [[ "${1}" == "reinstall" ]]; then __REINSTALL; exit 0;
+      elif [[ "${1}" == "uninstall" ]]; then __UNINSTALL; exit 0;
+      fi
     else
-      if [[ "${BASEVERSION}" == "1" ]] || [[ "${BASEVERSION}" == "2" ]] || [[ "${BASEVERSION}" == "3" ]] || [[ "${BASEVERSION}" == "4" ]] || [[ "${BASEVERSION}" == "5" ]]; then
-        for X in "${LEGACIES[@]}"; do          echo "      ${X}" | grep "${CLEANARG}"; done
-      fi
-      if [[ "${BASEVERSION}" == "6" ]] || [[ "${BASEVERSION}" == "7" ]] || [[ "${BASEVERSION}" == "8" ]]; then
-        for X in "${AVAILABLEVERSIONS[@]}"; do echo "      ${X}" | grep "${CLEANARG}"; done
-      fi
+      _NOARG;
     fi
-    exit 0;
   }
 
-  function _FETCH_LOCAL () {
-    declare -a VERSIONSINSTALLED=();
-    for ITEM in $(find "${DRUSHDIR}/versions" -maxdepth 1 -type d | cut -d/ -f6 | grep "drush-" | grep -v "master" | sort | uniq); do
-      VERSIONSINSTALLED+=("${ITEM}");
-    done
-    INSTALLED=$("${DRUSHDIR}/drush" --version | cut -d: -f2);
-    INSTALLED=${INSTALLED/  /};
-    INSTALLED=${INSTALLED/ /};
-    for X in "${VERSIONSINSTALLED[@]}"; do
-      if [[ "${X}" == "drush-${INSTALLED}" ]]; then tput setaf 2; fi
-      if [[ "${X}" = *"${BASEVERSION}"* ]]; then
-        if [[ -z "${CLEANARG}" ]]; then
-          echo "      ${X/drush-/}";
-        else
-          echo "      ${X/drush-/}" | grep ${CLEANARG};
+  function _FETCH () {
+    function __REMOTE () {
+      cd "${DRUSHDIR}";
+      declare -a AVAILABLEVERSIONS=($(cd "${DRUSHDIR}" && composer show drush/drush | sort | uniq | grep versions | tr ", " "\n"));
+      declare -a LEGACIES=($(printf '%s\n' "${LEGACIES[@]}" | sort | uniq | grep -e '^[1-5][.]'));
+      declare -a AVAILABLEVERSIONS=($(printf '%s\n' "${AVAILABLEVERSIONS[@]}" | sort | uniq | grep -e '^[6-9][.]'));
+      ALLVERSIONS=("${LEGACIES[@]}" "${AVAILABLEVERSIONS[@]}");
+      if [[ -z "${CLEANARG}" ]]; then
+        for X in "${ALLVERSIONS[@]}"; do          echo "      ${X}"; done
+      else
+        if [[ "${BASEVERSION}" == "1" ]] || [[ "${BASEVERSION}" == "2" ]] || [[ "${BASEVERSION}" == "3" ]] || [[ "${BASEVERSION}" == "4" ]] || [[ "${BASEVERSION}" == "5" ]]; then
+          for X in "${LEGACIES[@]}"; do          echo "      ${X}" | grep "${CLEANARG}"; done
         fi
-        if [[ "${X}" == "drush-${INSTALLED}" ]]; then tput sgr0; fi
+        if [[ "${BASEVERSION}" == "6" ]] || [[ "${BASEVERSION}" == "7" ]] || [[ "${BASEVERSION}" == "8" ]]; then
+          for X in "${AVAILABLEVERSIONS[@]}"; do echo "      ${X}" | grep "${CLEANARG}"; done
+        fi
       fi
-    done
+    }
+
+    function __LOCAL () {
+      declare -a VERSIONSINSTALLED=();
+      for ITEM in $(find "${DRUSHDIR}/versions" -maxdepth 1 -type d | cut -d/ -f6 | grep "drush-" | grep -v "master" | sort | uniq); do
+        VERSIONSINSTALLED+=("${ITEM}");
+      done
+      INSTALLED=$("${DRUSHDIR}/drush" --version | cut -d: -f2);
+      INSTALLED=${INSTALLED/  /};
+      INSTALLED=${INSTALLED/ /};
+      for X in "${VERSIONSINSTALLED[@]}"; do
+        if [[ "${X}" == "drush-${INSTALLED}" ]]; then tput setaf 2; fi
+        if [[ "${X}" = *"${BASEVERSION}"* ]]; then
+          if [[ -z "${CLEANARG}" ]]; then
+            echo "      ${X/drush-/}";
+          else
+            echo "      ${X/drush-/}" | grep ${CLEANARG};
+          fi
+          if [[ "${X}" == "drush-${INSTALLED}" ]]; then tput sgr0; fi
+        fi
+      done
+    }
+
+      if [[ "${ARGUMENTS}" == *"local"* ]]; then
+        __LOCAL;
+      elif [[ "${ARGUMENTS}" == *"remote"* ]]; then
+        __REMOTE;
+      else
+        __LOCAL;
+      fi
+
+    if [[ "${FIRSTARGUMENT}" == "ls-local" ]]; then __LOCAL; fi
+    if [[ "${FIRSTARGUMENT}" == "ls-remote" ]]; then __LOCAL; fi
     exit 0;
   }
 
@@ -485,10 +508,9 @@ function _RUN () {
     echo "   dvm pkg install <name>                    Install an extension matching <name>";
     echo "   dvm pkg reinstall <name>                  Reinstall an extension matching <name>";
     echo "   dvm pkg uninstall <name>                  Uninstall an extension matching <name>";
-    echo "   dvm ls-local                              List installed versions.";
-    echo "   dvm ls-local <version>                    List installed versions matching a search criteria";
-    echo "   dvm ls-remote                             List remote versions available for install";
-    echo "   dvm ls-remote <version>                   List remote versions matching a search criteria";
+    echo "   dvm ls                                    List installed versions.";
+    echo "   dvm ls local <version>                    List installed versions matching a search criteria";
+    echo "   dvm ls remote <version>                   List remote versions matching a search criteria";
     echo "   dvm initialize                            Install any required dependencies";
     echo "   dvm upgrade                               Updates DVM to the latest available version/branch";
     echo "   dvm upgrade <version>                     Changes DVM to version <version>";
@@ -517,11 +539,6 @@ function SETVARS () {
   DVMVERSION=$(cd "${DRUSHDIR}" && git rev-parse --abbrev-ref HEAD);
   if [[ ! -d "${DRUSHDIR}" ]]; then mkdir -p "${DRUSHDIR}"; fi
   if [[ ! -d "${LINKDIR}" ]]; then mkdir -p "${LINKDIR}"; fi
-  if [[ "${*}" == *"reinstall"* ]]; then STATE="reinstall"; fi
-  if [[ "${*}" == *"uninstall"* ]]; then STATE="uninstall"; fi
-  if [[ "${*}" == *"install"* ]] && [[ "${STATE}" != "reinstall" ]] && [[ "${STATE}" != "uninstall" ]]; then STATE="install"; fi
-  if [[ "${*}" == *"exec"* ]]; then STATE="exec"; fi
-  if [[ "${*}" == *"upgrade"* ]]; then STATE="upgrade"; fi
 
   CLEANARG="${*}";
   CLEANARG=${CLEANARG/uninstall/};
@@ -535,6 +552,10 @@ function SETVARS () {
   CLEANARG=${CLEANARG/download/};
   CLEANARG=${CLEANARG/ls-local/};
   CLEANARG=${CLEANARG/ls-remote/};
+  CLEANARG=${CLEANARG/ls/};
+  CLEANARG=${CLEANARG/ll/};
+  CLEANARG=${CLEANARG/local/};
+  CLEANARG=${CLEANARG/remote/};
   CLEANARG=${CLEANARG/upgrade/};
   CLEANARG=${CLEANARG/  /};
   CLEANARG=${CLEANARG/ /};
