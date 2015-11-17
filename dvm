@@ -114,8 +114,8 @@ function DVM () {
   }
 
 function _RUN () {
-
-    case "${ARGUMENTS[0]}" in
+  FIRSTARGUMENT=$(echo "${ARGUMENTS}" | cut -d " " -f 1);
+    case "${FIRSTARGUMENT}" in
       *[use]*)        _SWITCH;
                       exit 0;
                       ;;
