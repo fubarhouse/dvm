@@ -477,14 +477,17 @@ function _RUN () {
 
       if [[ "${ARGUMENTS}" == *"local"* ]]; then
         __LOCAL;
+        exit 0;
       elif [[ "${ARGUMENTS}" == *"remote"* ]]; then
         __REMOTE;
+        exit 0;
       else
         __LOCAL;
+        exit 0;
       fi
 
-    if [[ "${FIRSTARGUMENT}" == "ls-local" ]]; then __LOCAL; fi
-    if [[ "${FIRSTARGUMENT}" == "ls-remote" ]]; then __LOCAL; fi
+    if [[ "${FIRSTARGUMENT}" == "ls-local" ]]; then __LOCAL; exit 0; fi
+    if [[ "${FIRSTARGUMENT}" == "ls-remote" ]]; then __REMOTE; exit 0; fi
     exit 0;
   }
 
