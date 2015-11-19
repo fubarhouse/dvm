@@ -456,11 +456,14 @@ function _RUN () {
         if [[ "${X}" =~ ^${LATESTVERSION}* ]]; then
           if [[ "${X}" =~ ${Y} ]]; then
             ALLOWEDVERSIONS+=("${X}");
-          elif [[ "${X}" == "${LATESTVERSION}" ]]; then
-            ALLOWEDVERSIONS+=("${X}");
           fi
         fi
       done
+    done
+    for X in "${AVAILABLEVERSIONS[@]}"; do
+      if [[ "${X}" == "${LATESTVERSION}" ]]; then
+        ALLOWEDVERSIONS+=("${X}");
+      fi
     done
     VERSIONCOUNT="${#ALLOWEDVERSIONS[@]}"
     LATESTVERSION="${ALLOWEDVERSIONS[$VERSIONCOUNT - 1]}";
