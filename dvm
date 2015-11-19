@@ -381,7 +381,7 @@ function _RUN () {
     function __INSTALL () {
       if [[ -n "${CLEANARG}" ]]; then
         if [[ -d "${DRUSHVERDIR}" ]]; then
-          echo "Drush ${CLEANARG} has already been installed.";
+          echo "  Drush ${CLEANARG} has already been installed.";
         else
           __GETVERSIONS;
           if [[ "${VALIDVERSION}" == true ]]; then
@@ -398,7 +398,7 @@ function _RUN () {
           VALIDVERSION=true;
           __INSTALL_ACTION;
         else
-          echo "Drush ${CLEANARG} has't previously been installed.";
+          echo "  Drush ${CLEANARG} has't previously been installed.";
           exit 0;
         fi
       else
@@ -421,7 +421,7 @@ function _RUN () {
             echo "  Drush ${CLEANARG} is not installed.";
           fi
         else
-          echo "You cannot uninstall a currently active version."
+          echo "  You cannot uninstall a currently active version."
           exit 0;
         fi
       else
