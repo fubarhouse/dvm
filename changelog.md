@@ -4,6 +4,7 @@
 
 ### 1.3
 
+    #31: sort latest version before updating
     #27: add a basic changelog
     #26: adjust output spacing
     #25: add ability to simply get and install the latest version
