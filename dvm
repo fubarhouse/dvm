@@ -445,16 +445,33 @@ function _RUN () {
     declare -a AVAILABLEVERSIONS=($(printf '%s\n' "${AVAILABLEVERSIONS[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[6-9][.]'));
     ALLVERSIONS=("${LEGACIES[@]}" "${AVAILABLEVERSIONS[@]}");
     VERSIONCOUNT="${#ALLVERSIONS[@]}"
-    echo "  There are ${VERSIONCOUNT} versions available for Drush!"
+    echo "  There are ${VERSIONCOUNT} versions available for Drush compatible with DVM!"
     LATESTVERSION="${ALLVERSIONS[$VERSIONCOUNT - 1]}";
+    # Clean up output before sorting
+    LATESTVERSION=$(echo "${LATESTVERSION}" | cut -d "-" -f 1);
+    declare -a ALLOWEDVERSIONS=();
+    declare -a FILTER=("alpha" "beta" "rc");
+    for X in "${AVAILABLEVERSIONS[@]}"; do
+      for Y in "${FILTER[@]}"; do
+        if [[ "${X}" =~ ^${LATESTVERSION}* ]]; then
+          if [[ "${X}" =~ ${Y} ]]; then
+            ALLOWEDVERSIONS+=("${X}");
+          elif [[ "${X}" == "${LATESTVERSION}" ]]; then
+            ALLOWEDVERSIONS+=("${X}");
+          fi
+        fi
+      done
+    done
+    VERSIONCOUNT="${#ALLOWEDVERSIONS[@]}"
+    LATESTVERSION="${ALLOWEDVERSIONS[$VERSIONCOUNT - 1]}";
     echo "  The latest version is ${LATESTVERSION}";
-    dvm install "${LATESTVERSION}";
+    "${DRUSHDIR}/dvm" install "${LATESTVERSION}";
     CURRENTVERSION=$(drush --version | cut -d: -f2);
     CURRENTVERSION=${CURRENTVERSION/  /};
     CURRENTVERSION=${CURRENTVERSION/ /};
     if [[ "${CURRENTVERSION}" != "${LATESTVERSION}" ]]; then
       echo "  Currently using ${CURRENTVERSION}";
-      dvm use "${LATESTVERSION}";
+      "${DRUSHDIR}/dvm" use "${LATESTVERSION}";
     else
       echo "  You're already using ${LATESTVERSION}";
     fi
