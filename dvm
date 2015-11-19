@@ -167,6 +167,9 @@ function _RUN () {
       "upgrade")    _UPGRADE;
                     exit 0;
                     ;;
+      "update")     _UPDATE;
+                    exit 0;
+                    ;;
       *)            echo "  Input was invalid.";
                     echo "  Type in 'nvm' for usage.";
                     exit 0;
@@ -435,6 +438,28 @@ function _RUN () {
     fi
   }
 
+  function _UPDATE () {
+    cd "${DRUSHDIR}";
+    declare -a AVAILABLEVERSIONS=($(cd "${DRUSHDIR}" && composer show drush/drush | sort | uniq | grep versions | tr ", " "\n"));
+    declare -a LEGACIES=($(printf '%s\n' "${LEGACIES[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[1-5][.]'));
+    declare -a AVAILABLEVERSIONS=($(printf '%s\n' "${AVAILABLEVERSIONS[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[6-9][.]'));
+    ALLVERSIONS=("${LEGACIES[@]}" "${AVAILABLEVERSIONS[@]}");
+    VERSIONCOUNT="${#ALLVERSIONS[@]}"
+    echo "  There are ${VERSIONCOUNT} versions available for Drush!"
+    LATESTVERSION="${ALLVERSIONS[$VERSIONCOUNT - 1]}";
+    echo "  The latest version is ${LATESTVERSION}";
+    dvm install "${LATESTVERSION}";
+    CURRENTVERSION=$(drush --version | cut -d: -f2);
+    CURRENTVERSION=${CURRENTVERSION/  /};
+    CURRENTVERSION=${CURRENTVERSION/ /};
+    if [[ "${CURRENTVERSION}" != "${LATESTVERSION}" ]]; then
+      echo "  Currently using ${CURRENTVERSION}";
+      dvm use "${LATESTVERSION}";
+    else
+      echo "  You're already using ${LATESTVERSION}";
+    fi
+  }
+
   function _FETCH () {
     function __REMOTE () {
       cd "${DRUSHDIR}";
@@ -515,6 +540,7 @@ function _RUN () {
     echo "   dvm ls local <version>                    List installed versions matching a search criteria";
     echo "   dvm ls remote <version>                   List remote versions matching a search criteria";
     echo "   dvm initialize                            Install any required dependencies";
+    echo "   dvm update                                Install the latest version of drush and use it by default";
     echo "   dvm upgrade                               Updates DVM to the latest available version/branch";
     echo "   dvm upgrade <version>                     Changes DVM to version <version>";
     echo " ";
@@ -560,6 +586,7 @@ function SETVARS () {
   CLEANARG=${CLEANARG/local/};
   CLEANARG=${CLEANARG/remote/};
   CLEANARG=${CLEANARG/upgrade/};
+  CLEANARG=${CLEANARG/update/};
   CLEANARG=${CLEANARG/  /};
   CLEANARG=${CLEANARG/ /};
   VERSION="${CLEANARG}";
