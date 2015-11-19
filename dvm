@@ -346,7 +346,7 @@ function _RUN () {
           VALIDVERSION=false;
           echo "  Version ${CLEANARG} was not found.";
           echo "  ${CLEANARG} was not found in list, so DVM will search remotely...";
-          declare -a AVAILABLEVERSIONS=($(cd "${DRUSHDIR}" && composer show drush/drush -q | grep -v "x-dev"| grep versions | tr ", " "\n"));
+          declare -a AVAILABLEVERSIONS=($(cd "${DRUSHDIR}" && composer show drush/drush -q | grep versions | tr ", " "\n"));
           for X in "${AVAILABLEVERSIONS[@]}"; do
             if [[ "${CLEANARG}" == "${X}" ]]; then
               VALIDVERSION=true;
