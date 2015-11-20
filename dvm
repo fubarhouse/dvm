@@ -113,6 +113,18 @@ function DVM () {
     fi
   }
 
+function _INSTALLINFO () {
+  if [[ -n $(which drush) ]]; then
+    eval "dirname $(which drush)" &> /dev/null;
+    if [[ $(eval "dirname $(which drush)") =~ ^[${DRUSHDIR}] ]]; then
+      drush status | grep "Drush version" | cut -d: -f2;
+    else
+      echo "  DVM is not using a version.";
+      echo "  Type in dvm use <version> or dvm update to fix.";
+    fi
+  fi
+}
+
 function _RUN () {
   FIRSTARGUMENT=$(echo "${ARGUMENTS}" | cut -d " " -f 1);
     case "${FIRSTARGUMENT}" in
@@ -125,14 +137,7 @@ function _RUN () {
       "pkg")        _GETPKG;
                     exit 0;
                     ;;
-      "current")    if [[ -n $(which drush) ]]; then
-                      if [[ $(which drush) == "${LINKDIR}/drush" ]]; then
-                        drush status | grep "Drush version" | cut -d: -f2;
-                      else
-                        echo "  DVM is not using a version.";
-                        echo "  Type in dvm use <version> to fix.";
-                      fi
-                    fi
+      "current")    _INSTALLINFO;
                     exit 0;
                     ;;
       "status")     if [[ -n $(which drush) ]]; then
