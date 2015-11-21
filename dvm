@@ -119,8 +119,8 @@ function _INSTALLINFO () {
     if [[ $(eval "dirname $(which drush)") =~ ^[${DRUSHDIR}] ]]; then
       drush status | grep "Drush version" | cut -d: -f2;
     else
-      echo "  DVM is not using a version.";
-      echo "  Type in dvm use <version> or dvm update to fix.";
+      echo "  DVM is not set up to use drush.";
+      echo "  Type 'dvm update' to fix.";
     fi
   fi
 }
