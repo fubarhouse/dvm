@@ -479,19 +479,13 @@ function _RUN () {
         else
           LATESTVERSION=$(echo "${ALLOWEDVERSIONS[${#ALLOWEDVERSIONS[@]} - 1]}" | cut -d "-" -f1);
         fi
+        if [[ -z "${LATESTVERSION}" ]] && [[ "${#AVAILABLEVERSIONS[@]}" == 1 ]]; then
+          LATESTVERSION=$(echo "${AVAILABLEVERSIONS[${#AVAILABLEVERSIONS[@]} - 1]}");
+        fi
         if [[ "${X}" == "${LATESTVERSION}" ]]; then
           ALLOWEDVERSIONS+=("${X}");
-          echo "it should work!";
         fi
       done
-      echo "All: ${ALLVERSIONS[@]}";
-      echo "Available: ${AVAILABLEVERSIONS[@]}";
-      echo "Allowed: ${ALLOWEDVERSIONS[@]}";
-      echo "Latest version is ${LATESTVERSION}";
-
-
-
-
       if [[ -z "${CLEANARG}" ]]; then
         echo "  The latest version is ${LATESTVERSION}";
       else
