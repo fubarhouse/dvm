@@ -454,39 +454,48 @@ function _RUN () {
       declare -a LEGACIES=($(printf '%s\n' "${LEGACIES[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[1-5][.]' | grep "${CLEANARG}"));
       declare -a AVAILABLEVERSIONS=($(printf '%s\n' "${AVAILABLEVERSIONS[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[6-9][.]' | grep "${CLEANARG}"));
     fi
+    ALLVERSIONS=("${LEGACIES[@]}" "${AVAILABLEVERSIONS[@]}" "");
     ALLVERSIONS=${ALLVERSIONS/  /};
     ALLVERSIONS=${ALLVERSIONS/ /}
     if [[ -n "${ALLVERSIONS[@]}" ]]; then
-      ALLVERSIONS=("${LEGACIES[@]}" "${AVAILABLEVERSIONS[@]}" "");
       VERSIONCOUNT="${#ALLVERSIONS[@]}";
       if [[ -z "${CLEANARG}" ]]; then
         echo "  There are ${VERSIONCOUNT} versions available for Drush compatible with DVM!"
       fi
-      LATESTVERSION="${ALLVERSIONS[$VERSIONCOUNT - 1]}";
-      # Clean up output before sorting
-      LATESTVERSION=$(echo "${LATESTVERSION}" | cut -d "-" -f 1);
       declare -a ALLOWEDVERSIONS=();
       declare -a FILTER=("alpha" "beta" "rc");
-      for X in "${AVAILABLEVERSIONS[@]}"; do
+      for X in "${ALLVERSIONS[@]}"; do
         for Y in "${FILTER[@]}"; do
+          LATESTVERSION="${X}";
+          LATESTVERSION=$(echo "${LATESTVERSION}" | cut -d "-" -f1);
           if [[ "${X}" =~ ^${LATESTVERSION}* ]]; then
             if [[ "${X}" =~ ${Y} ]]; then
               ALLOWEDVERSIONS+=("${X}");
             fi
           fi
         done
-      done
-      for X in "${AVAILABLEVERSIONS[@]}"; do
+        if [[ "${#ALLOWEDVERSIONS[@]}" == 0 ]]; then
+          LATESTVERSION=$(echo "${ALLOWEDVERSIONS[${#ALLOWEDVERSIONS[0]}]}" | cut -d "-" -f1);
+        else
+          LATESTVERSION=$(echo "${ALLOWEDVERSIONS[${#ALLOWEDVERSIONS[@]} - 1]}" | cut -d "-" -f1);
+        fi
         if [[ "${X}" == "${LATESTVERSION}" ]]; then
           ALLOWEDVERSIONS+=("${X}");
+          echo "it should work!";
         fi
       done
-      VERSIONCOUNT="${#ALLOWEDVERSIONS[@]}"
-      LATESTVERSION="${ALLOWEDVERSIONS[$VERSIONCOUNT - 1]}";
+      echo "All: ${ALLVERSIONS[@]}";
+      echo "Available: ${AVAILABLEVERSIONS[@]}";
+      echo "Allowed: ${ALLOWEDVERSIONS[@]}";
+      echo "Latest version is ${LATESTVERSION}";
+
+
+
+
       if [[ -z "${CLEANARG}" ]]; then
         echo "  The latest version is ${LATESTVERSION}";
       else
-        echo "  You'vve opted to update the current version to the latest version matching ${CLEANARG}";
+        echo "  You've opted to update the current version to the latest version matching ${CLEANARG}";
         echo "  The query has returned with ${LATESTVERSION} being the latest available.";
       fi
       "${DRUSHDIR}/dvm" install "${LATESTVERSION}";
