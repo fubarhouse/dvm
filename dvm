@@ -456,7 +456,7 @@ function _RUN () {
     fi
     ALLVERSIONS=${ALLVERSIONS/  /};
     ALLVERSIONS=${ALLVERSIONS/ /}
-    if [[ ! "${ALLVERSIONS[@]}" == "" ]]; then
+    if [[ -n "${ALLVERSIONS[@]}" ]]; then
       ALLVERSIONS=("${LEGACIES[@]}" "${AVAILABLEVERSIONS[@]}" "");
       VERSIONCOUNT="${#ALLVERSIONS[@]}";
       if [[ -z "${CLEANARG}" ]]; then
