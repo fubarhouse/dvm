@@ -108,8 +108,20 @@ function DVM () {
         esac
       fi
     else
-      echo "  To upgrade DVM, please use a git installation method.";
-      echo "  Consult the repository's readme for more information."
+      if [[ -z "${DVMVERSIONS[@]}" ]]; then
+        declare -a DVMVERSIONS=("1.0" "1.1" "1.2" "1.3" "master");
+      fi
+      if [[ -n "${CLEANARG}" ]] && [[ ! "${DVMVERSIONS[@]}" =~ [${CLEANARG}] ]]; then
+        _NOARG;
+        exit 0;
+      else
+        if [[ -n "${CLEANARG}" ]]; then
+          wget "https://raw.githubusercontent.com/fubarhouse/dvm/${CLEANARG}/dvm" -O "${DRUSHDIR}/dvm";
+        else
+          wget "https://raw.githubusercontent.com/fubarhouse/dvm/master/dvm" -O "${DRUSHDIR}/dvm";
+        fi
+        echo "  Please consider reinstalling with git, see readme for more information."
+      fi
     fi
   }
 

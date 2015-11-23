@@ -34,28 +34,25 @@ The preferred method is to use the `$PATH` variable and `git`
     git clone https://github.com/fubarhouse/dvm.git ~/.dvm
     echo "export PATH=\$PATH:$HOME/.dvm" >> ~/.bash_profile;
     source ~/.bash_profile
-    dvm install 8.0.0
-    dvm use 8.0.0
+    dvm update
 
-Alternatively you can combine `alias` and `git`:
+Alternatively you *could* combine `alias` and `git`:
 
     git clone https://github.com/fubarhouse/dvm.git ~/.dvm
     alias dvm="${HOME}/.dvm/dvm" >> ~/.bash_profile;
     alias drush="${HOME}/.dvm/drush" >> ~/.bash_profile;
     source ~/.bash_profile
-    dvm install 8.0.0
-    dvm use 8.0.0
+    dvm update
 
 If you prefer to have a fixed install not using `git`, you can use any choice of the above including wget:
-Please note that this method is *not* preferred as it does not yet support any upgrade paths but still works perfectly.
+Please note that this method is *not* preferred as support is both limited and delayed and the output is messy.
 
     mkdir "${HOME}/.dvm"
-    wget -O ~/.dvm https://raw.githubusercontent.com/fubarhouse/dvm/master/dvm
+    wget https://raw.githubusercontent.com/fubarhouse/dvm/master/dvm -O ~/.dvm/dvm
     alias dvm="${HOME}/.dvm/dvm" >> ~/.bash_profile;
     alias drush="${HOME}/.dvm/drush" >> ~/.bash_profile;
     source ~/.bash_profile
-    dvm install 8.0.0
-    dvm use 8.0.0
+    dvm update
 
 And then you can ensure all the dependencies (composer, unzip etc) are installed using:
 
