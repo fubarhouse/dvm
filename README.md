@@ -9,7 +9,7 @@ It was made, tested and used on a OSX El Capitan system for intended use on a De
 
 ### Dependencies
 
-If you're using Drupal/Drush currently then it would be safe to assume dependencies are taken care of, but should you neeed specifics you can see the dependencies below:
+If you're using Drupal/Drush currently then it would be safe to assume dependencies are taken care of, but should you need specifics you can see the dependencies below:
 
 * `git`
 * `wget`
