@@ -126,11 +126,11 @@ We are looking to support as many people as possible, so we are prepared to comm
 
 ### Drush
 
-#### 2.x.x* and earlier
+#### 2.x.x and earlier
 
-* Versions `2.x.x*` and later are successfully working without errors using DVM.
+* Versions `2.x.x` and later are successfully working without errors using DVM.
 
-* Versions `2.x.x+*` and `2.x.x` do not support global functionality, so it's recommended to use `3.x.x` at a minimum.
+* Versions `2.x.x+x` and `2.x.x` do not support global functionality, so it's recommended to use `3.x.x` at a minimum.
 
 * Versions `1.x.x+x` will *not* be officially supported as these versions do not support global functionality and the underdeveloped code of the time is infinitely unusable and impractical from a version control stand-point.
 
