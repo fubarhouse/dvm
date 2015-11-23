@@ -445,47 +445,45 @@ function _RUN () {
 
   function _UPDATE () {
     cd "${DRUSHDIR}";
+
+    # Get lists of versions
     if [[ -z "${CLEANARG}" ]]; then
       declare -a AVAILABLEVERSIONS=($(cd "${DRUSHDIR}" && composer show drush/drush | sort | uniq | grep versions | tr ", " "\n"));
       declare -a LEGACIES=($(printf '%s\n' "${LEGACIES[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[1-5][.]'));
       declare -a AVAILABLEVERSIONS=($(printf '%s\n' "${AVAILABLEVERSIONS[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[6-9][.]'));
+      declare -a BASEVERSIONS=($(printf '%s\n' "${AVAILABLEVERSIONS[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[6-9][.]' | grep -v "alpha" | grep -v "beta" | grep -v "rc"));
     else
       declare -a AVAILABLEVERSIONS=($(cd "${DRUSHDIR}" && composer show drush/drush | sort | uniq | grep versions | tr ", " "\n" | grep "${CLEANARG}"));
       declare -a LEGACIES=($(printf '%s\n' "${LEGACIES[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[1-5][.]' | grep "${CLEANARG}"));
       declare -a AVAILABLEVERSIONS=($(printf '%s\n' "${AVAILABLEVERSIONS[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[6-9][.]' | grep "${CLEANARG}"));
+      declare -a BASEVERSIONS=($(printf '%s\n' "${AVAILABLEVERSIONS[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[6-9][.]' | grep -v "alpha" | grep -v "beta" | grep -v "rc" | grep "${CLEANARG}"));
     fi
-    ALLVERSIONS=("${LEGACIES[@]}" "${AVAILABLEVERSIONS[@]}" "");
-    ALLVERSIONS=${ALLVERSIONS/  /};
-    ALLVERSIONS=${ALLVERSIONS/ /}
-    if [[ -n "${ALLVERSIONS[@]}" ]]; then
-      VERSIONCOUNT="${#ALLVERSIONS[@]}";
-      if [[ -z "${CLEANARG}" ]]; then
-        echo "  There are ${VERSIONCOUNT} versions available for Drush compatible with DVM!"
-      fi
-      declare -a ALLOWEDVERSIONS=();
-      declare -a FILTER=("alpha" "beta" "rc");
-      for X in "${ALLVERSIONS[@]}"; do
-        for Y in "${FILTER[@]}"; do
-          LATESTVERSION="${X}";
-          LATESTVERSION=$(echo "${LATESTVERSION}" | cut -d "-" -f1);
-          if [[ "${X}" =~ ^${LATESTVERSION}* ]]; then
-            if [[ "${X}" =~ ${Y} ]]; then
-              ALLOWEDVERSIONS+=("${X}");
-            fi
-          fi
-        done
-        if [[ "${#ALLOWEDVERSIONS[@]}" == 0 ]]; then
-          LATESTVERSION=$(echo "${ALLOWEDVERSIONS[${#ALLOWEDVERSIONS[0]}]}" | cut -d "-" -f1);
-        else
-          LATESTVERSION=$(echo "${ALLOWEDVERSIONS[${#ALLOWEDVERSIONS[@]} - 1]}" | cut -d "-" -f1);
-        fi
-        if [[ -z "${LATESTVERSION}" ]] && [[ "${#AVAILABLEVERSIONS[@]}" == 1 ]]; then
-          LATESTVERSION=$(echo "${AVAILABLEVERSIONS[${#AVAILABLEVERSIONS[@]} - 1]}");
-        fi
-        if [[ "${X}" == "${LATESTVERSION}" ]]; then
-          ALLOWEDVERSIONS+=("${X}");
-        fi
+    # Get categorized list of versions
+    for X in "${AVAILABLEVERSIONS[@]}"; do
+      case "${X}" in
+        *alpha*)  VERSIONS_ALPHA+=("${X}"); ;;
+        *beta*)   VERSIONS_BETA+=("${X}"); ;;
+        *rc*)     VERSIONS_RC+=("${X}"); ;;
+        *)        VERSIONS_FULL+=("${X}")
+      esac
+    done
+    # Set the latest version
+    for X in "${BASEVERSIONS[@]}"; do
+      for Y in "${VERSIONS_ALPHA[@]}"; do
+        if [[ -n "${Y}" ]]; then LATESTVERSION="${X}"; fi
       done
+      for Y in "${VERSIONS_BETA[@]}"; do
+        if [[ -n "${Y}" ]]; then LATESTVERSION="${X}"; fi
+      done
+      for Y in "${VERSIONS_RC[@]}"; do
+        if [[ -n "${Y}" ]]; then LATESTVERSION="${X}"; fi
+      done
+      for Y in "${VERSIONS_FULL[@]}"; do
+        if [[ -n "${Y}" ]]; then LATESTVERSION="${X}"; fi
+      done
+    done
+    # Perform the updating!
+    if [[ -n "${LATESTVERSION}" ]]; then
       if [[ -z "${CLEANARG}" ]]; then
         echo "  The latest version is ${LATESTVERSION}";
       else
@@ -497,10 +495,7 @@ function _RUN () {
       CURRENTVERSION=${CURRENTVERSION/  /};
       CURRENTVERSION=${CURRENTVERSION/ /};
       if [[ "${CURRENTVERSION}" != "${LATESTVERSION}" ]]; then
-        echo "  Currently using ${CURRENTVERSION}";
         "${DRUSHDIR}/dvm" use "${LATESTVERSION}";
-      else
-        echo "  You're already using ${LATESTVERSION}";
       fi
     else
       echo "  The query returned no results.";
