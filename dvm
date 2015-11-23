@@ -5,7 +5,7 @@ function DVM () {
   function _SETARRAYS () {
     DRUSHDIR="${HOME}/.dvm";
     DVMVERSIONS=();
-    DVMVERSIONSTEMP=($(cd "${DRUSHDIR}" && git remote show origin | grep tracked));
+    if [[ -d "${DRUSHDIR}/.git" ]]; then DVMVERSIONSTEMP=($(cd "${DRUSHDIR}" && git remote show origin | grep tracked)); fi
     for X in "${DVMVERSIONSTEMP[@]}"; do
       X=${X/  /};
       X=${X/ /};
@@ -621,7 +621,7 @@ function SETVARS () {
 
   LINKDIR="${HOME}/.dvm";
   DRUSHDIR="${HOME}/.dvm";
-  DVMVERSION=$(cd "${DRUSHDIR}" && git rev-parse --abbrev-ref HEAD);
+  if [[ -d "${DRUSHDIR}/.git" ]]; then DVMVERSION=$(cd "${DRUSHDIR}" && git rev-parse --abbrev-ref HEAD); fi
   if [[ ! -d "${DRUSHDIR}" ]]; then mkdir -p "${DRUSHDIR}"; fi
   if [[ ! -d "${LINKDIR}" ]]; then mkdir -p "${LINKDIR}"; fi
 
