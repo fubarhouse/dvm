@@ -31,33 +31,33 @@ If you're using Drupal/Drush currently then it would be safe to assume dependenc
 
 The preferred method is to use the `$PATH` variable and `git`
 
-    git clone https://github.com/fubarhouse/dvm.git ~/.dvm
+    git clone https://github.com/fubarhouse/dvm.git ~/.dvm;
     echo "export PATH=\$PATH:$HOME/.dvm" >> ~/.bash_profile;
-    source ~/.bash_profile
-    dvm update
+    source ~/.bash_profile;
+    dvm update;
 
 Alternatively you *could* combine `alias` and `git`:
 
-    git clone https://github.com/fubarhouse/dvm.git ~/.dvm
+    git clone https://github.com/fubarhouse/dvm.git ~/.dvm;
     alias dvm="${HOME}/.dvm/dvm" >> ~/.bash_profile;
     alias drush="${HOME}/.dvm/drush" >> ~/.bash_profile;
-    source ~/.bash_profile
-    dvm update
+    source ~/.bash_profile;
+    dvm update;
 
 If you prefer to have a fixed install not using `git`, you can use any choice of the above including wget:
 Please note that this method is *not* preferred as support is both limited and delayed and the output is messy.
 
-    mkdir "${HOME}/.dvm"
-    wget https://raw.githubusercontent.com/fubarhouse/dvm/master/dvm -O ~/.dvm/dvm
+    mkdir "${HOME}/.dvm";
+    wget https://raw.githubusercontent.com/fubarhouse/dvm/master/dvm -O ~/.dvm/dvm;
     alias dvm="${HOME}/.dvm/dvm" >> ~/.bash_profile;
     alias drush="${HOME}/.dvm/drush" >> ~/.bash_profile;
-    source ~/.bash_profile
-    dvm update
+    source ~/.bash_profile;
+    dvm update;
 
 And then you can ensure all the dependencies (composer, unzip etc) are installed using:
 
-    dvm initialize
-    dvm update
+    dvm initialize;
+    dvm update;
 
 Dependencies not installed via the initialization argument (currently) include:
 
@@ -69,12 +69,12 @@ There's a convenient way of moving between versions of *DVM* without having to s
 
 Upgrading will move you to the latest version and perform a git pull if you aren't on the latest version and it will perform a git pull if you're using the master copy.
 
-    dvm upgrade
+    dvm upgrade;
 
 To interchange versions of DVM, you can use the following examples to demonstrate how you can do that:
 
-    dvm upgrade 1.1
-    dvm upgrade master
+    dvm upgrade 1.1;
+    dvm upgrade master;
 
 If you feel the need to switch between branches, you can simply use the following and substitute `master` for the version number
 
@@ -84,31 +84,37 @@ If you feel the need to switch between branches, you can simply use the followin
 
 Currently the update process will not accept an argument to find the latest release based on regex, but it will support a command to go and get the latest version from the remote list and install that one and set it to the default install so that all is taken care of.
 
-    dvm drush
+    dvm update;
+
+You can also update based on a query, which will get the latest possible release of a given version number. This will automatically install the latest release targeted and set it to be the default version in use by DVM.
+
+    dvm update 7.0;
+    dvm update 7.1;
+    dvm update 8.0;
 
 ## Usage
 
 To get a list of available versions:
 
-    dvm ls remote
+    dvm ls remote;
 
 Or to search for a version, type an argument to ls-remote to do a basic query string on the same set of commands:
 
-    dvm ls remote 8.0.0
+    dvm ls remote 8.0.0;
 
 To download and install version v7.0.0 and v8.0.0-rc3, do this:
 
-    dvm install 7.0.0
-    dvm install 8.0.0
+    dvm install 7.0.0;
+    dvm install 8.0.0;
 
 You can switch between installed versions:
 
-    dvm use 7.0.0
-    dvm use 8.0.0
+    dvm use 7.0.0;
+    dvm use 8.0.0;
 
 Or you can just run a command using a specific version of Drush using:
 
-    dvm exec 7.0.0 --version
+    dvm exec 7.0.0 --version;
 
 ## Compatibility
 
