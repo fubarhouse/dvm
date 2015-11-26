@@ -4,10 +4,15 @@
 
 ### 1.4
 
+    #38: functionalize new get_versions method and tell other functions to use this
+    #37: update get_versions to latest version output method
+    #36: reorder the output of "ls remote"
+    #35: simplify update function
+    #34: add regex to update function
     #33: address the accurateness of the current command
     #30: revise readme for public image
-		#29: encapsulate complete change history in changelog
-		#28: reduce functions available to those who install with wget
+    #29: encapsulate complete change history in changelog
+    #28: reduce functions available to those who install with wget
 
 ### 1.3
 
