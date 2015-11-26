@@ -518,19 +518,65 @@ function _RUN () {
   function _FETCH () {
     function __REMOTE () {
       cd "${DRUSHDIR}";
-      declare -a AVAILABLEVERSIONS=($(cd "${DRUSHDIR}" && composer show drush/drush | sort | uniq | grep versions | tr ", " "\n"));
-      declare -a LEGACIES=($(printf '%s\n' "${LEGACIES[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[1-5][.]'));
-      declare -a AVAILABLEVERSIONS=($(printf '%s\n' "${AVAILABLEVERSIONS[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[6-9][.]'));
-      ALLVERSIONS=("${LEGACIES[@]}" "${AVAILABLEVERSIONS[@]}");
+
+      # Get lists of versions
       if [[ -z "${CLEANARG}" ]]; then
-        for X in "${ALLVERSIONS[@]}"; do          echo "      ${X}"; done
+        declare -a AVAILABLEVERSIONS=($(cd "${DRUSHDIR}" && composer show drush/drush | sort | uniq | grep versions | tr ", " "\n"));
+        declare -a LEGACIES=($(printf '%s\n' "${LEGACIES[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[1-5][.]'));
+        declare -a AVAILABLEVERSIONS=($(printf '%s\n' "${AVAILABLEVERSIONS[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[6-9][.]'));
+        declare -a BASEVERSIONS=($(printf '%s\n' "${AVAILABLEVERSIONS[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[6-9][.]' | grep -v "alpha" | grep -v "beta" | grep -v "rc"));
       else
-        if [[ "${BASEVERSION}" == "1" ]] || [[ "${BASEVERSION}" == "2" ]] || [[ "${BASEVERSION}" == "3" ]] || [[ "${BASEVERSION}" == "4" ]] || [[ "${BASEVERSION}" == "5" ]]; then
-          for X in "${LEGACIES[@]}"; do          echo "      ${X}" | grep "${CLEANARG}"; done
-        fi
-        if [[ "${BASEVERSION}" == "6" ]] || [[ "${BASEVERSION}" == "7" ]] || [[ "${BASEVERSION}" == "8" ]]; then
-          for X in "${AVAILABLEVERSIONS[@]}"; do echo "      ${X}" | grep "${CLEANARG}"; done
-        fi
+        declare -a AVAILABLEVERSIONS=($(cd "${DRUSHDIR}" && composer show drush/drush | sort | uniq | grep versions | tr ", " "\n" | grep "${CLEANARG}"));
+        declare -a LEGACIES=($(printf '%s\n' "${LEGACIES[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[1-5][.]' | grep "${CLEANARG}"));
+        declare -a AVAILABLEVERSIONS=($(printf '%s\n' "${AVAILABLEVERSIONS[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[6-9][.]' | grep "${CLEANARG}"));
+        declare -a BASEVERSIONS=($(printf '%s\n' "${AVAILABLEVERSIONS[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[6-9][.]' | grep -v "alpha" | grep -v "beta" | grep -v "rc" | grep "${CLEANARG}"));
+      fi
+      # Get categorized list of versions
+      for X in "${AVAILABLEVERSIONS[@]}"; do
+        case "${X}" in
+          *-alpha*)  VERSIONS_ALPHA+=("${X}"); ;;
+          *-beta*)   VERSIONS_BETA+=("${X}"); ;;
+          *-rc*)     VERSIONS_RC+=("${X}"); ;;
+          *)        VERSIONS_FULL+=("${X}")
+        esac
+      done
+      # Set the latest version
+      for X in "${BASEVERSIONS[@]}"; do
+        for Y in "${VERSIONS_ALPHA[@]}"; do
+          if [[ -n $(echo "${Y}") ]] && [[ "${Y}" =~ ^[${X}] ]]; then
+            if [[ -z $(echo "${REMOTEVERSIONS[@]}" | grep "${Y}") ]]; then
+              REMOTEVERSIONS[${#REMOTEVERSIONS[@]} + 1]="${Y}";
+            fi
+          fi
+        done
+        for Y in "${VERSIONS_BETA[@]}"; do
+          if [[ -n $(echo "${Y}") ]] && [[ "${Y}" =~ ^[${X}] ]]; then
+            if [[ -z $(echo "${REMOTEVERSIONS[@]}" | grep "${Y}") ]]; then
+              REMOTEVERSIONS[${#REMOTEVERSIONS[@]} + 1]="${Y}";
+            fi
+          fi
+        done
+        for Y in "${VERSIONS_RC[@]}"; do
+          if [[ -n $(echo "${Y}") ]] && [[ "${Y}" =~ ^[${X}] ]]; then
+            if [[ -z $(echo "${REMOTEVERSIONS[@]}" | grep "${Y}") ]]; then
+              REMOTEVERSIONS[${#REMOTEVERSIONS[@]} + 1]="${Y}";
+            fi
+          fi
+        done
+        for Y in "${VERSIONS_FULL[@]}"; do
+          if [[ -n $(echo "${Y}") ]] && [[ "${Y}" =~ ^[${X}]* ]]; then
+            if [[ -n "${Y}" ]] && [[ "${Y}" == "${X}" ]]; then
+              REMOTEVERSIONS[${#REMOTEVERSIONS[@]} + 1]="${Y}";
+            fi
+          fi
+        done
+      done
+      declare -a REMOTEVERSIONS=("${LEGACIES[@]}" "${REMOTEVERSIONS[@]}");
+
+      if [[ -z "${CLEANARG}" ]]; then
+        for X in "${REMOTEVERSIONS[@]}"; do          echo "      ${X}"; done
+      else
+        for X in "${REMOTEVERSIONS[@]}"; do          echo "      ${X}" | grep "${CLEANARG}"; done
       fi
     }
 
