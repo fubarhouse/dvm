@@ -239,7 +239,7 @@ function _RUN () {
       "ls-remote")  _FETCH "remote";
                     exit 0;
                     ;;
-      "initialize") *_INITIALIZE;
+      "initialize") _INITIALIZE;
                     exit 0;
                     ;;
       "upgrade")    _UPGRADE;
