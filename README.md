@@ -134,6 +134,15 @@ We are looking to support as many people as possible, so we are prepared to comm
 
 * Versions `1.x.x+x` will *not* be officially supported as these versions do not support global functionality and the underdeveloped code of the time is infinitely unusable and impractical from a version control stand-point.
 
+### Environments
+
+Tested on the following environments:
+
+* OSX El Capitan
+* Vagrant/Ubuntu 12.04
+* Go Daddy Shared Linux Hosting
+* Cloud9.io
+
 ## License
 
 dvm is released under the MIT license.
