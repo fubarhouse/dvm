@@ -1,1 +1,183 @@
-My Page
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Font Awesome, the iconic font and CSS framework">
+  <meta name="author" content="Dave Gandy">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- <link rel="shortcut icon" href="/favicon.ico"> -->
+  <title>Drush Verison Manager, the version control system built for Drupal developers</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" />
+  <!-- <script>
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA--1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+      var ga = document.createElement('script');
+      ga.src = 'https://www.google-analytics.com/ga.js';
+      var s = document.scripts[0];
+      s.parentNode.insertBefore(ga, s);
+    })();
+  </script> -->
+</head>
+<body>
+  <script>
+    (function(){
+      var bsa = document.createElement('script');
+      bsa.src = 'https://s3.buysellads.com/ac/bsa.js';
+      var s = document.scripts[0];
+      s.parentNode.insertBefore(bsa, s);
+    })();
+  </script>
+  <div id="wrap"> <!-- necessary for sticky footer. wrap all content except footer -->
+    <div class="collapse hidden-print" id="banner">
+  <div class="container">
+    <div class="message-container">
+      <div class="tagline">
+        <span id="rotating-message"></span>
+      </div>
+      <div class="action">
+        <a id="rotating-url" class="btn btn-primary btn-block" href=""></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="jumbotron jumbotron-carousel hidden-print" style="color: #8a6d3b; background-color: #fcf8e3; border-color: #faebcc;">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-8 col-sm-8 text-center">
+        <h1>Drush Version Manager</h1>
+        <p>Quick, easy, fuss-free.</p>
+        <div class="actions">
+          <a class="btn btn-default btn-lg" href="https://github.com/fubarhouse/dvm">
+            <i class="fa fa-download fa-lg"></i>&nbsp;Get Started</a>
+        </div>
+        <div class="shameless-self-promotion row">
+          <p>&nbsp;</p>
+          <div class="col-sm-3">&nbsp;</div>
+          <div class="col-sm-2">Version 1.4</div>
+          <div class="col-sm-2"><a style="color: #8a6d3b; font-weight:500;" href="https://github.com/fubarhouse/dvm">GitHub Project</a></div>
+          <div class="col-sm-2">Created by <br /><a style="color: #8a6d3b; font-weight:500;" href="http://twitter.com/fubarhouse">Karl Hepworth</a></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="social-buttons" class="hidden-print">
+  <div class="container">
+
+    <ul class="list-inline">
+      <li><iframe class="github-btn" src="https://ghbtns.com/github-btn.html?user=fubarhouse&repo=dvm&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="100px" height="20px"></iframe></li>
+      <li><iframe class="github-btn" src="https://ghbtns.com/github-btn.html?user=fubarhouse&repo=dvm&type=fork&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="102px" height="20px"></iframe></li>
+      <li class="follow-btn"><a href="https://twitter.com/fubarhouse" class="twitter-follow-button" data-link-color="#0069D6" data-show-count="true">Follow @fubarhouse</a></li>
+      <li class="tweet-btn hidden-phone"><a href="https://twitter.com/share" class="twitter-share-button" data-url="http://fubarhouse.gitgub.io/dvm" data-text="DVM - The Drush version manager" data-counturl="http://fubarhouse.github.com/dvm/" data-count="horizontal" data-via="fubarhouse" data-related="fubarhouse:Creator of DVM">Tweet</a></li>
+    </ul>
+  </div>
+</div>
+
+
+<div class="container">
+  <section class="hidden-print">
+    <div class="stripe-ad">
+      <p class="lead">The Drush version manager is a free and convenient way to easily move through multiple Drush versions, with a straight to-the-point approach using a friendly command-line interface.</p>
+    </div>
+  </section>
+
+
+  <section id="why" class="feature-list">
+    <div class="row">
+      <div class="col-md-4 col-sm-4">
+        <h4><i class="fa fa-cloud"></i> Tested with popular UNIX systems</h4>
+        Tested and used on <a href="https://www.godaddy.com/">GoDaddy</a> Shared Linux Hosting and <a href="https://c9.io/">Cloud9</a>. Being fully compatible with older versions of Bash will allow this to be installed anywhere!
+      </div>
+      <div class="col-md-4 col-sm-4">
+        <h4><i class="fa fa-archive"></i> Backwards compatibility</h4>
+        DVM has been tested and working on versions as low as 2.0.0, but we recommend 3.0.0 or later as it supports aliasing.
+      </div>
+      <div class="col-md-4 col-sm-4">
+        <h4><i class="fa fa-flag"></i> Symlinks</h4>
+        Use of UNIX symlinks to manage an unlimited number of versions with quick switching and inline execution of commands on any version.
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4 col-sm-4">
+        <h4><i class="fa fa-code-fork"></i> Using another version</h4>
+        Use multiple versions for use with scripting with a simple command. A convenient way to check versions and run commands and scripts with logic.
+      </div>
+      <div class="col-md-4 col-sm-4">
+        <h4><i class="fa fa-download"></i> Get the latest!</h4>
+        Conveniently update your local version or change to another version, choose to install/uninstall any specific version, or simply generate a list of versions all with simple commands.
+      </div>
+      <div class="col-md-4 col-sm-4">
+        <h4><i class="fa fa-laptop"></i> Ansible</h4>
+        For convenient use with Ansible and Vagrant, <a href="https://github.com/fubarhouse/fubarhouse.dvm">an Ansible role is available</a> for your automation needs. We encourage you to contribute to the repository should you run into any issues.
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4 col-sm-6">
+        <h4><i class="fa fa-heart"></i> Made with love</h4>
+        Maximum compatibility and love has gone into this program, with support for Drush version 3.0.0 and higher on Bash version 2.4 (tested) and later. We enncourage you to feel free to add your own ideas/issues!
+      </div>
+      <div class="col-md-4 col-sm-6">
+        <h4><i class="fa fa-money"></i> Completely free to use</h4>
+        DVM is supplied as is and without charge under the <a href="http://opensource.org/licenses/mit-license.html">MIT license</a>. Our hosting is taken care of by GitHub and we won't ever ask you for payment.
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="row">
+  <p>&nbsp;</p>
+  <div class="container">
+    <div class="panel panel-warning">
+      <div class="panel-heading">
+        <h3 class="panel-title">Why use DVM?</h3>
+      </div>
+      <div class="panel-body">
+        <p>With the release of Drupal 8 and Drush 8, there are now many versions of Drush to choose from. With so many versions available, how does any one tie into your workflow?</p>
+        <p>DVM introduces the ability to quickly and simply execute drush scripts and commands using any version, anywhere, with support stretching all the way to versions 3.0.0 and above.</p>
+        <p>In addition to all the benefits, you can simply run <code>dvm update</code> to update and install the latest available version.</p>
+        <p>This project was inspired from similar projects such as <a href="https://github.com/creationix/nvm">NVM</a>, <a href="https://github.com/rvm/rvm">RVM</a> and <a href="https://github.com/yyuu/pyenv">PyEnv</a> and of course the absence of a service which can provide the same function.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </div>
+  <footer id="footer" class="footer hidden-print">
+  <div class="container text-center">
+    <div>
+      DVM v1.4<br class="hide-sm hide-md hide-lg">
+      Created by <a href="https://twitter.com/fubarhouse">Karl Hepworth</a>
+    </div>
+    <div>
+      <span class="hide-xs">&middot;</span><br class="hide-sm hide-md hide-lg">
+      Code licensed under <a href="http://opensource.org/licenses/mit-license.html">MIT License</a>
+      <span class="hide-xs hide-sm">&middot;</span><br class="hide-md hide-lg">
+      Documentation licensed under <a href="http://creativecommons.org/licenses/by/3.0/"><i class="fa fa-creative-commons">&nbsp;</i> BY 3.0</a>
+    </div>
+    <div>
+      Thanks to <a href="https://www.maxcdn.com/"><i class="fa fa-maxcdn"></i> MaxCDN</a> for <a href="http://www.bootstrapcdn.com/">BootstrapCDN</a> for Bootstrap &amp; FontAwesome.<br />
+      Thanks to <a href="http://github.com"><i class="fa fa-github"></i> GitHub</a> for making the entire project and it's hosting free
+    </div>
+    <div class="project">
+      <a href="https://github.com/fubarhouse/dvm">GitHub Project</a> &middot;
+      <a href="https://github.com/fubarhouse/dvm/issues">Issues</a>
+    </div>
+  </div>
+</footer>
+  <script src="https://platform.twitter.com/widgets.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/jquery.validate.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/algoliasearch.helper/2/algoliasearch.helper.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.2.2/backbone-min.js"></script>
+  </body>
+</html>
