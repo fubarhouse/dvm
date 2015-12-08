@@ -1,4 +1,4 @@
-# Drush Version Manager
+# [Drush Version Manager](http://fubarhouse.github.io/dvm/)
 
 DVM is a Drush Version Management platform based upon the sharp efficiency of [NVM](https://github.com/creationix/nvm) and spawned inspiration from NVM, RVM and PyEnv in that where so many versions of Drush and there's no convenient way to simply switch version in the way NVM or to upgrade for that matter. NVM, RVM and PyEnv have endeavored to achieve maximum efficiency with little human-readable input and taking their examples, the release of Drupal 8 and the popularity of a server configuration management tool Ansible this was essentially a must have for personal web development tools and as there's no viable alternative available, this tool has joined the pack publicly.
 
@@ -143,6 +143,12 @@ Tested on the following environments:
 * Vagrant/Ubuntu 12.04
 * Go Daddy Shared Linux Hosting
 * Cloud9.io
+
+## Future
+
+With the launch of our [GitHub web page](http://fubarhouse.github.io/dvm/) to promote the repository, the aim is to put more love, work and attention into  our Ansible role.
+
+Beyond this, there is no future plan other than maintenance and support, The creator wanted this to be a thing and to exist for all and the projects goals have been accomplished. We'd love to add more into it in the future but we feel it's a whole package as is without any idea of what we could improve...
 
 ## License
 
