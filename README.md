@@ -49,6 +49,7 @@ Please note that this method is *not* preferred as support is both limited and d
 
     mkdir "${HOME}/.dvm";
     wget https://raw.githubusercontent.com/fubarhouse/dvm/master/dvm -O ~/.dvm/dvm;
+    wget https://raw.githubusercontent.com/fubarhouse/dvm/master/package.json -O ~/.dvm/package.json;
     alias dvm="${HOME}/.dvm/dvm" >> ~/.bash_profile;
     alias drush="${HOME}/.dvm/drush" >> ~/.bash_profile;
     source ~/.bash_profile;
