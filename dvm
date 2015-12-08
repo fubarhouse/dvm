@@ -14,7 +14,9 @@ function DVM () {
         DVMVERSIONS+=("${X}");
       fi
     done
-    PACKAGES=($(find "${HOME}/.drush" -maxdepth 1 -type d | grep -v cache | cut -d/ -f5));
+    if [[ -d "${HOME}/.drush" ]]; then
+      PACKAGES=($(find "${HOME}/.drush" -maxdepth 1 -type d | grep -v cache | cut -d/ -f5));
+    fi
 
     DRUSH_V1=("1.0.0+drupal5" "1.0.0+drupal6" "1.0.0-beta1+drupal5" "1.0.0-beta2+drupal5" "1.0.0-beta3+drupal5" "1.0.0-beta4+drupal5" "1.0.0-rc1+drupal5" "1.0.0-rc1+drupal6" "1.0.0-rc11+drupal6" "1.0.0-rc2+drupal5" "1.0.0-rc2+drupal6" "1.0.0-rc2+drupal7" "1.0.0-rc3+drupal5" "1.1.0+drupal5" "1.1.0+drupal6" "1.2.0+drupal5" "1.2.0+drupal6" "1.3.0+drupal5" "1.4.0+drupal5");
     DRUSH_V2=("2.0.0" "2.0.0-alpha1+drupal5" "2.0.0-alpha1+drupal6" "2.0.0-alpha1+drupal7" "2.0.0-alpha2+drupal5" "2.0.0-alpha2+drupal6" "2.0.0-alpha2+drupal7" "2.0.0-rc1" "2.1.0");
@@ -31,10 +33,14 @@ function DVM () {
     AVAILABLEVERSIONS=();
     AVAILABLEVERSIONS+=($(printf '%s\n' "${LEGACIES[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[1-5][.]'));
     AVAILABLEVERSIONS+=($(printf '%s\n' "${COMPOSERVERSIONS[@]}" | sort | grep -v "x-dev"| uniq | grep -e '^[6-9][.]'));
-    VERSIONSINSTALLED=();
-    for ITEM in $(find "${DRUSHDIR}/versions" -maxdepth 1 -type d | cut -d/ -f6 | grep "drush-" | grep -v "master"); do
-      VERSIONSINSTALLED+=("${ITEM}");
-    done
+    if [[ -d "${DRUSHDIR}/versions" ]]; then
+      VERSIONSINSTALLED=();
+      for ITEM in $(find "${DRUSHDIR}/versions" -maxdepth 1 -type d | cut -d/ -f6 | grep "drush-" | grep -v "master"); do
+        VERSIONSINSTALLED+=("${ITEM}");
+      done
+    else
+      echo "  No version of Drush is currently installed with DVM.";
+    fi
   }
 
 
@@ -305,29 +311,33 @@ function _RUN () {
   }
 
   function _EXEC () {
-    CLEANARG=$(echo "${CLEANARG}" | cut -d ' ' -f1);
-    DRUSHVERDIR="${DRUSHDIR}/versions/drush-${CLEANARG}";
-    if [[ -n "${CLEANARG}" ]]; then
-      if [[ -e "${DRUSHDIR}/drush" ]]; then
-        COMMAND="${ARGUMENTS[*]}";
-        COMMAND=${COMMAND/exec/};
-        COMMAND=${COMMAND/${CLEANARG}/};
-        COMMAND=${COMMAND/  / };
-        cd "${DRUSHVERDIR}";
-        if [[ -e "./vendor/bin/drush" ]]; then
-          EXECUTABLE="vendor/bin/drush";
+    if [[ -d "${DRUSHDIR}/versions" ]]; then
+      CLEANARG=$(echo "${CLEANARG}" | cut -d ' ' -f1);
+      DRUSHVERDIR="${DRUSHDIR}/versions/drush-${CLEANARG}";
+      if [[ -n "${CLEANARG}" ]]; then
+        if [[ -e "${DRUSHDIR}/drush" ]]; then
+          COMMAND="${ARGUMENTS[*]}";
+          COMMAND=${COMMAND/exec/};
+          COMMAND=${COMMAND/${CLEANARG}/};
+          COMMAND=${COMMAND/  / };
+          cd "${DRUSHVERDIR}";
+          if [[ -e "./vendor/bin/drush" ]]; then
+            EXECUTABLE="vendor/bin/drush";
+          else
+            EXECUTABLE=$(find . -type f | grep -v "drush/" | grep -v "drush." | grep drush);
+            EXECUTABLE=${EXECUTABLE/.\//};
+          fi
+          eval "${DRUSHVERDIR}/${EXECUTABLE} ${COMMAND}";
         else
-          EXECUTABLE=$(find . -type f | grep -v "drush/" | grep -v "drush." | grep drush);
-          EXECUTABLE=${EXECUTABLE/.\//};
+          echo "  Drush ${CLEANARG} is not installed.";
         fi
-        eval "${DRUSHVERDIR}/${EXECUTABLE} ${COMMAND}";
       else
-        echo "  Drush ${CLEANARG} is not installed."
+        _NOARG;
       fi
+      exit 0;
     else
-      _NOARG;
+      echo "  No versions are locally available";
     fi
-    exit 0;
   }
 
   function _GETPKG () {
@@ -549,24 +559,28 @@ function _RUN () {
     }
 
     function __LOCAL () {
-      declare -a VERSIONSINSTALLED=();
-      for ITEM in $(find "${DRUSHDIR}/versions" -maxdepth 1 -type d | cut -d/ -f6 | grep "drush-" | grep -v "master" | sort | uniq); do
-        VERSIONSINSTALLED+=("${ITEM}");
-      done
-      INSTALLED=$("${DRUSHDIR}/drush" --version | cut -d: -f2);
-      INSTALLED=${INSTALLED/  /};
-      INSTALLED=${INSTALLED/ /};
-      for X in "${VERSIONSINSTALLED[@]}"; do
-        if [[ "${X}" == "drush-${INSTALLED}" ]]; then tput setaf 2; fi
-        if [[ "${X}" = *"${BASEVERSION}"* ]]; then
-          if [[ -z "${CLEANARG}" ]]; then
-            echo "      ${X/drush-/}";
-          else
-            echo "      ${X/drush-/}" | grep ${CLEANARG};
+      if [[ -d "${DRUSHDIR}/versions" ]]; then
+        declare -a VERSIONSINSTALLED=();
+        for ITEM in $(find "${DRUSHDIR}/versions" -maxdepth 1 -type d | cut -d/ -f6 | grep "drush-" | grep -v "master" | sort | uniq); do
+          VERSIONSINSTALLED+=("${ITEM}");
+        done
+        INSTALLED=$("${DRUSHDIR}/drush" --version | cut -d: -f2);
+        INSTALLED=${INSTALLED/  /};
+        INSTALLED=${INSTALLED/ /};
+        for X in "${VERSIONSINSTALLED[@]}"; do
+          if [[ "${X}" == "drush-${INSTALLED}" ]]; then tput setaf 2; fi
+          if [[ "${X}" = *"${BASEVERSION}"* ]]; then
+            if [[ -z "${CLEANARG}" ]]; then
+              echo "      ${X/drush-/}";
+            else
+              echo "      ${X/drush-/}" | grep ${CLEANARG};
+            fi
+            if [[ "${X}" == "drush-${INSTALLED}" ]]; then tput sgr0; fi
           fi
-          if [[ "${X}" == "drush-${INSTALLED}" ]]; then tput sgr0; fi
-        fi
-      done
+        done
+      else
+        echo "  No versions are locally available.";
+      fi
     }
 
       if [[ "${ARGUMENTS}" == *"local"* ]]; then
