@@ -292,23 +292,23 @@ function _RUN () {
         fi
         if [[ -e "${DRUSHDIR}/drush" ]]; then
           if [[ -n $("${DRUSHDIR}/drush" status | grep "version") ]]; then
-            if [[ ! "${SILENTMODE}" == true ]]; then
+            if [[ "${SILENTMODE}" == true ]]; then
               echo "  Drush is now using v${CLEANARG}";
             fi
           elif [[ $("${DRUSHDIR}/drush" status) == *"Could not find a valid Drupal installation"* ]]; then
             INSTALLSTATUS=$("${DRUSHDIR}/drush" status);
-            if [[ ! "${SILENTMODE}" == true ]]; then
+            if [[ "${SILENTMODE}" == true ]]; then
               echo "  Drush is now using v${CLEANARG}";
               echo "  ${INSTALLSTATUS}";
             fi
           else
-            if [[ ! "${SILENTMODE}" == true ]]; then
+            if [[ "${SILENTMODE}" == true ]]; then
               echo "  There was an error in installation.";
             fi
           fi
         fi
       else
-        if [[ ! "${SILENTMODE}" == true ]]; then
+        if [[ "${SILENTMODE}" == true ]]; then
           echo "  Drush ${CLEANARG} is not installed."
         fi
       fi
