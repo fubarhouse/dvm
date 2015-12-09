@@ -2,6 +2,11 @@
 
 function DVM () {
 
+  function _OUTPUT () {
+    if [[ ! "${SILENTMODE}" == true ]]; then
+      echo "${*}";
+    fi
+  }
   function _SETARRAYS () {
     DRUSHDIR="${HOME}/.dvm";
     DVMVERSIONS=();
