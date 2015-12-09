@@ -50,7 +50,7 @@ function DVM () {
 
   function _NOARG () {
     if [[ -z "${CLEANARG}" ]]; then
-      echo "  Missing argument <version>";
+      _OUTPUT "  Missing argument <version>";
       exit 0;
     fi
   }
@@ -119,14 +119,14 @@ function DVM () {
   function _INITIALIZE () {
     function __GETCOMPOSER () {
       if [[ -z $(which composer) ]]; then
-        echo "Installing composer";
+        _OUTPUT "Installing composer";
         curl -sS https://getcomposer.org/installer | php
         mv composer.phar "${LINKDIR}/composer"
       fi
     }
     function __UNZIP () {
       if [[ -z $(which unzip) ]]; then
-        echo "Installing unzip";
+        _OUTPUT "Installing unzip";
         sudo apt-get install unzip
       fi
     }
@@ -164,10 +164,10 @@ function DVM () {
           *                     ) if [[ "${DVMVERSIONS[@]}" == *"${CLEANARG}"* ]]; then
                                     cd "${DRUSHDIR}"; git checkout "${CLEANARG}"; git pull origin "${CLEANARG}";
                                   else
-                                    echo "  DVM ${CLEANARG} does not exist.";
-                                    echo "  Available versions include:";
+                                    _OUTPUT "  DVM ${CLEANARG} does not exist.";
+                                    _OUTPUT "  Available versions include:";
                                     for X in "${DVMVERSIONS[@]}"; do
-                                      echo "    ${X}";
+                                      _OUTPUT "    ${X}";
                                     done
                                   fi
                                   ;;
@@ -191,7 +191,7 @@ function DVM () {
         else
           wget "https://raw.githubusercontent.com/fubarhouse/dvm/master/dvm" -O "${DRUSHDIR}/dvm";
         fi
-        echo "  Please consider reinstalling with git, see readme for more information."
+        _OUTPUT "  Please consider reinstalling with git, see readme for more information."
       fi
     fi
   }
@@ -202,8 +202,8 @@ function _INSTALLINFO () {
     if [[ $(eval "dirname $(which drush)") =~ ^[${DRUSHDIR}] ]]; then
       drush status | grep "Drush version" | cut -d: -f2;
     else
-      echo "  DVM is not set up to use drush.";
-      echo "  Type 'dvm update' to fix.";
+      _OUTPUT "  DVM is not set up to use drush.";
+      _OUTPUT "  Type 'dvm update' to fix.";
     fi
   fi
 }
@@ -259,8 +259,8 @@ function _RUN () {
       "update")     _UPDATE;
                     exit 0;
                     ;;
-      *)            echo "  Input was invalid.";
-                    echo "  Type in 'nvm' for usage.";
+      *)            _OUTPUT "  Input was invalid.";
+                    _OUTPUT "  Type in 'nvm' for usage.";
                     exit 0;
                     ;;
     esac
@@ -297,25 +297,17 @@ function _RUN () {
         fi
         if [[ -e "${DRUSHDIR}/drush" ]]; then
           if [[ -n $("${DRUSHDIR}/drush" status | grep "version") ]]; then
-            if [[ ! "${SILENTMODE}" == true ]]; then
-              echo "  Drush is now using v${CLEANARG}";
-            fi
+            _OUTPUT "  Drush is now using v${CLEANARG}";
           elif [[ $("${DRUSHDIR}/drush" status) == *"Could not find a valid Drupal installation"* ]]; then
             INSTALLSTATUS=$("${DRUSHDIR}/drush" status);
-            if [[ ! "${SILENTMODE}" == true ]]; then
-              echo "  Drush is now using v${CLEANARG}";
-              echo "  ${INSTALLSTATUS}";
-            fi
+            _OUTPUT "  Drush is now using v${CLEANARG}";
+            _OUTPUT "  ${INSTALLSTATUS}";
           else
-            if [[ ! "${SILENTMODE}" == true ]]; then
-              echo "  There was an error in installation.";
-            fi
+            _OUTPUT "  There was an error in installation.";
           fi
         fi
       else
-        if [[ ! "${SILENTMODE}" == true ]]; then
-          echo "  Drush ${CLEANARG} is not installed."
-        fi
+        _OUTPUT "  Drush ${CLEANARG} is not installed."
       fi
     else
       _NOARG;
@@ -342,14 +334,14 @@ function _RUN () {
           fi
           eval "${DRUSHVERDIR}/${EXECUTABLE} ${COMMAND}";
         else
-          echo "  Drush ${CLEANARG} is not installed.";
+          _OUTPUT "  Drush ${CLEANARG} is not installed.";
         fi
       else
         _NOARG;
       fi
       exit 0;
     else
-      echo "  No versions are locally available";
+      _OUTPUT "  No versions are locally available";
     fi
   }
 
@@ -368,21 +360,21 @@ function _RUN () {
     function __SHOW {
       __PREP;
       if [[ -n "${PACKAGES[@]}" ]]; then
-        echo "  The following drush packages are installed:";
+        _OUTPUT "  The following drush packages are installed:";
         for X in "${PACKAGES[@]}"; do
           if [[ -n "${X}" ]]; then
             if [[ -n ${PACKAGESEARCH} ]]; then
-              echo "    ${X}" | grep "${PACKAGESEARCH}";
+              _OUTPUT "    ${X}" | grep "${PACKAGESEARCH}";
             else
-              echo "    ${X}";
+              _OUTPUT "    ${X}";
             fi
           fi
         done
       else
         if [[ -n "${PACKAGESEARCH}" ]]; then
-          echo "  Package search has returned no results.";
+          _OUTPUT "  Package search has returned no results.";
         else
-          echo "  No drush packages are installed.";
+          _OUTPUT "  No drush packages are installed.";
         fi
       fi
     }
@@ -391,39 +383,39 @@ function _RUN () {
       if [[ -n "${PACKAGESEARCH}" ]]; then
         if [[ "${ARGUMENTS}" == *"reinstall"* ]]; then
           if [[ -d "${HOME}/.drush/${PACKAGESEARCH}" ]]; then
-            echo "  Uninstalling ${PACKAGESEARCH}...";
+            _OUTPUT "  Uninstalling ${PACKAGESEARCH}...";
             rm -rf "${HOME}/.drush/${PACKAGESEARCH}"; fi
-            echo "  Done!";
+            _OUTPUT "  Done!";
             if [[ $(which drush) ]]; then
-              echo "  Installing ${PACKAGESEARCH}";
+              _OUTPUT "  Installing ${PACKAGESEARCH}";
               cd "${HOME}/.drush" && drush dl -y "${PACKAGESEARCH}";
-              echo "  Done!";
+              _OUTPUT "  Done!";
             else
-              echo "  Drush was not found."
+              _OUTPUT "  Drush was not found."
             fi
         elif [[ "${ARGUMENTS}" == *"uninstall"* ]]; then
           if [[ ! -d "${HOME}/.drush/${PACKAGESEARCH}" ]]; then
-            echo "  ${PACKAGESEARCH} could not be found on this system.";
+            _OUTPUT "  ${PACKAGESEARCH} could not be found on this system.";
           else
-            echo "  Uninstalling ${PACKAGESEARCH}...";
+            _OUTPUT "  Uninstalling ${PACKAGESEARCH}...";
             rm -rf "${HOME}/.drush/${PACKAGESEARCH}";
-            echo "  Done!";
+            _OUTPUT "  Done!";
           fi
         elif [[ ! "${ARGUMENTS}" == *"uninstall"* ]] && [[ ! "${ARGUMENTS}" == *"reinstall"* ]]; then
           if [[ -d "${HOME}/.drush/${PACKAGESEARCH}" ]]; then
-            echo "  ${PACKAGESEARCH} was found on this system and cannot install.";
+            _OUTPUT "  ${PACKAGESEARCH} was found on this system and cannot install.";
           else
             if [[ $(which drush) ]]; then
-              echo "  Installing ${PACKAGESEARCH}";
+              _OUTPUT "  Installing ${PACKAGESEARCH}";
               cd "${HOME}/.drush" && drush dl -y "${PACKAGESEARCH}";
-              echo "  Done!";
+              _OUTPUT "  Done!";
             else
-              echo "  Drush was not found."
+              _OUTPUT "  Drush was not found."
             fi
           fi
         fi
         else
-          echo "  Missing argument <name>";
+          _OUTPUT "  Missing argument <name>";
         fi
     }
     if [[ "${ARGUMENTS}" == *"show"* ]]; then __SHOW; fi
@@ -433,7 +425,7 @@ function _RUN () {
 
   function _INSTALL () {
     function __GETVERSIONS () {
-      echo "  Checking version number...";
+      _OUTPUT "  Checking version number...";
       if [[ -n "${CLEANARG}" ]]; then
         for X in "${AVAILABLEVERSIONS[@]}"; do
           if [[ "${CLEANARG}" == "${X}" ]]; then
@@ -442,11 +434,11 @@ function _RUN () {
         done
         if [[ "${VALIDVERSION}" == true ]]; then
           VALIDVERSION=true;
-          echo "  Version ${CLEANARG} was found.";
+          _OUTPUT "  Version ${CLEANARG} was found.";
         else
           VALIDVERSION=false;
-          echo "  Version ${CLEANARG} was not found.";
-          echo "  ${CLEANARG} was not found in list, so DVM will search remotely...";
+          _OUTPUT "  Version ${CLEANARG} was not found.";
+          _OUTPUT "  ${CLEANARG} was not found in list, so DVM will search remotely...";
           _GETREMOTES;
           for X in "${REMOTEVERSIONS[@]}"; do
             if [[ "${CLEANARG}" == "${X}" ]]; then
@@ -467,7 +459,7 @@ function _RUN () {
                   unzip "${CLEANARG}.zip"
                   rm -f "${CLEANARG}.zip";
                 else
-                  echo "  Drush ${CLEANARG} does not exist.";
+                  _OUTPUT "  Drush ${CLEANARG} does not exist.";
                 fi
                 exit 0;
                 ;;
@@ -482,7 +474,7 @@ function _RUN () {
     function __INSTALL () {
       if [[ -n "${CLEANARG}" ]]; then
         if [[ -d "${DRUSHVERDIR}" ]]; then
-          echo "  Drush ${CLEANARG} has already been installed.";
+          _OUTPUT "  Drush ${CLEANARG} has already been installed.";
         else
           __GETVERSIONS;
           if [[ "${VALIDVERSION}" == true ]]; then
@@ -499,7 +491,7 @@ function _RUN () {
           VALIDVERSION=true;
           __INSTALL_ACTION;
         else
-          echo "  Drush ${CLEANARG} has't previously been installed.";
+          _OUTPUT "  Drush ${CLEANARG} has't previously been installed.";
           exit 0;
         fi
       else
@@ -517,12 +509,12 @@ function _RUN () {
         if [[ ! "${TOUNINSTALL}" == *"${INSTALLED}"* ]]; then
           if [[ -d "${DRUSHDIR}/versions/drush-${CLEANARG}" ]]; then
             rm -rf "${DRUSHDIR}/versions/drush-${CLEANARG}";
-            echo "  Drush ${CLEANARG} has been uninstalled.";
+            _OUTPUT "  Drush ${CLEANARG} has been uninstalled.";
           else
-            echo "  Drush ${CLEANARG} is not installed.";
+            _OUTPUT "  Drush ${CLEANARG} is not installed.";
           fi
         else
-          echo "  You cannot uninstall a currently active version."
+          _OUTPUT "  You cannot uninstall a currently active version."
           exit 0;
         fi
       else
@@ -543,10 +535,10 @@ function _RUN () {
     _GETREMOTES;
     if [[ -n "${LATESTVERSION}" ]]; then
       if [[ -z "${CLEANARG}" ]]; then
-        echo "  The latest version is ${LATESTVERSION}";
+        _OUTPUT "  The latest version is ${LATESTVERSION}";
       else
-        echo "  You've opted to update the current version to the latest version matching ${CLEANARG}";
-        echo "  The query has returned with ${LATESTVERSION} being the latest available.";
+        _OUTPUT "  You've opted to update the current version to the latest version matching ${CLEANARG}";
+        _OUTPUT "  The query has returned with ${LATESTVERSION} being the latest available.";
       fi
       "${DRUSHDIR}/dvm" install "${LATESTVERSION}";
       CURRENTVERSION=$(drush --version | cut -d: -f2);
@@ -556,8 +548,8 @@ function _RUN () {
         "${DRUSHDIR}/dvm" use "${LATESTVERSION}";
       fi
     else
-      echo "  The query returned no results.";
-      echo "  Check your internet connection or try a different query."
+      _OUTPUT "  The query returned no results.";
+      _OUTPUT "  Check your internet connection or try a different query."
     fi
   }
 
@@ -565,9 +557,9 @@ function _RUN () {
     function __REMOTE () {
       _GETREMOTES;
       if [[ -z "${CLEANARG}" ]]; then
-        for X in "${REMOTEVERSIONS[@]}"; do          echo "      ${X}"; done
+        for X in "${REMOTEVERSIONS[@]}"; do          _OUTPUT "      ${X}"; done
       else
-        for X in "${REMOTEVERSIONS[@]}"; do          echo "      ${X}" | grep "${CLEANARG}"; done
+        for X in "${REMOTEVERSIONS[@]}"; do          _OUTPUT "      ${X}" | grep "${CLEANARG}"; done
       fi
     }
 
@@ -584,15 +576,15 @@ function _RUN () {
           if [[ "${X}" == "drush-${INSTALLED}" ]]; then tput setaf 2; fi
           if [[ "${X}" = *"${BASEVERSION}"* ]]; then
             if [[ -z "${CLEANARG}" ]]; then
-              echo "      ${X/drush-/}";
+              _OUTPUT "      ${X/drush-/}";
             else
-              echo "      ${X/drush-/}" | grep ${CLEANARG};
+              _OUTPUT "      ${X/drush-/}" | grep ${CLEANARG};
             fi
             if [[ "${X}" == "drush-${INSTALLED}" ]]; then tput sgr0; fi
           fi
         done
       else
-        echo "  No versions are locally available.";
+        _OUTPUT "  No versions are locally available.";
       fi
     }
 
