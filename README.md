@@ -117,6 +117,10 @@ Or you can just run a command using a specific version of Drush using:
 
     dvm exec 7.0.0 --version;
 
+To suppress the output generated from the script when using scripts to do anything which doesn't involve installation tasks, you can use:
+
+    dvm use 7.0.0 --silent;
+
 ## Compatibility
 
 ### Drush version Manager
