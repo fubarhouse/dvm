@@ -1,3 +1,5 @@
 composer.lock
 vendor*
+vendor/*
 versions*
+versions/*
