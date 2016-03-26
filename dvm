@@ -652,7 +652,7 @@ function _RUN () {
 
 function SETVARS () {
 
-  COMPOSER_DISABLE_XDEBUG_WARN = 1;
+  COMPOSER_DISABLE_XDEBUG_WARN=1;
   LINKDIR="${HOME}/.dvm";
   DRUSHDIR="${HOME}/.dvm";
   if [[ -d "${DRUSHDIR}/.git" ]]; then DVMVERSION=$(cd "${DRUSHDIR}" && git rev-parse --abbrev-ref HEAD); fi
