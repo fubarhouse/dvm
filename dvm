@@ -134,7 +134,7 @@ function DVM () {
       if [[ -z $(which pear) ]]; then
         curl -O  http://pear.php.net/go-pear.phar;
         sudo php -d detect_unicode=0 go-pear.phar;
-        echo "export PATH=\"$PATH:$HOME/pear/bin\"" >> ~/.bash_profile;
+        echo "export PATH=\"$PATH:$HOME/pear/bin\"" >> ~/.bashrc;
         rm -f go-pear.phar;
       fi
     }
@@ -604,6 +604,21 @@ function _RUN () {
     exit 0;
   }
 
+  function DVMXDEBUG () {
+    if [[ -n "${UNSETXDEBUG}" ]]; then
+      unset COMPOSER_DISABLE_XDEBUG_WARN;
+      unset UNSETXDEBUG;
+    else
+      XDEBUGOPTIONS=$(php -i | grep xdebug | grep enabled);
+      for X in "${XDEBUGOPTIONS[@]}"; do
+        if [[ "${X}" == *xdebug* ]]; then
+          export COMPOSER_DISABLE_XDEBUG_WARN=1;
+          UNSETXDEBUG=TRUE;
+        fi
+      done
+    fi
+  }
+
   function _HELP () {
     echo " Drush Version Manager";
     echo " ";
@@ -647,12 +662,13 @@ function _RUN () {
   ARGUMENTS=("${*}");
   _PRERUN "${*}";
   _SETARRAYS;
+  DVMXDEBUG set;
   _RUN;
+  DVMXDEBUG unset;
 }
 
 function SETVARS () {
 
-  export COMPOSER_DISABLE_XDEBUG_WARN=1;
   LINKDIR="${HOME}/.dvm";
   DRUSHDIR="${HOME}/.dvm";
   if [[ -d "${DRUSHDIR}/.git" ]]; then DVMVERSION=$(cd "${DRUSHDIR}" && git rev-parse --abbrev-ref HEAD); fi
