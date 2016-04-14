@@ -267,6 +267,21 @@ function _RUN () {
   }
 
   function _SWITCH () {
+    if [[ "${#CLEANARG}" == 1 ]]; then
+      for VERSION in "${VERSIONSINSTALLED[@]}"; do
+        if [[ "${VERSION}" =~ ^drush-${CLEANARG} ]]; then
+          CHANGETOVERSION="${VERSION}";
+        fi
+      done
+      if [[ -n "${CHANGETOVERSION}" ]]; then
+        CHANGETOVERSION=${CHANGETOVERSION/drush-/};
+        dvm use "${CHANGETOVERSION}";
+      else
+        _OUTPUT "  Drush ${CLEANARG} is not installed.";
+        exit 0;
+      fi
+      exit 1;
+    fi
     if [[ -n "${CLEANARG}" ]]; then
       if [[ -d "${DRUSHVERDIR}" ]]; then
         while [[ -n $(which drush) ]] && [[ $(which drush) != "${LINKDIR}/drush" ]]; do
