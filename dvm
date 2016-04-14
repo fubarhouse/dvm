@@ -530,6 +530,17 @@ function _RUN () {
         TOUNINSTALL=$(_FETCH "local");
         TOUNINSTALL=${TOUNINSTALL/  /};
         TOUNINSTALL=${TOUNINSTALL/ /};
+
+        if [[ "${#CLEANARG}" == 1 ]]; then
+          for I in "${VERSIONSINSTALLED[@]}"; do
+            I=${I/drush-/}
+            if [[ "${I}" =~ ^${CLEANARG} ]]; then
+              dvm uninstall "${I}";
+            fi
+          done
+          exit 1;
+        fi
+
         if [[ ! "${TOUNINSTALL}" == *"${INSTALLED}"* ]]; then
           if [[ -d "${DRUSHDIR}/versions/drush-${CLEANARG}" ]]; then
             rm -rf "${DRUSHDIR}/versions/drush-${CLEANARG}";
