@@ -446,7 +446,16 @@ function _RUN () {
           if [[ "${CLEANARG}" == "${X}" ]]; then
             VALIDVERSION=true;
           fi
+          if [[ "${#CLEANARG}" == 1 ]]; then
+            if [[ "${X}" =~ ^${CLEANARG} ]]; then
+              VERSIONTOINSTALL="${X}";
+            fi
+          fi
         done
+        if [[ -n "${VERSIONTOINSTALL}" ]]; then
+          dvm install "${VERSIONTOINSTALL}";
+          exit 1;
+        fi
         if [[ "${VALIDVERSION}" == true ]]; then
           VALIDVERSION=true;
           _OUTPUT "  Version ${CLEANARG} was found.";
