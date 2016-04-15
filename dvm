@@ -59,12 +59,12 @@ function DVM () {
     cd "${DRUSHDIR}";
     # Get lists of versions
     if [[ -z "${CLEANARG}" ]]; then
-      declare -a AVAILABLEVERSIONS=($(cd "${DRUSHDIR}" && composer show drush/drush --all | sort | uniq | grep versions | tr ", " "\n"));
+      declare -a AVAILABLEVERSIONS=($(cd "${DRUSHDIR}" && composer show drush/drush -a | sort | uniq | grep versions | tr ", " "\n"));
       declare -a LEGACIES=($(printf '%s\n' "${LEGACIES[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[1-5][.]'));
       declare -a AVAILABLEVERSIONS=($(printf '%s\n' "${AVAILABLEVERSIONS[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[6-9][.]'));
       declare -a BASEVERSIONS=($(printf '%s\n' "${AVAILABLEVERSIONS[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[6-9][.]' | grep -v "alpha" | grep -v "beta" | grep -v "rc"));
     else
-      declare -a AVAILABLEVERSIONS=($(cd "${DRUSHDIR}" && composer show drush/drush --all | sort | uniq | grep versions | tr ", " "\n" | grep "${CLEANARG}"));
+      declare -a AVAILABLEVERSIONS=($(cd "${DRUSHDIR}" && composer show drush/drush -a | sort | uniq | grep versions | tr ", " "\n" | grep "${CLEANARG}"));
       declare -a LEGACIES=($(printf '%s\n' "${LEGACIES[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[1-5][.]' | grep "${CLEANARG}"));
       declare -a AVAILABLEVERSIONS=($(printf '%s\n' "${AVAILABLEVERSIONS[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[6-9][.]' | grep "${CLEANARG}"));
       declare -a BASEVERSIONS=($(printf '%s\n' "${AVAILABLEVERSIONS[@]}" | sort | uniq | grep -v "x-dev"| grep -e '^[6-9][.]' | grep -v "alpha" | grep -v "beta" | grep -v "rc" | grep "${CLEANARG}"));
