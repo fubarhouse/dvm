@@ -51,7 +51,7 @@ function DVM () {
   function _NOARG () {
     if [[ -z "${CLEANARG}" ]]; then
       _OUTPUT "  Missing argument <version>";
-      exit 0;
+      exit 1;
     fi
   }
 
@@ -156,7 +156,7 @@ function DVM () {
         if [[ "${X}" != "master" ]]; then DVMVERSIONLATEST="${X}"; fi
       done
       if [[ -n "${CLEANARG}" ]]; then
-        if [[ ! "${DVMVERSIONS[@]}" =~ [${CLEANARG}] ]]; then _NOARG; exit 0; fi
+        if [[ ! "${DVMVERSIONS[@]}" =~ [${CLEANARG}] ]]; then _NOARG; fi
         case "${CLEANARG}" in
           "master"              ) cd "${DRUSHDIR}"; git checkout master; git pull origin "${CLEANARG}"; ;;
           "${DVMVERSION}"       ) echo "  You're already using ${CLEANARG}"; ;;
@@ -184,7 +184,6 @@ function DVM () {
       fi
       if [[ -n "${CLEANARG}" ]] && [[ ! "${DVMVERSIONS[@]}" =~ [${CLEANARG}] ]]; then
         _NOARG;
-        exit 0;
       else
         if [[ -n "${CLEANARG}" ]]; then
           wget "https://raw.githubusercontent.com/fubarhouse/dvm/${CLEANARG}/dvm" -O "${DRUSHDIR}/dvm";
@@ -278,9 +277,9 @@ function _RUN () {
         dvm use "${CHANGETOVERSION}";
       else
         _OUTPUT "  Drush ${CLEANARG} is not installed.";
-        exit 0;
+        exit 1;
       fi
-      exit 1;
+      exit 0;
     fi
     if [[ -n "${CLEANARG}" ]]; then
       if [[ -d "${DRUSHVERDIR}" ]]; then
@@ -357,6 +356,7 @@ function _RUN () {
       exit 0;
     else
       _OUTPUT "  No versions are locally available";
+      exit 1;
     fi
   }
 
@@ -454,7 +454,7 @@ function _RUN () {
         done
         if [[ -n "${VERSIONTOINSTALL}" ]]; then
           dvm install "${VERSIONTOINSTALL}";
-          exit 1;
+          exit 0;
         fi
         if [[ "${VALIDVERSION}" == true ]]; then
           VALIDVERSION=true;
@@ -538,19 +538,21 @@ function _RUN () {
               dvm uninstall "${I}";
             fi
           done
-          exit 1;
+          exit 0;
         fi
 
         if [[ ! "${TOUNINSTALL}" == *"${INSTALLED}"* ]]; then
           if [[ -d "${DRUSHDIR}/versions/drush-${CLEANARG}" ]]; then
             rm -rf "${DRUSHDIR}/versions/drush-${CLEANARG}";
             _OUTPUT "  Drush ${CLEANARG} has been uninstalled.";
+            exit 0;
           else
             _OUTPUT "  Drush ${CLEANARG} is not installed.";
+            exit 1;
           fi
         else
           _OUTPUT "  You cannot uninstall a currently active version."
-          exit 0;
+          exit 1;
         fi
       else
         _NOARG;
