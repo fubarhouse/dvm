@@ -442,14 +442,18 @@ function _RUN () {
     function __GETVERSIONS () {
       _OUTPUT "  Checking version number...";
       if [[ -n "${CLEANARG}" ]]; then
-        for X in "${AVAILABLEVERSIONS[@]}"; do
-          if [[ "${CLEANARG}" == "${X}" ]]; then
-            VALIDVERSION=true;
-          fi
-          if [[ "${#CLEANARG}" == 1 ]]; then
+
+        if [[ "${#CLEANARG}" == 1 ]]; then
+          _GETREMOTES;
+          for REMOTE in "${REMOTEVERSIONS[@]}"; do
             if [[ "${X}" =~ ^${CLEANARG} ]]; then
               VERSIONTOINSTALL="${X}";
             fi
+          done
+        fi
+        for X in "${AVAILABLEVERSIONS[@]}"; do
+          if [[ "${CLEANARG}" == "${X}" ]]; then
+            VALIDVERSION=true;
           fi
         done
         if [[ -n "${VERSIONTOINSTALL}" ]]; then
