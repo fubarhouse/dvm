@@ -457,7 +457,11 @@ function _RUN () {
           fi
         done
         if [[ -n "${VERSIONTOINSTALL}" ]]; then
-          dvm install "${VERSIONTOINSTALL}";
+          if [[ -n $(which dvm) ]]; then
+            dvm install "${VERSIONTOINSTALL}";
+          else
+            ~/.dvm/dvm install "${VERSIONTOINSTALL}";
+          fi
           exit 0;
         fi
         if [[ "${VALIDVERSION}" == true ]]; then
