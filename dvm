@@ -606,18 +606,26 @@ function _RUN () {
         for ITEM in $(find "${DRUSHDIR}/versions" -maxdepth 1 -type d | cut -d/ -f6 | grep "drush-" | grep -v "master" | sort | uniq); do
           VERSIONSINSTALLED+=("${ITEM}");
         done
-        INSTALLED=$("${DRUSHDIR}/drush" --version | cut -d: -f2);
-        INSTALLED=${INSTALLED/  /};
-        INSTALLED=${INSTALLED/ /};
+        if [[ -e "${DRUSHDIR}/drush" ]]; then
+          INSTALLED=$("${DRUSHDIR}/drush" --version | cut -d: -f2);
+          INSTALLED=${INSTALLED/  /};
+          INSTALLED=${INSTALLED/ /};
+        else
+          INSTALLED=false;
+        fi
         for X in "${VERSIONSINSTALLED[@]}"; do
-          if [[ "${X}" == "drush-${INSTALLED}" ]]; then tput setaf 2; fi
+          if [[ ! "${INSTALLED}" == false ]]; then
+            if [[ "${X}" == "drush-${INSTALLED}" ]]; then tput setaf 2; fi
+          fi
           if [[ "${X}" = *"${BASEVERSION}"* ]]; then
             if [[ -z "${CLEANARG}" ]]; then
               _OUTPUT "      ${X/drush-/}";
             else
               _OUTPUT "      ${X/drush-/}" | grep ${CLEANARG};
             fi
-            if [[ "${X}" == "drush-${INSTALLED}" ]]; then tput sgr0; fi
+            if [[ ! "${INSTALLED}" == false ]]; then
+              if [[ "${X}" == "drush-${INSTALLED}" ]]; then tput sgr0; fi
+            fi
           fi
         done
       else
