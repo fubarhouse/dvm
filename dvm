@@ -283,13 +283,9 @@ function _RUN () {
     fi
     if [[ -n "${CLEANARG}" ]]; then
       if [[ -d "${DRUSHVERDIR}" ]]; then
-        while [[ -n $(which drush) ]] && [[ $(which drush) != "${LINKDIR}/drush" ]]; do
-          if [[ -n $(which sudo) ]]; then
-            sudo rm -rf "${LINKDIR}/drush";
-          else
-            rm -rf "${LINKDIR}/drush";
-          fi
-        done
+        if [[ -n $(which drush) ]] && [[ $(which drush) != "${LINKDIR}/drush" ]]; then
+          sudo rm -rf "${LINKDIR}/drush";
+        fi
         if [[ -e "${LINKDIR}/drush" ]]; then
           rm -f "${LINKDIR}/drush";
         fi
@@ -334,7 +330,7 @@ function _RUN () {
       CLEANARG=$(echo "${CLEANARG}" | cut -d ' ' -f1);
       DRUSHVERDIR="${DRUSHDIR}/versions/drush-${CLEANARG}";
       if [[ -n "${CLEANARG}" ]]; then
-        if [[ -e "${DRUSHDIR}/drush" ]]; then
+        if [[ -e "${DRUSHVERDIR}" ]]; then
           COMMAND="${ARGUMENTS[*]}";
           COMMAND=${COMMAND/exec/};
           COMMAND=${COMMAND/${CLEANARG}/};
