@@ -274,7 +274,11 @@ function _RUN () {
       done
       if [[ -n "${CHANGETOVERSION}" ]]; then
         CHANGETOVERSION=${CHANGETOVERSION/drush-/};
-        dvm use "${CHANGETOVERSION}";
+        if [[ -n $(which dvm) ]]; then
+          dvm use "${CHANGETOVERSION}";
+        else
+          ~/.dvm/dvm use "${CHANGETOVERSION}";
+        fi
       else
         _OUTPUT "  Drush ${CLEANARG} is not installed.";
         exit 1;
