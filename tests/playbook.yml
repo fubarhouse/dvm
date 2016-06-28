@@ -1,0 +1,17 @@
+---
+
+- hosts: all
+  sudo: true
+  var
+    ansible_ssh_user: root
+    drush_version: 7.3.0
+    drush_versions: []
+    drush_packages: []
+  roles:
+    - { role: fubarhouse.dvm }
+  tasks:
+    - name: Get drush status
+      shell: drush status
+      register: drush_status
+      failed_when:
+          - "'.dvm/versions/drush-' not in drush_status.stdout"
