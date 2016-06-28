@@ -24,9 +24,10 @@
       - /etc/php5/fpm/conf.d
       - /etc/php5/apache2/conf.d
       - /etc/php5/cli/conf.d
-    ansible_ssh_user: root
-    drush_version: 7.3.0
-    drush_versions: []
+    ansible_ssh_user: travis
+    drush_version: 7.2.0
+    drush_versions:
+      - 7.2.0
     drush_packages: []
   roles:
     - { role: ../../geerlingguy.git }
