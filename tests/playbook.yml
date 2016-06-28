@@ -8,10 +8,10 @@
     drush_versions: []
     drush_packages: []
   roles:
-    - { role: geerlingguy.git }
-    - { role: geerlingguy.php }
-    - { role: geerlingguy.composer }
-    - { role: fubarhouse.dvm }
+    - geerlingguy.git
+    - geerlingguy.php
+    - geerlingguy.composer
+    - fubarhouse.dvm
   tasks:
     - name: Get drush status
       shell: drush status
