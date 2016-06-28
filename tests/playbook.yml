@@ -2,12 +2,15 @@
 
 - hosts: all
   sudo: true
-  var
+  vars:
     ansible_ssh_user: root
     drush_version: 7.3.0
     drush_versions: []
     drush_packages: []
   roles:
+    - { role: geerlingguy.git }
+    - { role: geerlingguy.php }
+    - { role: geerlingguy.composer }
     - { role: fubarhouse.dvm }
   tasks:
     - name: Get drush status
