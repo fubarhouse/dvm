@@ -14,6 +14,5 @@ script:
   - git clone https://github.com/geerlingguy/ansible-role-composer ../geerlingguy.composer
   - git clone https://github.com/fubarhouse/fubarhouse.dvm ../fubarhouse.dvm
   - cd tests
-  - ansible-galaxy install -r requirements.yml
   - ansible-playbook -i inventory playbook.yml --syntax-check
   - ansible-playbook -i inventory playbook.yml --sudo -vvvv
