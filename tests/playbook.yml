@@ -35,7 +35,7 @@
     - { role: ../../fubarhouse.dvm }
   tasks:
     - name: Get drush status
-      shell: drush status
+      shell: "{{ fubarhouse_dvm.dvm_dir }}/drush status"
       register: drush_status
       failed_when:
           - "'.dvm/versions/drush-' not in drush_status.stdout"
