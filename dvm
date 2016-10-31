@@ -133,7 +133,7 @@ function DVM () {
     function __PEAR () {
       if [[ -z $(which pear) ]]; then
         curl -O  http://pear.php.net/go-pear.phar;
-        sudo php -d detect_unicode=0 go-pear.phar;
+        php go-pear.phar;
         echo "export PATH=\"$PATH:$HOME/pear/bin\"" >> ~/.bashrc;
         rm -f go-pear.phar;
       fi
