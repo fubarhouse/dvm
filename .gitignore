@@ -3,3 +3,5 @@ vendor*
 vendor/*
 versions*
 versions/*
+.idea
+.idea/*
