@@ -4,10 +4,12 @@ import (
 	"io/ioutil"
 	"strings"
 	"fmt"
+	"os"
 	"os/user"
 	"os/exec"
 )
 
+const PATH_DRUSH = "/usr/local/bin/drush"
 const PATH_COMPOSER = "/usr/local/bin/composer"
 
 type DrushVersionList struct {
@@ -74,8 +76,8 @@ func (drushVersionList *DrushVersionList) ListInstalled() DrushVersionList {
 	// an identifier for the currently used version.
 	usr, _ := user.Current()
 	workingDir := usr.HomeDir + "/.dvm/versions"
-	//thisDrush := getActiveVersion()
-	thisDrush := "7.2.0"
+	thisDrush := GetActiveVersion()
+	//thisDrush := "7.2.0"
 	files, _ := ioutil.ReadDir(workingDir)
 	installedVersions := NewDrushVersionList()
 	for _, file := range files {
@@ -96,8 +98,18 @@ func (drushVersionList *DrushVersionList) ListInstalled() DrushVersionList {
 func (drushVersionList *DrushVersionList) PrintInstalled() {
 	// Prints a list of all installed Command versions.
 	// See ListInstalled() for more information.
-	drushVersionList.ListInstalled()
-	for _, value := range drushVersionList.list {
+	InstalledVersions := drushVersionList.ListInstalled()
+	for _, value := range InstalledVersions.list {
 		fmt.Println(value)
 	}
+}
+
+func GetActiveVersion() string {
+	// Returns the currently active Command version
+	drushOutputVersion, drushOutputError := exec.Command(PATH_DRUSH, "version", "--format=string").Output()
+	if drushOutputError != nil {
+		fmt.Println(drushOutputError)
+		os.Exit(1)
+	}
+	return string(strings.Replace(string(drushOutputVersion), "\n", "", -1))
 }
