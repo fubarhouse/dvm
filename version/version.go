@@ -105,7 +105,31 @@ func (drushVersion *DrushVersion) LegacyInstallVersion() {
 	drushVersion.Status()
 }
 
+func (drushVersion *DrushVersion) Init() {
+	usr, _ := user.Current()
+	_, err := os.Stat(usr.HomeDir + "/.dvm/")
+	if err != nil {
+		mkdirErr := os.MkdirAll(usr.HomeDir+"/.dvm/", 0775)
+		if mkdirErr == nil {
+			fmt.Printf("Making directory %v\n", usr.HomeDir+"/.dvm/")
+		} else {
+			fmt.Printf("Could not make directory %v\n", usr.HomeDir+"/.dvm/")
+		}
+	}
+	_, err = os.Stat(usr.HomeDir + "/.dvm/versions")
+	if err != nil {
+		mkdirErr := os.MkdirAll(usr.HomeDir+"/.dvm/versions", 0775)
+		if mkdirErr == nil {
+			fmt.Printf("Making directory %v\n", usr.HomeDir+"/.dvm/versions")
+		} else {
+			fmt.Printf("Could not make directory %v\n", usr.HomeDir+"/.dvm/versions")
+		}
+	}
+}
+
 func (drushVersion *DrushVersion) Install() {
+	// Each install will verify the installation of DVM
+	drushVersion.Init()
 	// Installs a version of Command supported by composer.
 	usr, _ := user.Current()
 	_, err := os.Stat(usr.HomeDir + "/.dvm/versions/drush-" + drushVersion.version)
@@ -159,11 +183,16 @@ func (drushVersion *DrushVersion) Reinstall() {
 func (drushVersion *DrushVersion) UninstallSym() {
 	// Remove symlink
 	symlinkSource := PATH_DRUSH
-	_, rmErr := exec.Command("sh", "-c", "rm -f "+symlinkSource).Output()
-	if rmErr != nil {
-		fmt.Printf("Unsuccessfully unlinked Drush v%v\n", drushVersion.version)
+	_, statErr := os.Stat(symlinkSource)
+	if statErr == nil {
+		_, rmErr := exec.Command("sh", "-c", "rm -f "+symlinkSource).Output()
+		if rmErr != nil {
+			fmt.Printf("Unsuccessfully unlinked Drush v%v\n", drushVersion.version)
+		} else {
+			fmt.Printf("Successfully unlinked Drush v%v\n", drushVersion.version)
+		}
 	} else {
-		fmt.Printf("Successfully unlinked Drush v%v\n", drushVersion.version)
+		fmt.Sprintf("File %v has not yet been created.", PATH_DRUSH)
 	}
 }
 
@@ -214,10 +243,15 @@ func (drushVersion *DrushVersion) SetDefault() {
 
 func GetActiveVersion() string {
 	// Returns the currently active Command version
-	drushOutputVersion, drushOutputError := exec.Command(PATH_DRUSH, "version", "--format=string").Output()
-	if drushOutputError != nil {
-		fmt.Println(drushOutputError)
-		os.Exit(1)
+	_, statErrr := os.Stat(PATH_DRUSH)
+	if statErrr == nil {
+		drushOutputVersion, drushOutputError := exec.Command(PATH_DRUSH, "version", "--format=string").Output()
+		if drushOutputError != nil {
+			fmt.Println(drushOutputError)
+			os.Exit(1)
+		}
+		return string(strings.Replace(string(drushOutputVersion), "\n", "", -1))
+	} else {
+		return "nil"
 	}
-	return string(strings.Replace(string(drushOutputVersion), "\n", "", -1))
 }
