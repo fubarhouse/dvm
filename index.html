@@ -59,7 +59,7 @@
         <div class="shameless-self-promotion row">
           <p>&nbsp;</p>
           <div class="col-sm-3">&nbsp;</div>
-          <div class="col-sm-2">Version 1.4</div>
+          <div class="col-sm-2">Version 2.1</div>
           <div class="col-sm-2"><a style="color: #8a6d3b; font-weight:500;" href="https://github.com/fubarhouse/dvm">GitHub Project</a></div>
           <div class="col-sm-2">Created by <br /><a style="color: #8a6d3b; font-weight:500;" href="http://twitter.com/fubarhouse">Karl Hepworth</a></div>
         </div>
@@ -122,7 +122,11 @@
     <div class="row">
       <div class="col-md-4 col-sm-6">
         <h4><i class="fa fa-heart"></i> Made with love</h4>
-        Maximum compatibility and love has gone into this program, with support for Drush version 3.0.0 and higher on Bash version 2.4 (tested) and later. We encourage you to feel free to add your own ideas/issues!
+        DVM was recently rewritten in Go 1.8 in order to improve error handling, stdout reporting, compatibility and overall code cleanliness. DVM should basically work under any UNIX system because of this.
+      </div>
+      <div class="col-md-4 col-sm-6">
+        <h4><i class="fa fa-check"></i> Simple requirements</h4>
+        DVM assumes you have composer installed, and if you're trying for versions prior to composer compatibility it will also assume you've got wget and unzip installed to the $PATH.
       </div>
       <div class="col-md-4 col-sm-6">
         <h4><i class="fa fa-money"></i> Completely free to use</h4>
@@ -142,7 +146,6 @@
       <div class="panel-body">
         <p>With the release of Drupal 8 and Drush 8, there are now many versions of Drush to choose from. With so many versions available, how does any one tie into your workflow?</p>
         <p>DVM introduces the ability to quickly and simply execute drush scripts and commands using any version, anywhere, with support stretching all the way to versions 3.0.0 and above.</p>
-        <p>In addition to all the benefits, you can simply run <code>dvm update</code> to update and install the latest available version.</p>
         <p>This project was inspired from similar projects such as <a href="https://github.com/creationix/nvm">NVM</a>, <a href="https://github.com/rvm/rvm">RVM</a> and <a href="https://github.com/yyuu/pyenv">PyEnv</a> and of course the absence of a service which can provide the same function.</p>
       </div>
     </div>
@@ -153,7 +156,7 @@
   <footer id="footer" class="footer hidden-print">
   <div class="container text-center">
     <div>
-      DVM v1.4<br class="hide-sm hide-md hide-lg">
+      DVM v2.1<br class="hide-sm hide-md hide-lg">
       Created by <a href="https://twitter.com/fubarhouse">Karl Hepworth</a>
     </div>
     <div>
