@@ -6,6 +6,16 @@ Drush version control system, to manage a variety of Drush versions and provide 
 
 It has been rewritten in Google's Golang as a pilot for the core maintainer to learn a new language and see what it would hold in professional development. It wasn't intended to stick or be released however the pilot program was extremely stable and efficient and it didn't make sense not to release it.
 
+**Installation**
+
+There are three ways to install DVM, but if you're at all familiar with Golang these are very standardized shipping methods.
+
+  * run `go get -u github.com/fubarhouse/dvm/...`
+  * run `go get -u github.com/fubarhouse/dvm/...` and compile your own build the program.
+  * Download the pre-compiled binaries.
+  
+Either method chosen, you can optionally copy or create a symlink to the binary in a location discoverable by $PATH. 
+
 **DVM usage**
 
   -default
@@ -65,25 +75,15 @@ Examples of each module can be found in the test functions of each test file of 
 
 **Package rundown**:
 
-* Drush Version Management
-    * plugin
-        ````
-        Drush package management, provides a way to install, reinstall, uninstall and list package objects.
-        ````
-    * version
-        ````
-        Drush version management, where a version can be installed, reinstalled, uninstalled and a variety of other utility methods.
-        ````
-    * versionlist
-        ````
-        Provides Drush Version Management information, by displaying desired information on particular versions - installed or not.
-        ````
-* Drush Execution
-    * aliases
-        ````
-        Execute 'drush sa' and grab all aliases, and provides convenient ways to filter and store those results.
-        ````
-    * sites
-        ````
-        Execute 'drush sa' and grab all aliases and filter them as non-alias items, with a wide array of filter options.
-        ````
+* plugin
+    ````
+    Drush package management, provides a way to install, reinstall, uninstall and list package objects.
+    ````
+* version
+    ````
+    Drush version management, where a version can be installed, reinstalled, uninstalled and a variety of other utility methods.
+    ````
+* versionlist
+    ````
+    Provides Drush Version Management information, by displaying desired information on particular versions - installed or not.
+    ````
