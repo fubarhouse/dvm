@@ -2,12 +2,13 @@ package version
 
 import (
 	"fmt"
-	"os/exec"
-	"os"
-	"log"
-	"strings"
-	"os/user"
 	"github.com/fubarhouse/dvm/versionlist"
+	"log"
+	"os"
+	"os/exec"
+	"os/user"
+	"strconv"
+	"strings"
 )
 
 const PATH_DRUSH = "/usr/local/bin/drush"
@@ -23,7 +24,7 @@ type DrushVersion struct {
 }
 
 func NewDrushVersion(version string) DrushVersion {
-	// An API to create/store a Command version object.
+	// An API to create/store a Drush version object.
 	retVal := DrushVersion{version, false}
 	retVal.validVersion = retVal.Exists()
 	if retVal.validVersion == false {
@@ -33,8 +34,8 @@ func NewDrushVersion(version string) DrushVersion {
 }
 
 func (drushVersion *DrushVersion) Exists() bool {
-	// Takes in a Command version object and tests if it exists
-	// in any available Command version list object.
+	// Takes in a Drush version object and tests if it exists
+	// in any available Drush version list object.
 	drushVersions := versionlist.NewDrushVersionList()
 	drushVersions.ListLocal()
 	for _, versionItem := range drushVersions.ListContents() {
@@ -52,7 +53,7 @@ func (drushVersion *DrushVersion) Exists() bool {
 }
 
 func (drushVersion *DrushVersion) Status() bool {
-	// Check the installation state of any individual Command version object.
+	// Check the installation state of any individual Drush version object.
 	usr, _ := user.Current()
 	_, err := os.Stat(usr.HomeDir + "/.dvm/versions/drush-" + drushVersion.version)
 	if err == nil {
@@ -63,13 +64,13 @@ func (drushVersion *DrushVersion) Status() bool {
 
 func (drushVersion *DrushVersion) LegacyInstall() {
 	// Basically the main() func for Legacy versions which encapsulates
-	// the code/dependencies for installing legacy Command versions.
+	// the code/dependencies for installing legacy Drush versions.
 	drushVersion.LegacyInstallVersion()
 	drushVersion.LegacyInstallTable()
 }
 
 func (drushVersion *DrushVersion) LegacyInstallTable() {
-	// ConsoleTable is essentially always missing from older Command versions.
+	// ConsoleTable is essentially always missing from older Drush versions.
 	// This ensures the script is available to the legacy version.
 	// @TODO: Restore functionality in the Golang way...
 	//usr, _ := user.Current()
@@ -88,7 +89,7 @@ func (drushVersion *DrushVersion) LegacyInstallVersion() {
 	// Installs from a zip file which was located via git tags (manual input see ListLocal()).
 	// @TODO: Rewrite in the Golang way.
 	usr, _ := user.Current()
-	fmt.Println("Downloading and extracting legacy Command version ", drushVersion.version)
+	fmt.Println("Downloading and extracting legacy Drush version ", drushVersion.version)
 	zipFileName := drushVersion.version + ".zip"
 	remotePath := "https://github.com/drush-ops/drush/archive/" + zipFileName
 	zipPath := usr.HomeDir + "/.dvm/versions/"
@@ -109,14 +110,14 @@ func (drushVersion *DrushVersion) Install() {
 	usr, _ := user.Current()
 	_, err := os.Stat(usr.HomeDir + "/.dvm/versions/drush-" + drushVersion.version)
 	if err != nil {
-		majorVersion := fmt.Sprintf("%c", drushVersion.version[0])
+		majorVersion, _ := strconv.ParseInt(fmt.Sprintf("%c", drushVersion.version[0]), 16, 16)
 		workingDir := usr.HomeDir + "/.dvm/versions"
-		fmt.Printf("Attempting to install Command v%v\n", drushVersion.version)
+		fmt.Printf("Attempting to install Drush v%v\n", drushVersion.version)
 
-		if majorVersion == "6" || majorVersion == "7" || majorVersion == "8" || majorVersion == "9" {
+		if majorVersion >= 6 {
 			_, installError := exec.Command("sh", "-c", "cd "+workingDir+"/ && mkdir -p ./drush-"+drushVersion.version+" && cd ./drush-"+drushVersion.version+" && "+PATH_COMPOSER+" require \"drush/drush:"+drushVersion.version+"\"").Output()
 			if installError != nil {
-				fmt.Printf("Could not install Command %v, cleaning installation...\n", drushVersion.version)
+				fmt.Printf("Could not install Drush v%v, cleaning installation...\n", drushVersion.version)
 				fmt.Println(installError)
 				exec.Command("sh", "-c", "rm -rf "+workingDir+"/drush-"+drushVersion.version).Output()
 			}
@@ -124,7 +125,7 @@ func (drushVersion *DrushVersion) Install() {
 			drushVersion.LegacyInstall()
 		}
 	} else {
-		fmt.Printf("Command v%v is already installed.\n", drushVersion.version)
+		fmt.Printf("Drush v%v is already installed.\n", drushVersion.version)
 	}
 }
 
@@ -133,14 +134,17 @@ func (drushVersion *DrushVersion) Uninstall() {
 	usr, _ := user.Current()
 	_, err := os.Stat(usr.HomeDir + "/.dvm/versions/drush-" + drushVersion.version)
 	if err == nil {
+		if GetActiveVersion() == drushVersion.version {
+			drushVersion.UninstallSym()
+		}
 		workingDir := usr.HomeDir + "/.dvm/versions"
-		fmt.Printf("Removing installation of Command v%v\n", drushVersion.version)
+		fmt.Printf("Removing installation of Drush v%v\n", drushVersion.version)
 		_, rmErr := exec.Command("sh", "-c", "rm -rf "+workingDir+"/drush-"+drushVersion.version).Output()
 		if rmErr != nil {
 			fmt.Println(rmErr)
 		}
 	} else {
-		fmt.Printf("Command v%v is not installed.\n", drushVersion.version)
+		fmt.Printf("Drush v%v is not installed.\n", drushVersion.version)
 	}
 }
 
@@ -150,51 +154,59 @@ func (drushVersion *DrushVersion) Reinstall() {
 	drushVersion.Install()
 }
 
-func (drushVersion *DrushVersion) SetDefault() {
-	// Removes whatever is located at PATH_DRUSH
-	// Adds a symlink to an installed version.
+func (drushVersion *DrushVersion) UninstallSym() {
+	// Remove symlink
+	symlinkSource := PATH_DRUSH
+	_, rmErr := exec.Command("sh", "-c", "rm -f "+symlinkSource).Output()
+	if rmErr != nil {
+		fmt.Printf("Unsuccessfully unlinked Drush v%v\n", drushVersion.version)
+	} else {
+		fmt.Printf("Successfully unlinked Drush v%v\n", drushVersion.version)
+	}
+}
+
+func (drushVersion *DrushVersion) InstallSym() {
+	// Add symlink
 	usr, _ := user.Current()
 	workingDir := usr.HomeDir + "/.dvm/versions"
-	majorVersion := fmt.Sprintf("%c", drushVersion.version[0])
-	symlinkSource := ""
+	majorVersion, _ := strconv.ParseInt(fmt.Sprintf("%c", drushVersion.version[0]), 16, 16)
+	symlinkSource := PATH_DRUSH
 	symlinkDest := ""
-	if majorVersion == "6" || majorVersion == "7" || majorVersion == "8" || majorVersion == "9" {
+	if majorVersion >= 6 {
 		// If the version is supported by composer:
-		symlinkSource = PATH_DRUSH
 		symlinkDest = workingDir + "/drush-" + drushVersion.version + "/vendor/bin/drush"
 	} else {
 		// If it isn't supported by Composer...
-		symlinkSource = PATH_DRUSH
 		symlinkDest = workingDir + "/drush-" + drushVersion.version + "/drush"
 	}
 
-	if drushVersion.validVersion == true {
-		// Remove symlink
-		_, rmErr := exec.Command("sh", "-c", "rm -f "+symlinkSource).Output()
-		if rmErr != nil {
-			fmt.Println("Could not remove "+PATH_DRUSH+": ", rmErr)
-		} else {
-			fmt.Println("Symlink successfully removed.")
-		}
-		// Add symlink
-		_, rmErr = exec.Command("sh", "-c", "ln -sF "+symlinkDest+" "+symlinkSource).Output()
-		if rmErr != nil {
-			fmt.Println("Could not sym "+PATH_DRUSH+": ", rmErr)
-		} else {
-			fmt.Println("Symlink successfully created.")
-		}
-		// Verify version
-		currVer, rmErr := exec.Command("sh", "-c", PATH_DRUSH+" --version").Output()
-		if rmErr != nil {
-			fmt.Println("Command returned error: ", rmErr)
-			os.Exit(1)
-		} else {
-			if string(currVer) == drushVersion.version {
-				fmt.Printf("Command is now set to v%v", drushVersion.version)
-			}
-		}
+	_, rmErr := exec.Command("sh", "-c", "ln -sF "+symlinkDest+" "+symlinkSource).Output()
+	if rmErr != nil {
+		fmt.Printf("Unsuccessfully linked Drush v%v\n", drushVersion.version)
 	} else {
-		log.Fatal("Command version entered is not valid.")
+		fmt.Printf("Successfully linked Drush v%v\n", drushVersion.version)
+	}
+	// Verify version
+	currVer, rmErr := exec.Command("sh", "-c", PATH_DRUSH+" --version").Output()
+	if rmErr != nil {
+		fmt.Println("Drush returned error: ", rmErr)
+		os.Exit(1)
+	} else {
+		if string(currVer) == drushVersion.version {
+			fmt.Printf("Drush is now set to v%v", drushVersion.version)
+		}
+	}
+}
+
+func (drushVersion *DrushVersion) SetDefault() {
+	// Removes whatever is located at PATH_DRUSH
+	// Adds a symlink to an installed version.
+
+	if drushVersion.validVersion == true {
+		drushVersion.UninstallSym()
+		drushVersion.InstallSym()
+	} else {
+		log.Fatal("Drush version entered is not valid.")
 	}
 }
 
