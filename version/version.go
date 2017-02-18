@@ -12,9 +12,9 @@ import (
 )
 
 const PATH_DRUSH = "/usr/local/bin/drush"
-const PATH_UNZIP = "/usr/bin/unzip"
-const PATH_WGET = "/usr/local/bin/wget"
-const PATH_COMPOSER = "/usr/local/bin/composer"
+const PATH_UNZIP = "unzip"
+const PATH_WGET = "wget"
+const PATH_COMPOSER = "composer"
 
 type DrushVersion struct {
 	// A struct to store a single version and to identify validity via OOP.
