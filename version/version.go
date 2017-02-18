@@ -120,6 +120,8 @@ func (drushVersion *DrushVersion) Install() {
 				fmt.Printf("Could not install Drush v%v, cleaning installation...\n", drushVersion.version)
 				fmt.Println(installError)
 				exec.Command("sh", "-c", "rm -rf "+workingDir+"/drush-"+drushVersion.version).Output()
+			} else {
+				fmt.Printf("Successfully installed Drush v%v\n", drushVersion.version)
 			}
 		} else {
 			drushVersion.LegacyInstall()
