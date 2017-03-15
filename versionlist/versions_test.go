@@ -1,8 +1,8 @@
 package versionlist
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 )
 
 func TestCreateNewVersionList(t *testing.T) {

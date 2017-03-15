@@ -2,12 +2,12 @@ package version
 
 import (
 	"fmt"
-	"os/exec"
-	"os"
-	"log"
-	"strings"
-	"os/user"
 	"github.com/fubarhouse/dvm/versionlist"
+	"log"
+	"os"
+	"os/exec"
+	"os/user"
+	"strings"
 )
 
 const PATH_DRUSH = "/usr/local/bin/drush"

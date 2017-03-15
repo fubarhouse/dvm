@@ -1,12 +1,12 @@
 package versionlist
 
 import (
-	"io/ioutil"
-	"strings"
 	"fmt"
+	"io/ioutil"
 	"os"
-	"os/user"
 	"os/exec"
+	"os/user"
+	"strings"
 )
 
 const PATH_DRUSH = "/usr/local/bin/drush"
