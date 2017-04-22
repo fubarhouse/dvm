@@ -10,7 +10,7 @@ import (
 )
 
 const PATH_DRUSH = "/usr/local/bin/drush"
-const PATH_COMPOSER = "/usr/local/bin/composer"
+const PATH_COMPOSER = "composer"
 
 type DrushVersionList struct {
 	// A struct to store associated versions in a simple []string.
