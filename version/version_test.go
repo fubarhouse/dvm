@@ -19,14 +19,14 @@ func TestCreateNewVersion(t *testing.T) {
 func TestDrushExists(t *testing.T) {
 	// Test if a Command version is available for installation
 	y := NewDrushVersion(TESTVERSION)
-	if y.Exists() == false {
+	if !y.Exists() {
 		t.Error("Test failed")
 	}
 }
 func TestDrushStatus(t *testing.T) {
 	// Test if a Command version is installed
 	y := NewDrushVersion(TESTVERSION)
-	if y.Status() == false {
+	if !y.Status() {
 		t.Error("Test failed")
 	}
 }
@@ -35,7 +35,7 @@ func TestDrushInstall(t *testing.T) {
 	// Test if a version of Command can be installed.
 	y := NewDrushVersion(TESTVERSION)
 	y.Install()
-	if y.Status() == false {
+	if !y.Status() {
 		t.Error("Test failed")
 	}
 	y.Uninstall()
@@ -45,7 +45,7 @@ func TestDrushUninstall(t *testing.T) {
 	// Test if a version of Command can be uninstalled.
 	y := NewDrushVersion(TESTVERSION)
 	y.Uninstall()
-	if y.Status() == true {
+	if y.Status() {
 		t.Error("Test failed")
 	}
 }
@@ -54,11 +54,11 @@ func TestDrushReinstall(t *testing.T) {
 	// Test if a version of Command can be reinstalled.
 	y := NewDrushVersion(TESTVERSION)
 	y.Uninstall()
-	if y.Status() == true {
+	if y.Status() {
 		t.Error("Test failed")
 	}
 	y.Install()
-	if y.Status() == false {
+	if !y.Status() {
 		t.Error("Test failed")
 	}
 }
@@ -66,9 +66,9 @@ func TestDrushReinstall(t *testing.T) {
 func TestDrushLegacyInstall(t *testing.T) {
 	// Test if a legacy (non-composer) Command install can execute.
 	y := NewDrushVersion(LEGACYVERSION)
-	if y.Exists() == true {
+	if y.Exists() {
 		y.Install()
-		if y.Status() == true {
+		if y.Status() {
 			y.Uninstall()
 		} else {
 			t.Error("Test failed")
@@ -87,10 +87,6 @@ func TestDrushSpecifyDefault(t *testing.T) {
 	NEWVERSION := TESTVERSION
 	VERSIONCHANGED := false
 
-	// Create objects
-	x := NewDrushVersion(NEWVERSION)
-	y := NewDrushVersion(ACTIVEVERSION)
-
 	if NEWVERSION == ACTIVEVERSION {
 		if NEWVERSION == "7.0.0" {
 			NEWVERSION = "7.2.0"
@@ -100,11 +96,15 @@ func TestDrushSpecifyDefault(t *testing.T) {
 		VERSIONCHANGED = true
 	}
 
+	// Create objects
+	x := NewDrushVersion(NEWVERSION)
+	y := NewDrushVersion(ACTIVEVERSION)
+
 	x.Install()
 	y.Install()
 	x.SetDefault()
 
-	if GetActiveVersion() == NEWVERSION {
+	if GetActiveVersion() != NEWVERSION {
 		t.Error("Test failed")
 	} else {
 		if VERSIONCHANGED != false {
