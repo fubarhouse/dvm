@@ -1,19 +1,78 @@
 ---
 
-language: python
-
 python:
   - 2.7
 
-install:
-  - pip install ansible
+services: docker
+
+env:
+  - distro: ubuntu1604
+    init: /sbin/init
+    run_opts: "--privileged"
+    playbook: test.yml
+  - distro: ubuntu1404
+    init: /sbin/init
+    run_opts: "--privileged"
+    playbook: test.yml
+  - distro: ubuntu1204
+    init: /sbin/init
+    run_opts: "--privileged"
+    playbook: test.yml
+  - distro: centos6
+    init: "/sbin/init"
+    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    playbook: test.yml
+  - distro: centos7
+    init: /usr/lib/systemd/systemd
+    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    playbook: test.yml
+  - distro: debian8
+    init: /lib/systemd/systemd
+    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    playbook: test.yml
+  # - distro: fedora24
+  #   init: /usr/lib/systemd/systemd
+  #   run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+  #   playbook: test.yml
+
+before_install:
+
+  # Pull container.
+  - 'docker pull geerlingguy/docker-${distro}-ansible:latest'
 
 script:
-  - sudo apt-get install -y apache2
-  - git clone https://github.com/geerlingguy/ansible-role-git ../geerlingguy.git
-  - git clone https://github.com/geerlingguy/ansible-role-php ../geerlingguy.php
-  - git clone https://github.com/geerlingguy/ansible-role-composer ../geerlingguy.composer
-  - git clone https://github.com/fubarhouse/fubarhouse.dvm ../fubarhouse.dvm
-  - cd tests
-  - ansible-playbook -i inventory playbook.yml --syntax-check
-  - ansible-playbook -i inventory playbook.yml --sudo -vvvv
+
+  - container_id=$(mktemp)
+
+  # Run container in detached state.
+  - 'docker run --detach --volume="${PWD}":/etc/ansible/roles/role_under_test:ro ${run_opts} geerlingguy/docker-${distro}-ansible:latest "${init}" > "${container_id}"'
+
+  # Install dependencies.
+  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-galaxy install geerlingguy.git'
+  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-galaxy install fubarhouse.golang'
+
+  # Ansible syntax check.
+  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/role_under_test/tests/${playbook} --syntax-check -vvvv'
+
+  # Test role.
+  - 'docker exec "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/role_under_test/tests/${playbook} --sudo -vvvv'
+
+  # Test role idempotence.
+  - idempotence=$(mktemp)
+  - >
+    docker exec "$(cat ${container_id})"
+    ansible-playbook /etc/ansible/roles/role_under_test/tests/${playbook} --sudo -vvvv
+    | tee -a ${idempotence}
+  - >
+    tail ${idempotence}
+    | grep -q 'changed=0.*failed=0'
+    && (echo 'Idempotence test: pass' && echo "")
+    || (echo 'Idempotence test: fail' && exit 1)
+
+  # Test golang project.
+  - 'docker exec "$(cat ${container_id})" env TERM=xterm dvm -install -version="7.3.0"'
+  - 'docker exec "$(cat ${container_id})" env TERM=xterm dvm -default -version="7.3.0"'
+  - 'docker exec "$(cat ${container_id})" env TERM=xterm /home/travis/go_travis_test/bin/go test /home/travis/go_travis_test/bin/src/github.com/fubarhouse/dvm/...'
+
+notifications:
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/
