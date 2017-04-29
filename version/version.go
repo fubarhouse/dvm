@@ -2,18 +2,18 @@ package version
 
 import (
 	"fmt"
-	"os/exec"
-	"os"
-	"log"
-	"strings"
-	"os/user"
 	"github.com/fubarhouse/dvm/versionlist"
+	"log"
+	"os"
+	"os/exec"
+	"os/user"
+	"strings"
 )
 
-const PATH_DRUSH = "drush"
-const PATH_UNZIP = "unzip"
-const PATH_WGET = "wget"
-const PATH_COMPOSER = "composer"
+const PATH_DRUSH = "/usr/local/bin/drush"
+const PATH_UNZIP = "/usr/bin/unzip"
+const PATH_WGET = "/usr/local/bin/wget"
+const PATH_COMPOSER = "/usr/local/bin/composer"
 
 type DrushVersion struct {
 	// A struct to store a single version and to identify validity via OOP.
