@@ -43,17 +43,16 @@ before_install:
   # Ensure composer has installed drush.
   - 'composer require drush/drush'
   - 'mkdir ${HOME}/.drush'
+  - 'sudo mkdir -p /usr/local/bin'
   - 'sudo chmod 777 /usr/local/bin'
   - 'sudo touch /usr/local/bin/drush'
-
-  # Find drush.
-  # - 'which drush'
 
 script:
 
   - container_id=$(mktemp)
 
   # Run golang tests
+
   - go test -v ./...
 
 notifications:
