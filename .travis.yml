@@ -43,7 +43,7 @@ before_install:
   # Ensure composer has installed drush.
   - 'composer require drush/drush'
   - 'mkdir ${HOME}/.drush'
-  - 'touch /usr/local/bin/drush'
+  - 'sudo touch /usr/local/bin/drush'
 
   # Find drush.
   # - 'which drush'
