@@ -35,16 +35,22 @@ env:
   #   run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
   #   playbook: test.yml
 
-install:
+before_install:
 
-  # Pull container.
+  # Pull our container.
   - 'docker pull geerlingguy/docker-${distro}-ansible:latest'
+
+  # Ensure composer has installed drush.
+  - 'composer require drush/drush'
+
+  # Find drush.
+  - 'which drush'
 
 script:
 
   - container_id=$(mktemp)
 
-  # Run container in detached state.
+  # Run golang tests
   - go test -v ./...
 
 notifications:
