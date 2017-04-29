@@ -35,7 +35,7 @@ env:
   #   run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
   #   playbook: test.yml
 
-before_install:
+install:
 
   # Pull container.
   - 'docker pull geerlingguy/docker-${distro}-ansible:latest'
