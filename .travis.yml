@@ -53,7 +53,7 @@ script:
 
   # Run golang tests
 
-  - sudo go test -v ./...
+  - go test -v ./...
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/

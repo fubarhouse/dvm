@@ -8,7 +8,7 @@ import (
 	"os/user"
 )
 
-const PATH_DRUSH = "/usr/local/bin/drush"
+const PATH_DRUSH = "drush"
 
 type drushPackage struct {
 	// A struct to store information on a drush package.

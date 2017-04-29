@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-const PATH_DRUSH = "/usr/local/bin/drush"
+const PATH_DRUSH = "drush"
 const PATH_COMPOSER = "composer"
 
 type DrushVersionList struct {
