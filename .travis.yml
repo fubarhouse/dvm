@@ -43,6 +43,7 @@ before_install:
   # Ensure composer has installed drush.
   - 'composer require drush/drush'
   - 'mkdir ${HOME}/.drush'
+  - 'sudo chmod 777 /usr/local/bin'
   - 'sudo touch /usr/local/bin/drush'
 
   # Find drush.
