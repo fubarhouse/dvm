@@ -41,7 +41,10 @@ before_install:
   - 'docker pull geerlingguy/docker-${distro}-ansible:latest'
 
   # Ensure composer has installed drush.
-  - 'composer global require drush/drush'
+
+  - 'sudo wget --quiet -O - http://ftp.drupal.org/files/projects/drush-7.x-5.9.tar.gz | sudo tar -zxf - -C /usr/local/share'
+  - 'sudo ln -s /usr/local/share/drush/drush /usr/local/bin/drush'
+
   - 'mkdir ${HOME}/.drush'
   - 'sudo mkdir -p /usr/local/bin'
   - 'sudo chmod 777 /usr/local/bin'
