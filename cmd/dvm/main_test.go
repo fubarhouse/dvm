@@ -36,6 +36,7 @@ func TestDrushHomePathExists(t *testing.T) {
 	User, userErr := user.Current()
 	_, statErr := os.Stat(User.HomeDir + "/.drush")
 	if userErr != nil || statErr != nil {
+		t.Log("Could not find", User.HomeDir+"/.drush")
 		t.Fail()
 	}
 	test.Finalize(t)
