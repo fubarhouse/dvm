@@ -2,9 +2,9 @@
 
 language: go
 go:
-  - 1.5.x
-  - 1.6.x
-  - 1.7.x
+#  - 1.5.x
+#  - 1.6.x
+#  - 1.7.x
   - 1.8.x
 services: docker
 
@@ -15,21 +15,21 @@ env:
   - distro: ubuntu1404
     init: /sbin/init
     run_opts: "--privileged"
-  - distro: ubuntu1204
-    init: /sbin/init
-    run_opts: "--privileged"
-  - distro: centos6
-    init: "/sbin/init"
-    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
-  - distro: centos7
-    init: /usr/lib/systemd/systemd
-    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
-  - distro: debian8
-    init: /lib/systemd/systemd
-    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
-  - distro: fedora24
-    init: /usr/lib/systemd/systemd
-    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+#  - distro: ubuntu1204
+#    init: /sbin/init
+#    run_opts: "--privileged"
+#  - distro: centos6
+#    init: "/sbin/init"
+#    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+#  - distro: centos7
+#    init: /usr/lib/systemd/systemd
+#    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+#  - distro: debian8
+#    init: /lib/systemd/systemd
+#    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+#  - distro: fedora24
+#    init: /usr/lib/systemd/systemd
+#    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
 
 before_install:
 
@@ -40,7 +40,7 @@ before_install:
   # Get working-copy functional
 
   - mkdir /home/travis/.drush
-  - sudo chown 777 /usr/local/bin
+  - sudo chmod 777 /usr/local/bin
 
 script:
 
@@ -51,7 +51,7 @@ script:
   - go test -v ./cmd/dvm/...
   - go test -v ./plugin/...
   - go test -v ./version/...
-  - go test -v ./cmd/versionlist/...
+  - go test -v ./versionlist/...
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
