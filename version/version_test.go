@@ -2,7 +2,6 @@ package version
 
 import (
 	"fmt"
-	"github.com/fubarhouse/dvm/version"
 	"testing"
 )
 
@@ -12,7 +11,7 @@ const LEGACYVERSION = "4.0.0"
 func TestDrushInstallDefaultTestCase(t *testing.T) {
 	Version := "7.0.0"
 	// Ensure a version is tested to prevent failure.
-	y := version.NewDrushVersion(Version)
+	y := NewDrushVersion(Version)
 	y.Install()
 	y.SetDefault()
 	if !y.Status() {
