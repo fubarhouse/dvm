@@ -2,6 +2,9 @@
 
 language: go
 go:
+  - 1.5.x
+  - 1.6.x
+  - 1.7.x
   - 1.8.x
 services: docker
 
@@ -9,46 +12,30 @@ env:
   - distro: ubuntu1604
     init: /sbin/init
     run_opts: "--privileged"
-    playbook: test.yml
   - distro: ubuntu1404
     init: /sbin/init
     run_opts: "--privileged"
-    playbook: test.yml
   - distro: ubuntu1204
     init: /sbin/init
     run_opts: "--privileged"
-    playbook: test.yml
   - distro: centos6
     init: "/sbin/init"
     run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
-    playbook: test.yml
   - distro: centos7
     init: /usr/lib/systemd/systemd
     run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
-    playbook: test.yml
   - distro: debian8
     init: /lib/systemd/systemd
     run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
-    playbook: test.yml
-  # - distro: fedora24
-  #   init: /usr/lib/systemd/systemd
-  #   run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
-  #   playbook: test.yml
+  - distro: fedora24
+    init: /usr/lib/systemd/systemd
+    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
 
 before_install:
 
   # Pull our container.
+
   - 'docker pull geerlingguy/docker-${distro}-ansible:latest'
-
-  # Ensure composer has installed drush.
-
-  - 'sudo wget --quiet -O - http://ftp.drupal.org/files/projects/drush-7.x-5.9.tar.gz | sudo tar -zxf - -C /usr/local/share'
-  - 'sudo ln -s /usr/local/share/drush/drush /usr/local/bin/drush'
-
-  - 'mkdir ${HOME}/.drush'
-  - 'sudo mkdir -p /usr/local/bin'
-  - 'sudo chmod 777 /usr/local/bin'
-  - 'sudo touch /usr/local/bin/drush'
 
 script:
 
@@ -56,7 +43,10 @@ script:
 
   # Run golang tests
 
-  - go test -v ./...
+  - go test -v ./cmd/dvm/...
+  - go test -v ./plugin/...
+  - go test -v ./version/...
+  - go test -v ./cmd/versionlist/...
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/

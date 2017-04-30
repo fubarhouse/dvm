@@ -2,22 +2,34 @@ package plugin
 
 import (
 	"fmt"
+	"github.com/fubarhouse/dvm/version"
 	"testing"
 )
+
+var initState = false
+
+func TestDrushInstallDefaultTestCase(t *testing.T) {
+	Version := "7.0.0"
+	// Ensure a version is tested to prevent failure.
+	y := version.NewDrushVersion(Version)
+	y.Install()
+	y.SetDefault()
+	if !y.Status() {
+		t.Error("Test failed")
+	}
+}
+
+func TestInitiate(t *testing.T) {
+	y := NewDrushPackage("registry_rebuild")
+	if y.Status() {
+		initState = true
+	}
+}
 
 func TestCreateNewPackage(t *testing.T) {
 	// Test the creation of package object
 	y := NewDrushPackage("registry_rebuild")
 	if fmt.Sprint(y.name) != "registry_rebuild" {
-		t.Error("Test failed")
-	}
-}
-
-func TestUninstallPackage(t *testing.T) {
-	// Test the uninstallation of a drush package
-	y := NewDrushPackage("registry_rebuild")
-	y.Uninstall()
-	if y.status == true {
 		t.Error("Test failed")
 	}
 }
@@ -51,6 +63,15 @@ func TestListPackage(t *testing.T) {
 		}
 	}
 	if foundPackage != true {
+		t.Error("Test failed")
+	}
+}
+
+func TestUninstallPackage(t *testing.T) {
+	// Test the uninstallation of a drush package
+	y := NewDrushPackage("registry_rebuild")
+	y.Uninstall()
+	if y.status == true {
 		t.Error("Test failed")
 	}
 }

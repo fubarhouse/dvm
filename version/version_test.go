@@ -2,16 +2,38 @@ package version
 
 import (
 	"fmt"
+	"github.com/fubarhouse/dvm/version"
 	"testing"
 )
 
 const TESTVERSION = "7.0.0"
 const LEGACYVERSION = "4.0.0"
 
+func TestDrushInstallDefaultTestCase(t *testing.T) {
+	Version := "7.0.0"
+	// Ensure a version is tested to prevent failure.
+	y := version.NewDrushVersion(Version)
+	y.Install()
+	y.SetDefault()
+	if !y.Status() {
+		t.Error("Test failed")
+	}
+}
+
 func TestCreateNewVersion(t *testing.T) {
 	// Test the creation of version object
 	y := NewDrushVersion(TESTVERSION)
 	if fmt.Sprint(y.version) != TESTVERSION {
+		t.Error("Test failed")
+	}
+}
+
+func TestDrushInstall(t *testing.T) {
+	// Test if a version of Command can be installed.
+	y := NewDrushVersion(TESTVERSION)
+	y.Install()
+	y.SetDefault()
+	if y.Status() == false {
 		t.Error("Test failed")
 	}
 }
@@ -23,22 +45,13 @@ func TestDrushExists(t *testing.T) {
 		t.Error("Test failed")
 	}
 }
+
 func TestDrushStatus(t *testing.T) {
 	// Test if a Command version is installed
 	y := NewDrushVersion(TESTVERSION)
 	if !y.Status() {
 		t.Error("Test failed")
 	}
-}
-
-func TestDrushInstall(t *testing.T) {
-	// Test if a version of Command can be installed.
-	y := NewDrushVersion(TESTVERSION)
-	y.Install()
-	if !y.Status() {
-		t.Error("Test failed")
-	}
-	y.Uninstall()
 }
 
 func TestDrushUninstall(t *testing.T) {
