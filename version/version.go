@@ -19,7 +19,7 @@ type DrushVersion struct {
 	// This is used by many methods to process input data.
 	version      string
 	validVersion bool
-	exec         string
+	Executable   string
 }
 
 func NewDrushVersion(version string) DrushVersion {
@@ -160,11 +160,11 @@ func (drushVersion *DrushVersion) SetDefault() {
 	symlinkDest := ""
 	if majorVersion == "6" || majorVersion == "7" || majorVersion == "8" || majorVersion == "9" {
 		// If the version is supported by composer:
-		symlinkSource = drushVersion.exec
+		symlinkSource = drushVersion.Executable
 		symlinkDest = workingDir + "/drush-" + drushVersion.version + "/vendor/bin/drush"
 	} else {
 		// If it isn't supported by Composer...
-		symlinkSource = drushVersion.exec
+		symlinkSource = drushVersion.Executable
 		symlinkDest = workingDir + "/drush-" + drushVersion.version + "/drush"
 	}
 
@@ -172,19 +172,19 @@ func (drushVersion *DrushVersion) SetDefault() {
 		// Remove symlink
 		_, rmErr := exec.Command("sh", "-c", "rm -f "+symlinkSource).Output()
 		if rmErr != nil {
-			fmt.Println("Could not remove "+drushVersion.exec+": ", rmErr)
+			fmt.Println("Could not remove "+drushVersion.Executable+": ", rmErr)
 		} else {
 			fmt.Println("Symlink successfully removed.")
 		}
 		// Add symlink
 		_, rmErr = exec.Command("sh", "-c", "ln -sF "+symlinkDest+" "+symlinkSource).Output()
 		if rmErr != nil {
-			fmt.Println("Could not sym "+drushVersion.exec+": ", rmErr)
+			fmt.Println("Could not sym "+drushVersion.Executable+": ", rmErr)
 		} else {
 			fmt.Println("Symlink successfully created.")
 		}
 		// Verify version
-		currVer, rmErr := exec.Command("sh", "-c", drushVersion.exec+" --version").Output()
+		currVer, rmErr := exec.Command("sh", "-c", drushVersion.Executable+" --version").Output()
 		if rmErr != nil {
 			fmt.Println("Command returned error: ", rmErr)
 			os.Exit(1)

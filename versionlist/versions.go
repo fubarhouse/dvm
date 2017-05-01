@@ -12,14 +12,14 @@ import (
 type DrushVersionList struct {
 	// A struct to store associated versions in a simple []string.
 	// This is used by methods to store and use multiple version data.
-	list 		[]string
-	executable	string
+	list       []string
+	Executable string
 }
 
 func NewDrushVersionList() DrushVersionList {
 	// An API to create/store a Command version list object.
 	retVal := DrushVersionList{}
-	retVal.executable = "/usr/local/bin/drush"
+	retVal.Executable = "/usr/local/bin/drush"
 	return retVal
 }
 
@@ -75,7 +75,7 @@ func (drushVersionList *DrushVersionList) ListInstalled() DrushVersionList {
 	// an identifier for the currently used version.
 	usr, _ := user.Current()
 	workingDir := usr.HomeDir + "/.dvm/versions"
-	thisDrush := GetActiveVersion(drushVersionList.executable)
+	thisDrush := GetActiveVersion(drushVersionList.Executable)
 	//thisDrush := "7.2.0"
 	files, _ := ioutil.ReadDir(workingDir)
 	installedVersions := NewDrushVersionList()

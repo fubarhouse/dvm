@@ -38,7 +38,7 @@ func main() {
 	if string(*flagVersion) != "" {
 		this := version.NewDrushVersion(string(*flagVersion))
 		if *drushPath != "" {
-			this.exec = string(*drushPath)
+			this.Executable = string(*drushPath)
 		}
 		if bool(*flagInstall) == true {
 			this.Install()

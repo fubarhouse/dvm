@@ -10,8 +10,6 @@ import (
 	"testing"
 )
 
-const DRUSHPATH = "/usr/local/bin/drush"
-
 type testResult struct {
 	name   string
 	result bool

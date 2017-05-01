@@ -11,9 +11,9 @@ import (
 type drushPackage struct {
 	// A struct to store information on a drush package.
 	// This is used by associated methods to manage individual packages.
-	name   string
-	status bool
-	exec   string
+	name       string
+	status     bool
+	Executable string
 }
 
 func NewDrushPackage(name string) drushPackage {
@@ -21,7 +21,7 @@ func NewDrushPackage(name string) drushPackage {
 	drushPackage := new(drushPackage)
 	drushPackage.name = name
 	drushPackage.status = drushPackage.Status()
-	drushPackage.exec = "/usr/local/bin/drush"
+	drushPackage.Executable = "/usr/local/bin/drush"
 	return *drushPackage
 }
 
@@ -73,7 +73,7 @@ func (drushPackage *drushPackage) Install() {
 	_, err := os.Stat(workingDir + "/" + drushPackage.name + "/")
 	if err != nil {
 		// err
-		_, drushPackageError := exec.Command(drushPackage.exec, "dl", drushPackage.name).Output()
+		_, drushPackageError := exec.Command(drushPackage.Executable, "dl", drushPackage.name).Output()
 		if drushPackageError == nil {
 			drushPackage.status = drushPackage.Status()
 			fmt.Printf("Successfully installed Command package %v\n", drushPackage.name)
