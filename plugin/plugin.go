@@ -8,13 +8,12 @@ import (
 	"os/user"
 )
 
-const PATH_DRUSH = "/usr/local/bin/drush"
-
 type drushPackage struct {
 	// A struct to store information on a drush package.
 	// This is used by associated methods to manage individual packages.
 	name   string
 	status bool
+	exec   string
 }
 
 func NewDrushPackage(name string) drushPackage {
@@ -22,6 +21,7 @@ func NewDrushPackage(name string) drushPackage {
 	drushPackage := new(drushPackage)
 	drushPackage.name = name
 	drushPackage.status = drushPackage.Status()
+	drushPackage.exec = "/usr/local/bin/drush"
 	return *drushPackage
 }
 
@@ -31,7 +31,7 @@ func (drushPackage *drushPackage) Status() bool {
 	files, _ := ioutil.ReadDir(workingDir)
 	installedPackages := []string{}
 	for _, file := range files {
-		if file.IsDir() == true {
+		if file.IsDir() {
 			activeItemDirectory := file.Name()
 			_, err := os.Stat(workingDir + "/" + activeItemDirectory + "/")
 			if err == nil {
@@ -53,7 +53,7 @@ func (drushPackage *drushPackage) List() []string {
 	files, _ := ioutil.ReadDir(workingDir)
 	installedPackages := []string{}
 	for _, file := range files {
-		if file.IsDir() == true {
+		if file.IsDir() {
 			activeItemDirectory := file.Name()
 			if activeItemDirectory != "cache" {
 				installedPackages = append(installedPackages, file.Name())
@@ -73,7 +73,7 @@ func (drushPackage *drushPackage) Install() {
 	_, err := os.Stat(workingDir + "/" + drushPackage.name + "/")
 	if err != nil {
 		// err
-		_, drushPackageError := exec.Command(PATH_DRUSH, "dl", drushPackage.name).Output()
+		_, drushPackageError := exec.Command(drushPackage.exec, "dl", drushPackage.name).Output()
 		if drushPackageError == nil {
 			drushPackage.status = drushPackage.Status()
 			fmt.Printf("Successfully installed Command package %v\n", drushPackage.name)

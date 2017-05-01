@@ -5,6 +5,7 @@ import (
 	"testing"
 )
 
+const DEFAULT_DRUSH_PATH = "/usr/local/bin/drush"
 const TESTVERSION = "7.0.0"
 const LEGACYVERSION = "4.0.0"
 
@@ -95,7 +96,7 @@ func TestDrushSpecifyDefault(t *testing.T) {
 
 	// Set-up constants for use, they cannot be
 	// constants in case we need to reassign them.
-	ACTIVEVERSION := GetActiveVersion()
+	ACTIVEVERSION := GetActiveVersion(DEFAULT_DRUSH_PATH)
 	NEWVERSION := TESTVERSION
 	VERSIONCHANGED := false
 
@@ -116,10 +117,10 @@ func TestDrushSpecifyDefault(t *testing.T) {
 	y.Install()
 	x.SetDefault()
 
-	if GetActiveVersion() != NEWVERSION {
+	if GetActiveVersion(DEFAULT_DRUSH_PATH) != NEWVERSION {
 		t.Error("Test failed")
 	} else {
-		if VERSIONCHANGED != false {
+		if !VERSIONCHANGED {
 			y.SetDefault()
 			x.Uninstall()
 		}

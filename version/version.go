@@ -10,7 +10,6 @@ import (
 	"strings"
 )
 
-const PATH_DRUSH = "/usr/local/bin/drush"
 const PATH_UNZIP = "/usr/bin/unzip"
 const PATH_WGET = "/usr/local/bin/wget"
 const PATH_COMPOSER = "/usr/local/bin/composer"
@@ -20,13 +19,14 @@ type DrushVersion struct {
 	// This is used by many methods to process input data.
 	version      string
 	validVersion bool
+	exec         string
 }
 
 func NewDrushVersion(version string) DrushVersion {
 	// An API to create/store a Command version object.
-	retVal := DrushVersion{version, false}
+	retVal := DrushVersion{version, false, "/usr/local/bin/drush"}
 	retVal.validVersion = retVal.Exists()
-	if retVal.validVersion == false {
+	if !retVal.validVersion {
 		log.Fatalf("Input drush v%v was not found in Git tag history or composer.", retVal.version)
 	}
 	return retVal
@@ -111,12 +111,12 @@ func (drushVersion *DrushVersion) Install() {
 	if err != nil {
 		majorVersion := fmt.Sprintf("%c", drushVersion.version[0])
 		workingDir := usr.HomeDir + "/.dvm/versions"
-		fmt.Printf("Attempting to install Command v%v\n", drushVersion.version)
+		fmt.Printf("Attempting to install v%v\n", drushVersion.version)
 
 		if majorVersion == "6" || majorVersion == "7" || majorVersion == "8" || majorVersion == "9" {
 			_, installError := exec.Command("sh", "-c", "cd "+workingDir+"/ && mkdir -p ./drush-"+drushVersion.version+" && cd ./drush-"+drushVersion.version+" && "+PATH_COMPOSER+" require \"drush/drush:"+drushVersion.version+"\"").Output()
 			if installError != nil {
-				fmt.Printf("Could not install Command %v, cleaning installation...\n", drushVersion.version)
+				fmt.Printf("Could not install %v, cleaning installation...\n", drushVersion.version)
 				fmt.Println(installError)
 				exec.Command("sh", "-c", "rm -rf "+workingDir+"/drush-"+drushVersion.version).Output()
 			}
@@ -151,7 +151,7 @@ func (drushVersion *DrushVersion) Reinstall() {
 }
 
 func (drushVersion *DrushVersion) SetDefault() {
-	// Removes whatever is located at PATH_DRUSH
+	// Removes whatever is located at drushVersion.exec
 	// Adds a symlink to an installed version.
 	usr, _ := user.Current()
 	workingDir := usr.HomeDir + "/.dvm/versions"
@@ -160,31 +160,31 @@ func (drushVersion *DrushVersion) SetDefault() {
 	symlinkDest := ""
 	if majorVersion == "6" || majorVersion == "7" || majorVersion == "8" || majorVersion == "9" {
 		// If the version is supported by composer:
-		symlinkSource = PATH_DRUSH
+		symlinkSource = drushVersion.exec
 		symlinkDest = workingDir + "/drush-" + drushVersion.version + "/vendor/bin/drush"
 	} else {
 		// If it isn't supported by Composer...
-		symlinkSource = PATH_DRUSH
+		symlinkSource = drushVersion.exec
 		symlinkDest = workingDir + "/drush-" + drushVersion.version + "/drush"
 	}
 
-	if drushVersion.validVersion == true {
+	if drushVersion.validVersion {
 		// Remove symlink
 		_, rmErr := exec.Command("sh", "-c", "rm -f "+symlinkSource).Output()
 		if rmErr != nil {
-			fmt.Println("Could not remove "+PATH_DRUSH+": ", rmErr)
+			fmt.Println("Could not remove "+drushVersion.exec+": ", rmErr)
 		} else {
 			fmt.Println("Symlink successfully removed.")
 		}
 		// Add symlink
 		_, rmErr = exec.Command("sh", "-c", "ln -sF "+symlinkDest+" "+symlinkSource).Output()
 		if rmErr != nil {
-			fmt.Println("Could not sym "+PATH_DRUSH+": ", rmErr)
+			fmt.Println("Could not sym "+drushVersion.exec+": ", rmErr)
 		} else {
 			fmt.Println("Symlink successfully created.")
 		}
 		// Verify version
-		currVer, rmErr := exec.Command("sh", "-c", PATH_DRUSH+" --version").Output()
+		currVer, rmErr := exec.Command("sh", "-c", drushVersion.exec+" --version").Output()
 		if rmErr != nil {
 			fmt.Println("Command returned error: ", rmErr)
 			os.Exit(1)
@@ -198,9 +198,9 @@ func (drushVersion *DrushVersion) SetDefault() {
 	}
 }
 
-func GetActiveVersion() string {
+func GetActiveVersion(executable string) string {
 	// Returns the currently active Command version
-	drushOutputVersion, drushOutputError := exec.Command(PATH_DRUSH, "version", "--format=string").Output()
+	drushOutputVersion, drushOutputError := exec.Command(executable, "version", "--format=string").Output()
 	if drushOutputError != nil {
 		fmt.Println(drushOutputError)
 		os.Exit(1)

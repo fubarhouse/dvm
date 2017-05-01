@@ -9,18 +9,17 @@ import (
 	"strings"
 )
 
-const PATH_DRUSH = "/usr/local/bin/drush"
-const PATH_COMPOSER = "composer"
-
 type DrushVersionList struct {
 	// A struct to store associated versions in a simple []string.
 	// This is used by methods to store and use multiple version data.
-	list []string
+	list 		[]string
+	executable	string
 }
 
 func NewDrushVersionList() DrushVersionList {
 	// An API to create/store a Command version list object.
 	retVal := DrushVersionList{}
+	retVal.executable = "/usr/local/bin/drush"
 	return retVal
 }
 
@@ -50,7 +49,7 @@ func (drushVersionList *DrushVersionList) ListRemote() {
 	// Fetches a list of all available versions from composer.
 	// Versions must start with integers 6,7,8 or 9 to be returned.
 	drushVersionsObj := NewDrushVersionList()
-	drushVersionsCommand, _ := exec.Command("sh", "-c", PATH_COMPOSER+" show drush/drush -a | grep versions | sort | uniq").Output()
+	drushVersionsCommand, _ := exec.Command("sh", "-c", "composer", "show drush/drush -a | grep versions | sort | uniq").Output()
 	drushVersions := strings.Split(string(drushVersionsCommand), ", ")
 	drushVersionsObj.list = drushVersions
 	acceptableVersions := []string{}
@@ -76,7 +75,7 @@ func (drushVersionList *DrushVersionList) ListInstalled() DrushVersionList {
 	// an identifier for the currently used version.
 	usr, _ := user.Current()
 	workingDir := usr.HomeDir + "/.dvm/versions"
-	thisDrush := GetActiveVersion()
+	thisDrush := GetActiveVersion(drushVersionList.executable)
 	//thisDrush := "7.2.0"
 	files, _ := ioutil.ReadDir(workingDir)
 	installedVersions := NewDrushVersionList()
@@ -104,9 +103,9 @@ func (drushVersionList *DrushVersionList) PrintInstalled() {
 	}
 }
 
-func GetActiveVersion() string {
+func GetActiveVersion(executable string) string {
 	// Returns the currently active Command version
-	drushOutputVersion, drushOutputError := exec.Command(PATH_DRUSH, "version", "--format=string").Output()
+	drushOutputVersion, drushOutputError := exec.Command(executable, "version", "--format=string").Output()
 	if drushOutputError != nil {
 		fmt.Println(drushOutputError)
 		os.Exit(1)
