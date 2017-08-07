@@ -1,8 +1,8 @@
 package plugin
 
 import (
-	"fmt"
 	"io/ioutil"
+	log "github.com/Sirupsen/logrus"
 	"os"
 	"os/exec"
 	"os/user"
@@ -59,7 +59,7 @@ func (drushPackage *drushPackage) List() []string {
 		}
 	}
 	for _, Package := range installedPackages {
-		fmt.Println(Package)
+		log.Println(Package)
 	}
 	return installedPackages
 }
@@ -71,15 +71,15 @@ func (drushPackage *drushPackage) Install() {
 	_, err := os.Stat(workingDir + "/" + drushPackage.name + "/")
 	if err != nil {
 		// err
-		_, drushPackageError := exec.Command("drush", "dl", drushPackage.name).Output()
+		drushPackageOut, drushPackageError := exec.Command("drush", "dl", drushPackage.name).Output()
 		if drushPackageError == nil {
 			drushPackage.status = drushPackage.Status()
-			fmt.Printf("Successfully installed Command package %v\n", drushPackage.name)
+			log.Printf("Successfully installed Command package %v\n", drushPackage.name)
 		} else {
-			fmt.Printf("Could not install %v\n", drushPackageError)
+			log.Printf("Could not install %v\n%v", drushPackageError, string(drushPackageOut))
 		}
 	} else {
-		fmt.Printf("Unsuccessfully installed %v: already installed\n", drushPackage.name)
+		log.Printf("Unsuccessfully installed %v: already installed\n", drushPackage.name)
 	}
 }
 
@@ -92,12 +92,12 @@ func (drushPackage *drushPackage) Uninstall() {
 		_, drushPackageError := exec.Command("sh", "-c", "rm -rf "+workingDir+"/"+drushPackage.name).Output()
 		if drushPackageError == nil {
 			drushPackage.status = drushPackage.Status()
-			fmt.Printf("Successfully uninstalled Command package %v\n", drushPackage.name)
+			log.Printf("Successfully uninstalled %v\n", drushPackage.name)
 		} else {
-			fmt.Printf("Could not uninstall Command package %v\n", drushPackageError)
+			log.Printf("Could not uninstall %v\n", drushPackageError)
 		}
 	} else {
-		fmt.Printf("Unsuccessfully unistalled Command package %v: already uninstalled\n", drushPackage.name)
+		log.Printf("Unsuccessfully uninstalled %v: already uninstalled\n", drushPackage.name)
 	}
 }
 
