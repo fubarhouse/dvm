@@ -8,8 +8,6 @@ import (
 	"os/user"
 )
 
-const PATH_DRUSH = "/usr/local/bin/drush"
-
 type drushPackage struct {
 	// A struct to store information on a drush package.
 	// This is used by associated methods to manage individual packages.
@@ -73,15 +71,15 @@ func (drushPackage *drushPackage) Install() {
 	_, err := os.Stat(workingDir + "/" + drushPackage.name + "/")
 	if err != nil {
 		// err
-		_, drushPackageError := exec.Command(PATH_DRUSH, "dl", drushPackage.name).Output()
+		_, drushPackageError := exec.Command("drush", "dl", drushPackage.name).Output()
 		if drushPackageError == nil {
 			drushPackage.status = drushPackage.Status()
 			fmt.Printf("Successfully installed Command package %v\n", drushPackage.name)
 		} else {
-			fmt.Printf("Could not install Command package %v\n", drushPackageError)
+			fmt.Printf("Could not install %v\n", drushPackageError)
 		}
 	} else {
-		fmt.Printf("Unsuccessfully installed Command package %v: already installed\n", drushPackage.name)
+		fmt.Printf("Unsuccessfully installed %v: already installed\n", drushPackage.name)
 	}
 }
 
