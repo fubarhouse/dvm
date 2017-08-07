@@ -8,7 +8,7 @@ It has been rewritten in Google's Golang as a pilot for the core maintainer to l
 
 ## Requirements
 
-DVM will reqire the following to be available in the system depending on what you're trying to do:
+DVM will require the following to be available in the system depending on what you're trying to do:
 * composer
 * unzip
 * wget
