@@ -23,7 +23,7 @@ type DrushVersion struct {
 
 // NewDrushVersion will return a new DrushVersion.
 func NewDrushVersion(version string) DrushVersion {
-	// An API to create/store a Command version object.
+	// An API to create/store a Drush version object.
 	retVal := DrushVersion{version, false}
 	retVal.validVersion = retVal.Exists()
 	if retVal.validVersion == false {
@@ -49,8 +49,8 @@ func assertFileSystem() {
 
 // Exists will return a bool based on the availability status of a drush version.
 func (drushVersion *DrushVersion) Exists() bool {
-	// Takes in a Command version object and tests if it exists
-	// in any available Command version list object.
+	// Takes in a Drush version object and tests if it exists
+	// in any available Drush version list object.
 	drushVersions := versionlist.NewDrushVersionList()
 	drushVersions.ListLocal()
 	for _, versionItem := range drushVersions.ListContents() {
@@ -67,7 +67,7 @@ func (drushVersion *DrushVersion) Exists() bool {
 	return false
 }
 
-// Status will check the installation state of any individual Command version object.
+// Status will check the installation state of any individual Drush version object.
 func (drushVersion *DrushVersion) Status() bool {
 	usr, _ := user.Current()
 	_, err := os.Stat(usr.HomeDir + "/.dvm/versions/drush-" + drushVersion.version)
@@ -78,13 +78,13 @@ func (drushVersion *DrushVersion) Status() bool {
 }
 
 // LegacyInstall is basically the main() func for Legacy versions which encapsulates
-// the code/dependencies for installing legacy Command versions.
+// the code/dependencies for installing legacy Drush versions.
 func (drushVersion *DrushVersion) LegacyInstall() {
 	drushVersion.LegacyInstallVersion()
 	drushVersion.LegacyInstallTable()
 }
 
-// LegacyInstallTable is essentially always missing from older Command versions.
+// LegacyInstallTable is essentially always missing from older Drush versions.
 // This ensures the script is available to the legacy version.
 func (drushVersion *DrushVersion) LegacyInstallTable() {
 	// @TODO: Restore functionality in the Golang way...
@@ -105,7 +105,7 @@ func (drushVersion *DrushVersion) LegacyInstallTable() {
 func (drushVersion *DrushVersion) LegacyInstallVersion() {
 	// @TODO: Rewrite in the Golang way.
 	usr, _ := user.Current()
-	log.Infoln("Downloading and extracting legacy Command version ", drushVersion.version)
+	log.Infoln("Downloading and extracting legacy Drush version ", drushVersion.version)
 	zipFileName := drushVersion.version + ".zip"
 	remotePath := "https://github.com/drush-ops/drush/archive/" + zipFileName
 	zipPath := usr.HomeDir + "/.dvm/versions/"
@@ -124,26 +124,28 @@ func (drushVersion *DrushVersion) LegacyInstallVersion() {
 // Install will install a version of drush version with composer in a common location.
 func (drushVersion *DrushVersion) Install() {
 	assertFileSystem()
-	// Installs a version of Command supported by composer.
+	// Installs a version of Drush supported by composer.
 	usr, _ := user.Current()
 	_, err := os.Stat(usr.HomeDir + "/.dvm/versions/drush-" + drushVersion.version)
 	if err != nil {
 		majorVersion := fmt.Sprintf("%c", drushVersion.version[0])
 		workingDir := usr.HomeDir + "/.dvm/versions"
-		log.Infof("Attempting to install Command v%v\n", drushVersion.version)
+		log.Infof("Attempting to install Drush v%v", drushVersion.version)
 
 		if majorVersion == "6" || majorVersion == "7" || majorVersion == "8" || majorVersion == "9" {
 			_, installError := exec.Command("sh", "-c", "cd "+workingDir+"/ && mkdir -p ./drush-"+drushVersion.version+" && cd ./drush-"+drushVersion.version+" && composer require \"drush/drush:"+drushVersion.version+"\"").Output()
 			if installError != nil {
-				log.Errorf("Could not install Command %v, cleaning installation...\n", drushVersion.version)
+				log.Errorf("Could not install Drush %v, cleaning installation...", drushVersion.version)
 				log.Errorln(installError)
 				exec.Command("sh", "-c", "rm -rf "+workingDir+"/drush-"+drushVersion.version).Output()
+			} else {
+				log.Infof("Successfully installed Drush v%v", drushVersion.version)
 			}
 		} else {
 			drushVersion.LegacyInstall()
 		}
 	} else {
-		log.Infof("Command v%v is already installed.\n", drushVersion.version)
+		log.Infof("Drush v%v is already installed.", drushVersion.version)
 	}
 }
 
@@ -154,19 +156,21 @@ func (drushVersion *DrushVersion) Uninstall() {
 	_, err := os.Stat(usr.HomeDir + "/.dvm/versions/drush-" + drushVersion.version)
 	if err == nil {
 		workingDir := usr.HomeDir + "/.dvm/versions"
-		log.Infof("Removing installation of Command v%v\n", drushVersion.version)
+		log.Infof("Removing installation of Drush v%v", drushVersion.version)
 		_, rmErr := exec.Command("sh", "-c", "rm -rf "+workingDir+"/drush-"+drushVersion.version).Output()
 		if rmErr != nil {
 			log.Errorln(rmErr)
+		} else {
+			log.Infof("Successfully uninstalled Drush v%v", drushVersion.version)
 		}
 	} else {
-		log.Errorf("Command v%v is not installed.\n", drushVersion.version)
+		log.Errorf("Drush v%v is not installed.", drushVersion.version)
 	}
 }
 
 // Reinstall will remove and reinstall a drush version.
 func (drushVersion *DrushVersion) Reinstall() {
-	// Uninstall and Install an input Command version.
+	// Uninstall and Install an input Drush version.
 	drushVersion.Uninstall()
 	drushVersion.Install()
 }
@@ -206,15 +210,15 @@ func (drushVersion *DrushVersion) SetDefault() {
 		// Verify version
 		currVer, rmErr := exec.Command("sh", "-c", PATH_DRUSH+" --version").Output()
 		if rmErr != nil {
-			log.Println("Command returned error: ", rmErr)
+			log.Println("Drush returned error: ", rmErr)
 			os.Exit(1)
 		} else {
 			if string(currVer) == drushVersion.version {
-				log.Printf("Command is now set to v%v", drushVersion.version)
+				log.Printf("Drush is now set to v%v", drushVersion.version)
 			}
 		}
 	} else {
-		log.Fatal("Command version entered is not valid.")
+		log.Fatal("Drush version entered is not valid.")
 	}
 }
 

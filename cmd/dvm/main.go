@@ -13,7 +13,10 @@ import (
 
 func main() {
 
-	if len(os.Args) == 2 {
+	if os.Args != nil && len(os.Args) > 2 {
+
+		fmt.Println(os.Args)
+
 		if os.Args[1] == "install" || os.Args[1] == "uninstall" || os.Args[1] == "reinstall" || os.Args[1] == "use" {
 			Action := os.Args[1]
 			Version := os.Args[2]
