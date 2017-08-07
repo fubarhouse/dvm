@@ -4,16 +4,13 @@ import (
 	"fmt"
 	"os/exec"
 	"os"
-	"log"
+	log "github.com/Sirupsen/logrus"
 	"strings"
 	"os/user"
 	"github.com/fubarhouse/dvm/versionlist"
 )
 
 const PATH_DRUSH = "/usr/local/bin/drush"
-const PATH_UNZIP = "/usr/bin/unzip"
-const PATH_WGET = "/usr/local/bin/wget"
-const PATH_COMPOSER = "/usr/local/bin/composer"
 
 type DrushVersion struct {
 	// A struct to store a single version and to identify validity via OOP.
@@ -30,6 +27,21 @@ func NewDrushVersion(version string) DrushVersion {
 		log.Fatalf("Input drush v%v was not found in Git tag history or composer.", retVal.version)
 	}
 	return retVal
+}
+
+// assertFileSystem will ensure the filesystem at ~/.dvm/versions is created for use.
+func assertFileSystem() {
+	usr, _ := user.Current()
+	Directory := usr.HomeDir + "/.dvm/versions/"
+	_, StatErr := os.Stat(Directory)
+	if StatErr != nil {
+		MkdirErr := os.MkdirAll(Directory, 0775)
+		if MkdirErr != nil {
+			log.Fatalf("Unsuccessfully attempted to create the directory %v with mode 0775.", Directory)
+		} else {
+			log.Infof("Successfully create the directory %v with mode 0775.", Directory)
+		}
+	}
 }
 
 func (drushVersion *DrushVersion) Exists() bool {
@@ -73,14 +85,14 @@ func (drushVersion *DrushVersion) LegacyInstallTable() {
 	// This ensures the script is available to the legacy version.
 	// @TODO: Restore functionality in the Golang way...
 	//usr, _ := user.Current()
-	//fmt.Println("Fixing dependency issue with module Console_Table")
+	//log.Infoln("Fixing dependency issue with module Console_Table")
 	//ctFileName := "Table.inc"
 	//ctRemotePath := "https://raw.githubusercontent.com/pear/Console_Table/master/Table.php"
 	//ctPath := usr.HomeDir + "/.dvm/versions/drush-" + drushVersion.version + "/includes/"
 	//ctFile := ctPath + ctFileName
-	//_, wgetErr := exec.Command("sh", "-c", PATH_WGET + " " + ctRemotePath).Output()
+	//_, wgetErr := exec.Command("sh", "-c", "wget", ctRemotePath).Output()
 	//if wgetErr != nil {
-	//	fmt.Println("wget returned error:", wgetErr)
+	//	log.Infoln("wget returned error:", wgetErr)
 	//}
 	//exec.Command("mv ./" + ctFileName + " " + ctFile).Run()
 }
@@ -88,43 +100,44 @@ func (drushVersion *DrushVersion) LegacyInstallVersion() {
 	// Installs from a zip file which was located via git tags (manual input see ListLocal()).
 	// @TODO: Rewrite in the Golang way.
 	usr, _ := user.Current()
-	fmt.Println("Downloading and extracting legacy Command version ", drushVersion.version)
+	log.Infoln("Downloading and extracting legacy Command version ", drushVersion.version)
 	zipFileName := drushVersion.version + ".zip"
 	remotePath := "https://github.com/drush-ops/drush/archive/" + zipFileName
 	zipPath := usr.HomeDir + "/.dvm/versions/"
 	zipFile := zipPath + zipFileName
 	exec.Command("sh", "-c", "mkdir -p "+zipPath).Run()
-	_, wgetErr := exec.Command("sh", "-c", PATH_WGET+" "+remotePath).Output()
+	_, wgetErr := exec.Command("sh", "-c", "wget",remotePath).Output()
 	if wgetErr != nil {
-		fmt.Println("wget returned error:", wgetErr)
+		log.Warnln("wget returned error:", wgetErr)
 	}
 	exec.Command("sh", "-c", "mv "+zipFileName+" "+zipPath).Run()
-	exec.Command("sh", "-c", "cd "+zipPath+" && "+PATH_UNZIP+" "+zipFile).Run()
+	exec.Command("sh", "-c", "cd "+zipPath+" && unzip "+zipFile).Run()
 	exec.Command("sh", "-c", "rm -f "+zipFile).Run()
 	drushVersion.Status()
 }
 
 func (drushVersion *DrushVersion) Install() {
+	assertFileSystem()
 	// Installs a version of Command supported by composer.
 	usr, _ := user.Current()
 	_, err := os.Stat(usr.HomeDir + "/.dvm/versions/drush-" + drushVersion.version)
 	if err != nil {
 		majorVersion := fmt.Sprintf("%c", drushVersion.version[0])
 		workingDir := usr.HomeDir + "/.dvm/versions"
-		fmt.Printf("Attempting to install Command v%v\n", drushVersion.version)
+		log.Infof("Attempting to install Command v%v\n", drushVersion.version)
 
 		if majorVersion == "6" || majorVersion == "7" || majorVersion == "8" || majorVersion == "9" {
-			_, installError := exec.Command("sh", "-c", "cd "+workingDir+"/ && mkdir -p ./drush-"+drushVersion.version+" && cd ./drush-"+drushVersion.version+" && "+PATH_COMPOSER+" require \"drush/drush:"+drushVersion.version+"\"").Output()
+			_, installError := exec.Command("sh", "-c", "cd "+workingDir+"/ && mkdir -p ./drush-"+drushVersion.version+" && cd ./drush-"+drushVersion.version+" && composer require \"drush/drush:"+drushVersion.version+"\"").Output()
 			if installError != nil {
-				fmt.Printf("Could not install Command %v, cleaning installation...\n", drushVersion.version)
-				fmt.Println(installError)
+				log.Errorf("Could not install Command %v, cleaning installation...\n", drushVersion.version)
+				log.Errorln(installError)
 				exec.Command("sh", "-c", "rm -rf "+workingDir+"/drush-"+drushVersion.version).Output()
 			}
 		} else {
 			drushVersion.LegacyInstall()
 		}
 	} else {
-		fmt.Printf("Command v%v is already installed.\n", drushVersion.version)
+		log.Infof("Command v%v is already installed.\n", drushVersion.version)
 	}
 }
 
@@ -134,13 +147,13 @@ func (drushVersion *DrushVersion) Uninstall() {
 	_, err := os.Stat(usr.HomeDir + "/.dvm/versions/drush-" + drushVersion.version)
 	if err == nil {
 		workingDir := usr.HomeDir + "/.dvm/versions"
-		fmt.Printf("Removing installation of Command v%v\n", drushVersion.version)
+		log.Infof("Removing installation of Command v%v\n", drushVersion.version)
 		_, rmErr := exec.Command("sh", "-c", "rm -rf "+workingDir+"/drush-"+drushVersion.version).Output()
 		if rmErr != nil {
-			fmt.Println(rmErr)
+			log.Errorln(rmErr)
 		}
 	} else {
-		fmt.Printf("Command v%v is not installed.\n", drushVersion.version)
+		log.Errorf("Command v%v is not installed.\n", drushVersion.version)
 	}
 }
 
@@ -172,25 +185,25 @@ func (drushVersion *DrushVersion) SetDefault() {
 		// Remove symlink
 		_, rmErr := exec.Command("sh", "-c", "rm -f "+symlinkSource).Output()
 		if rmErr != nil {
-			fmt.Println("Could not remove "+PATH_DRUSH+": ", rmErr)
+			log.Println("Could not remove "+PATH_DRUSH+": ", rmErr)
 		} else {
-			fmt.Println("Symlink successfully removed.")
+			log.Println("Symlink successfully removed.")
 		}
 		// Add symlink
 		_, rmErr = exec.Command("sh", "-c", "ln -sF "+symlinkDest+" "+symlinkSource).Output()
 		if rmErr != nil {
-			fmt.Println("Could not sym "+PATH_DRUSH+": ", rmErr)
+			log.Println("Could not sym "+PATH_DRUSH+": ", rmErr)
 		} else {
-			fmt.Println("Symlink successfully created.")
+			log.Println("Symlink successfully created.")
 		}
 		// Verify version
 		currVer, rmErr := exec.Command("sh", "-c", PATH_DRUSH+" --version").Output()
 		if rmErr != nil {
-			fmt.Println("Command returned error: ", rmErr)
+			log.Println("Command returned error: ", rmErr)
 			os.Exit(1)
 		} else {
 			if string(currVer) == drushVersion.version {
-				fmt.Printf("Command is now set to v%v", drushVersion.version)
+				log.Printf("Command is now set to v%v", drushVersion.version)
 			}
 		}
 	} else {
@@ -200,9 +213,9 @@ func (drushVersion *DrushVersion) SetDefault() {
 
 func GetActiveVersion() string {
 	// Returns the currently active Command version
-	drushOutputVersion, drushOutputError := exec.Command(PATH_DRUSH, "version", "--format=string").Output()
+	drushOutputVersion, drushOutputError := exec.Command("drush", "version", "--format=string").Output()
 	if drushOutputError != nil {
-		fmt.Println(drushOutputError)
+		log.Println(drushOutputError)
 		os.Exit(1)
 	}
 	return string(strings.Replace(string(drushOutputVersion), "\n", "", -1))
