@@ -1,3 +1,4 @@
+// dvm is a drush version management binary for unix systems.
 package main
 
 import (

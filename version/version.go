@@ -1,3 +1,4 @@
+// version is a package which manages a particular version of Drush
 package version
 
 import (
@@ -12,6 +13,7 @@ import (
 
 const PATH_DRUSH = "/usr/local/bin/drush"
 
+// DrushVersion is a struct containing information on a given version of Drush.
 type DrushVersion struct {
 	// A struct to store a single version and to identify validity via OOP.
 	// This is used by many methods to process input data.
@@ -19,6 +21,7 @@ type DrushVersion struct {
 	validVersion bool
 }
 
+// NewDrushVersion will return a new DrushVersion.
 func NewDrushVersion(version string) DrushVersion {
 	// An API to create/store a Command version object.
 	retVal := DrushVersion{version, false}
@@ -44,6 +47,7 @@ func assertFileSystem() {
 	}
 }
 
+// Exists will return a bool based on the availability status of a drush version.
 func (drushVersion *DrushVersion) Exists() bool {
 	// Takes in a Command version object and tests if it exists
 	// in any available Command version list object.
@@ -63,8 +67,8 @@ func (drushVersion *DrushVersion) Exists() bool {
 	return false
 }
 
+// Status will check the installation state of any individual Command version object.
 func (drushVersion *DrushVersion) Status() bool {
-	// Check the installation state of any individual Command version object.
 	usr, _ := user.Current()
 	_, err := os.Stat(usr.HomeDir + "/.dvm/versions/drush-" + drushVersion.version)
 	if err == nil {
@@ -73,16 +77,16 @@ func (drushVersion *DrushVersion) Status() bool {
 	return false
 }
 
+// LegacyInstall is basically the main() func for Legacy versions which encapsulates
+// the code/dependencies for installing legacy Command versions.
 func (drushVersion *DrushVersion) LegacyInstall() {
-	// Basically the main() func for Legacy versions which encapsulates
-	// the code/dependencies for installing legacy Command versions.
 	drushVersion.LegacyInstallVersion()
 	drushVersion.LegacyInstallTable()
 }
 
+// LegacyInstallTable is essentially always missing from older Command versions.
+// This ensures the script is available to the legacy version.
 func (drushVersion *DrushVersion) LegacyInstallTable() {
-	// ConsoleTable is essentially always missing from older Command versions.
-	// This ensures the script is available to the legacy version.
 	// @TODO: Restore functionality in the Golang way...
 	//usr, _ := user.Current()
 	//log.Infoln("Fixing dependency issue with module Console_Table")
@@ -96,8 +100,9 @@ func (drushVersion *DrushVersion) LegacyInstallTable() {
 	//}
 	//exec.Command("mv ./" + ctFileName + " " + ctFile).Run()
 }
+
+// LegacyInstallVersion will install from a zip file which was located via git tags (manual input see ListLocal()).
 func (drushVersion *DrushVersion) LegacyInstallVersion() {
-	// Installs from a zip file which was located via git tags (manual input see ListLocal()).
 	// @TODO: Rewrite in the Golang way.
 	usr, _ := user.Current()
 	log.Infoln("Downloading and extracting legacy Command version ", drushVersion.version)
@@ -116,6 +121,7 @@ func (drushVersion *DrushVersion) LegacyInstallVersion() {
 	drushVersion.Status()
 }
 
+// Install will install a version of drush version with composer in a common location.
 func (drushVersion *DrushVersion) Install() {
 	assertFileSystem()
 	// Installs a version of Command supported by composer.
@@ -141,6 +147,7 @@ func (drushVersion *DrushVersion) Install() {
 	}
 }
 
+// Uninstall will remove the file system associated to a given drush version.
 func (drushVersion *DrushVersion) Uninstall() {
 	// Uninstalls a drush version which was installed using DVM convention.
 	usr, _ := user.Current()
@@ -157,15 +164,15 @@ func (drushVersion *DrushVersion) Uninstall() {
 	}
 }
 
+// Reinstall will remove and reinstall a drush version.
 func (drushVersion *DrushVersion) Reinstall() {
 	// Uninstall and Install an input Command version.
 	drushVersion.Uninstall()
 	drushVersion.Install()
 }
 
+// SetDefault will remove and add a symlink to an specified installation of drush.
 func (drushVersion *DrushVersion) SetDefault() {
-	// Removes whatever is located at PATH_DRUSH
-	// Adds a symlink to an installed version.
 	usr, _ := user.Current()
 	workingDir := usr.HomeDir + "/.dvm/versions"
 	majorVersion := fmt.Sprintf("%c", drushVersion.version[0])
@@ -211,8 +218,8 @@ func (drushVersion *DrushVersion) SetDefault() {
 	}
 }
 
+// GetActiveVersion will return the currently active drush version.
 func GetActiveVersion() string {
-	// Returns the currently active Command version
 	drushOutputVersion, drushOutputError := exec.Command("drush", "version", "--format=string").Output()
 	if drushOutputError != nil {
 		log.Println(drushOutputError)
