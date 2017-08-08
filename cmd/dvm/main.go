@@ -32,12 +32,16 @@ func main() {
 
 	_, StatErr := os.Stat("/usr/local/bin/drush")
 	if StatErr != nil {
-		print_usage()
-		fmt.Println("-")
-		fmt.Println("No active version in use, please install and activate a drush version.")
-		os.Exit(0)
+		if len(os.Args) < 2 {
+			if os.Args[1] != "install" && os.Args[1] != "reinstall" && os.Args[1] != "use" {
+				print_usage()
+				fmt.Println("-")
+				fmt.Println("No active version in use, please install and activate a drush version.")
+				os.Exit(0)
+			}
+		}
 	}
-	if os.Args != nil && len(os.Args) > 2 {
+	if os.Args != nil && len(os.Args) >= 2 {
 
 		if os.Args[1] == "install" || os.Args[1] == "uninstall" || os.Args[1] == "reinstall" || os.Args[1] == "use" {
 			Action := os.Args[1]
