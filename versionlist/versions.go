@@ -49,7 +49,7 @@ func (drushVersionList *DrushVersionList) PrintLocal() {
 // Versions must start with integers 6,7,8 or 9 to be returned.
 func (drushVersionList *DrushVersionList) ListRemote() {
 	drushVersionsObj := NewDrushVersionList()
-	drushVersionsCommand, _ := exec.Command("sh", "-c", "composer", "show drush/drush -a | grep versions | sort | uniq").Output()
+	drushVersionsCommand, _ := exec.Command("sh", "-c", "composer show drush/drush -a | grep versions | sort | uniq").Output()
 	drushVersions := strings.Split(string(drushVersionsCommand), ", ")
 	drushVersionsObj.list = drushVersions
 	acceptableVersions := []string{}
