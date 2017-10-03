@@ -3,13 +3,13 @@ package version
 
 import (
 	"fmt"
-	"os/exec"
-	"os"
 	log "github.com/Sirupsen/logrus"
-	"strings"
-	"os/user"
-	"github.com/fubarhouse/dvm/versionlist"
 	"github.com/fubarhouse/dvm/conf"
+	"github.com/fubarhouse/dvm/versionlist"
+	"os"
+	"os/exec"
+	"os/user"
+	"strings"
 )
 
 // DrushVersion is a struct containing information on a given version of Drush.
@@ -110,7 +110,7 @@ func (drushVersion *DrushVersion) LegacyInstallVersion() {
 	zipPath := usr.HomeDir + "/.dvm/versions/"
 	zipFile := zipPath + zipFileName
 	exec.Command("sh", "-c", "mkdir -p "+zipPath).Run()
-	_, wgetErr := exec.Command("sh", "-c", "wget",remotePath).Output()
+	_, wgetErr := exec.Command("sh", "-c", "wget", remotePath).Output()
 	if wgetErr != nil {
 		log.Warnln("wget returned error:", wgetErr)
 	}
@@ -176,48 +176,53 @@ func (drushVersion *DrushVersion) Reinstall() {
 
 // SetDefault will remove and add a symlink to an specified installation of drush.
 func (drushVersion *DrushVersion) SetDefault() {
-	usr, _ := user.Current()
-	workingDir := usr.HomeDir + "/.dvm/versions"
-	majorVersion := fmt.Sprintf("%c", drushVersion.version[0])
-	symlinkSource := ""
-	symlinkDest := ""
-	if majorVersion == "6" || majorVersion == "7" || majorVersion == "8" || majorVersion == "9" {
-		// If the version is supported by composer:
-		symlinkSource = conf.Path()
-		symlinkDest = workingDir + "/drush-" + drushVersion.version + "/vendor/bin/drush"
-	} else {
-		// If it isn't supported by Composer...
-		symlinkSource = conf.Path()
-		symlinkDest = workingDir + "/drush-" + drushVersion.version + "/drush"
-	}
+	Drushes := versionlist.NewDrushVersionList()
+	if Drushes.IsInstalled(drushVersion.version) {
+		usr, _ := user.Current()
+		workingDir := usr.HomeDir + "/.dvm/versions"
+		majorVersion := fmt.Sprintf("%c", drushVersion.version[0])
+		symlinkSource := ""
+		symlinkDest := ""
+		if majorVersion == "6" || majorVersion == "7" || majorVersion == "8" || majorVersion == "9" {
+			// If the version is supported by composer:
+			symlinkSource = conf.Path()
+			symlinkDest = workingDir + "/drush-" + drushVersion.version + "/vendor/bin/drush"
+		} else {
+			// If it isn't supported by Composer...
+			symlinkSource = conf.Path()
+			symlinkDest = workingDir + "/drush-" + drushVersion.version + "/drush"
+		}
 
-	if drushVersion.validVersion == true {
-		// Remove symlink
-		_, rmErr := exec.Command("sh", "-c", "rm -f "+symlinkSource).Output()
-		if rmErr != nil {
-			log.Println("Could not remove "+conf.Path()+": ", rmErr)
-		} else {
-			log.Println("Symlink successfully removed.")
-		}
-		// Add symlink
-		_, rmErr = exec.Command("sh", "-c", "ln -sF "+symlinkDest+" "+symlinkSource).Output()
-		if rmErr != nil {
-			log.Println("Could not sym "+conf.Path()+": ", rmErr)
-		} else {
-			log.Println("Symlink successfully created.")
-		}
-		// Verify version
-		currVer, rmErr := exec.Command("sh", "-c", conf.Path()+" --version").Output()
-		if rmErr != nil {
-			log.Println("Drush returned error: ", rmErr)
-			os.Exit(1)
-		} else {
-			if string(currVer) == drushVersion.version {
-				log.Printf("Drush is now set to v%v", drushVersion.version)
+		if drushVersion.validVersion == true {
+			// Remove symlink
+			_, rmErr := exec.Command("sh", "-c", "rm -f "+symlinkSource).Output()
+			if rmErr != nil {
+				log.Println("Could not remove "+conf.Path()+": ", rmErr)
+			} else {
+				log.Println("Symlink successfully removed.")
 			}
+			// Add symlink
+			_, rmErr = exec.Command("sh", "-c", "ln -sF "+symlinkDest+" "+symlinkSource).Output()
+			if rmErr != nil {
+				log.Println("Could not sym "+conf.Path()+": ", rmErr)
+			} else {
+				log.Println("Symlink successfully created.")
+			}
+			// Verify version
+			currVer, rmErr := exec.Command("sh", "-c", conf.Path()+" --version").Output()
+			if rmErr != nil {
+				log.Println("Drush returned error: ", rmErr)
+				os.Exit(1)
+			} else {
+				if string(currVer) == drushVersion.version {
+					log.Printf("Drush is now set to v%v", drushVersion.version)
+				}
+			}
+		} else {
+			log.Fatal("Drush version entered is not valid.")
 		}
 	} else {
-		log.Fatal("Drush version entered is not valid.")
+		log.Fatalf("Drush version %v is not installed.", drushVersion.version)
 	}
 }
 
