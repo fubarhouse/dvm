@@ -9,9 +9,8 @@ import (
 	"strings"
 	"os/user"
 	"github.com/fubarhouse/dvm/versionlist"
+	"github.com/fubarhouse/dvm/conf"
 )
-
-const PATH_DRUSH = "/usr/local/bin/drush"
 
 // DrushVersion is a struct containing information on a given version of Drush.
 type DrushVersion struct {
@@ -184,11 +183,11 @@ func (drushVersion *DrushVersion) SetDefault() {
 	symlinkDest := ""
 	if majorVersion == "6" || majorVersion == "7" || majorVersion == "8" || majorVersion == "9" {
 		// If the version is supported by composer:
-		symlinkSource = PATH_DRUSH
+		symlinkSource = conf.Path()
 		symlinkDest = workingDir + "/drush-" + drushVersion.version + "/vendor/bin/drush"
 	} else {
 		// If it isn't supported by Composer...
-		symlinkSource = PATH_DRUSH
+		symlinkSource = conf.Path()
 		symlinkDest = workingDir + "/drush-" + drushVersion.version + "/drush"
 	}
 
@@ -196,19 +195,19 @@ func (drushVersion *DrushVersion) SetDefault() {
 		// Remove symlink
 		_, rmErr := exec.Command("sh", "-c", "rm -f "+symlinkSource).Output()
 		if rmErr != nil {
-			log.Println("Could not remove "+PATH_DRUSH+": ", rmErr)
+			log.Println("Could not remove "+conf.Path()+": ", rmErr)
 		} else {
 			log.Println("Symlink successfully removed.")
 		}
 		// Add symlink
 		_, rmErr = exec.Command("sh", "-c", "ln -sF "+symlinkDest+" "+symlinkSource).Output()
 		if rmErr != nil {
-			log.Println("Could not sym "+PATH_DRUSH+": ", rmErr)
+			log.Println("Could not sym "+conf.Path()+": ", rmErr)
 		} else {
 			log.Println("Symlink successfully created.")
 		}
 		// Verify version
-		currVer, rmErr := exec.Command("sh", "-c", PATH_DRUSH+" --version").Output()
+		currVer, rmErr := exec.Command("sh", "-c", conf.Path()+" --version").Output()
 		if rmErr != nil {
 			log.Println("Drush returned error: ", rmErr)
 			os.Exit(1)

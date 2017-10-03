@@ -7,6 +7,8 @@ import (
 	"github.com/fubarhouse/dvm/version"
 	"github.com/fubarhouse/dvm/versionlist"
 	"os"
+
+	"github.com/fubarhouse/dvm/conf"
 )
 
 // @TODO: Use git tags to discover content dynamically?
@@ -77,6 +79,13 @@ func main() {
 				Drushes.PrintRemote()
 			} else if os.Args[2] == "installed" {
 				Drushes.PrintInstalled()
+			}
+		}
+		if os.Args[1] == "config" {
+			if os.Args[2] == "set" {
+				conf.Set("", "")
+			} else if os.Args[2] == "get" {
+
 			}
 		}
 	} else {

@@ -7,9 +7,8 @@ import (
 	"os/exec"
 	"os/user"
 	"strings"
+	"github.com/fubarhouse/dvm/conf"
 )
-
-const PATH_DRUSH = "/usr/local/bin/drush"
 
 // DrushVersionList is a struct to store associated versions in a simple []string.
 // This is used by methods to store and use multiple version data.
@@ -105,7 +104,7 @@ func (drushVersionList *DrushVersionList) PrintInstalled() {
 
 // GetActiveVersion returns the currently active Command version
 func GetActiveVersion() string {
-	drushOutputVersion, drushOutputError := exec.Command(PATH_DRUSH, "version", "--format=string").Output()
+	drushOutputVersion, drushOutputError := exec.Command(conf.Path(), "version", "--format=string").Output()
 	if drushOutputError != nil {
 		fmt.Println(drushOutputError)
 		os.Exit(1)
