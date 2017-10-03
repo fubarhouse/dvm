@@ -26,7 +26,7 @@ There are three ways to install DVM, but if you're at all familiar with Golang t
 2. Build your own Go binary using the API's from the packages downloaded.
 
 ### Option 3
-1. Download the pre-compiled binaries.
+1. Download the [pre-compiled binaries](https://github.com/fubarhouse/dvm/releases).
 2. Copy to location in $PATH environment variable.
 
 ## Configuration
