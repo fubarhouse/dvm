@@ -25,19 +25,9 @@ There are three ways to install DVM, but if you're at all familiar with Golang t
 1. run `go get -u github.com/fubarhouse/dvm/...`
 2. Build your own Go binary using the API's from the packages downloaded.
 
-### Option 3
-1. Download the [pre-compiled binaries](https://github.com/fubarhouse/dvm/releases).
+## Option 3
+1. Download the pre-compiled binaries.
 2. Copy to location in $PATH environment variable.
-
-## Configuration
-Configurations are loaded via Viper, an example is below.
-
-The default values are in this example and should be overriden in `~/.dvm/config.toml` to suit your system.
-
-```
-[config]
-path = "/usr/local/bin/drush"
-```
 
 ## DVM Usage
 

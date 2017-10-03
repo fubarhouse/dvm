@@ -2,13 +2,14 @@ package versionlist
 
 import (
 	"fmt"
-	"github.com/fubarhouse/dvm/conf"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"os/user"
 	"strings"
 )
+
+const PATH_DRUSH = "/usr/local/bin/drush"
 
 // DrushVersionList is a struct to store associated versions in a simple []string.
 // This is used by methods to store and use multiple version data.
@@ -102,33 +103,9 @@ func (drushVersionList *DrushVersionList) PrintInstalled() {
 	}
 }
 
-// GetInstalled returns a list of all installed drush versions.
-func (drushVersionList *DrushVersionList) GetInstalled() []string {
-	InstalledVersions := drushVersionList.ListInstalled()
-	var versions []string
-	for _, value := range InstalledVersions.list {
-		versions = append(versions, value)
-	}
-	return versions
-}
-
-// IsInstalled returns a boolean of the status of an input version.
-func (drushVersionList *DrushVersionList) IsInstalled(version string) bool {
-	InstalledVersions := drushVersionList.ListInstalled()
-	for _, value := range InstalledVersions.list {
-		if strings.Contains(value, version) {
-			return true
-		}
-		if strings.Contains(value, version+"*") {
-			return true
-		}
-	}
-	return false
-}
-
 // GetActiveVersion returns the currently active Command version
 func GetActiveVersion() string {
-	drushOutputVersion, drushOutputError := exec.Command(conf.Path(), "version", "--format=string").Output()
+	drushOutputVersion, drushOutputError := exec.Command(PATH_DRUSH, "version", "--format=string").Output()
 	if drushOutputError != nil {
 		fmt.Println(drushOutputError)
 		os.Exit(1)
