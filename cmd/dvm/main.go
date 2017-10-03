@@ -3,12 +3,15 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"os/user"
+
+	"github.com/fubarhouse/dvm/conf"
 	"github.com/fubarhouse/dvm/plugin"
 	"github.com/fubarhouse/dvm/version"
 	"github.com/fubarhouse/dvm/versionlist"
-	"os"
-
-	"github.com/fubarhouse/dvm/conf"
+	"github.com/spf13/viper"
 )
 
 // @TODO: Use git tags to discover content dynamically?
@@ -32,7 +35,19 @@ func print_usage() {
 
 func main() {
 
-	_, StatErr := os.Stat("/usr/local/bin/drush")
+	x, _ := user.Current()
+	y := x.HomeDir
+	cp := y + "/.dvm"
+
+	viper.SetConfigName("config")
+	viper.AddConfigPath(cp)
+	err := viper.ReadInConfig()
+
+	if err != nil {
+		log.Println("No configuration file loaded - using defaults")
+	}
+
+	_, StatErr := os.Stat(viper.GetString("config.path"))
 	if StatErr != nil {
 		if len(os.Args) < 2 {
 			if os.Args[1] != "install" && os.Args[1] != "reinstall" && os.Args[1] != "use" {
@@ -83,7 +98,7 @@ func main() {
 		}
 		if os.Args[1] == "config" {
 			if os.Args[2] == "set" {
-				conf.Set("", "")
+				conf.Set(os.Args[3], os.Args[4])
 			} else if os.Args[2] == "get" {
 
 			}
