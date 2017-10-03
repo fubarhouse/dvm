@@ -44,6 +44,11 @@ func main() {
 	viper.AddConfigPath(cp)
 	err := viper.ReadInConfig()
 
+	if len(os.Args) == 1 {
+		print_usage()
+		os.Exit(0)
+	}
+
 	if err != nil {
 		log.Println("No configuration file loaded - using defaults")
 	}
