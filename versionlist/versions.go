@@ -114,14 +114,10 @@ func (drushVersionList *DrushVersionList) GetInstalled() []string {
 
 // IsInstalled returns a boolean of the status of an input version.
 func (drushVersionList *DrushVersionList) IsInstalled(version string) bool {
-	InstalledVersions := drushVersionList.ListInstalled()
-	for _, value := range InstalledVersions.list {
-		if strings.Contains(value, version) {
-			return true
-		}
-		if strings.Contains(value, version+"*") {
-			return true
-		}
+	usr, _ := user.Current()
+	workingDir := usr.HomeDir + "/.dvm/versions/drush-" + version
+	if _, err := os.Stat(workingDir); err == nil {
+		return true
 	}
 	return false
 }

@@ -186,7 +186,9 @@ func (drushVersion *DrushVersion) SetDefault() {
 		if majorVersion == "6" || majorVersion == "7" || majorVersion == "8" || majorVersion == "9" {
 			// If the version is supported by composer:
 			symlinkSource = conf.Path()
-			symlinkDest = workingDir + "/drush-" + drushVersion.version + "/vendor/bin/drush"
+			if _, err := os.Stat(workingDir + "/drush-" + drushVersion.version + "/vendor/bin/drush"); err == nil {
+				symlinkDest = workingDir + "/drush-" + drushVersion.version + "/vendor/bin/drush"
+			}
 		} else {
 			// If it isn't supported by Composer...
 			symlinkSource = conf.Path()
