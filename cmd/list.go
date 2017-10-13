@@ -15,34 +15,33 @@
 package cmd
 
 import (
-	"github.com/Sirupsen/logrus"
 	"github.com/spf13/cobra"
 
 	"github.com/fubarhouse/dvm/versionlist"
 )
 
+var flagAvailable bool
+var flagInstalled bool
+
 // listCmd represents the list command
 var listCmd = &cobra.Command{
-	Use:       "list",
-	Short:     "List available or installed Drush versions.",
-	Long:      ``,
-	Args:      cobra.OnlyValidArgs,
-	ValidArgs: []string{"installed", "available"},
+	Use:   "list",
+	Short: "List available or installed Drush versions.",
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) > 0 {
-			Drushes := versionlist.NewDrushVersionList()
-			if args[0] == "available" {
-				Drushes.PrintRemote()
-			} else if args[0] == "installed" {
-				Drushes.PrintInstalled()
-			}
+		Drushes := versionlist.NewDrushVersionList()
+		if flagAvailable == true {
+			Drushes.PrintRemote()
+		} else if flagInstalled == true {
+			Drushes.PrintInstalled()
 		} else {
 			cmd.Help()
-			logrus.Fatal("expected 1 argument, 0 found")
 		}
 	},
 }
 
 func init() {
 	RootCmd.AddCommand(listCmd)
+	listCmd.Flags().BoolVarP(&flagAvailable, "available", "a", false, "List available versions")
+	listCmd.Flags().BoolVarP(&flagInstalled, "installed", "i", false, "List installed versions")
 }
