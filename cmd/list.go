@@ -37,6 +37,7 @@ var listCmd = &cobra.Command{
 				Drushes.PrintInstalled()
 			}
 		} else {
+			cmd.Help()
 			logrus.Fatal("expected 1 argument, 0 found")
 		}
 	},

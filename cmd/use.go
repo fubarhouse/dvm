@@ -31,6 +31,7 @@ var useCmd = &cobra.Command{
 			this := version.NewDrushVersion(args[0])
 			this.SetDefault()
 		} else {
+			cmd.Help()
 			logrus.Fatal("expected 1 argument, 0 found")
 		}
 	},
