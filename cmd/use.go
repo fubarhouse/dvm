@@ -15,7 +15,6 @@
 package cmd
 
 import (
-	"github.com/Sirupsen/logrus"
 	"github.com/spf13/cobra"
 
 	"github.com/fubarhouse/dvm/version"
@@ -27,26 +26,16 @@ var useCmd = &cobra.Command{
 	Short: "Initialise or replace an established symlink to the configured location, for a given version of Drush",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) > 0 {
-			this := version.NewDrushVersion(args[0])
+		if flagVersion != "" {
+			this := version.NewDrushVersion(flagVersion)
 			this.SetDefault()
 		} else {
 			cmd.Help()
-			logrus.Fatal("expected 1 argument, 0 found")
 		}
 	},
 }
 
 func init() {
 	RootCmd.AddCommand(useCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// useCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// useCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	useCmd.Flags().StringVarP(&flagVersion, "version", "v", "", "Version to target, it does not have a default value.")
 }

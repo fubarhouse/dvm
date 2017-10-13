@@ -15,7 +15,6 @@
 package cmd
 
 import (
-	"github.com/Sirupsen/logrus"
 	"github.com/spf13/cobra"
 
 	"github.com/fubarhouse/dvm/version"
@@ -27,16 +26,16 @@ var installCmd = &cobra.Command{
 	Short: "Install a specific version of Drush",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) > 0 {
-			this := version.NewDrushVersion(args[0])
+		if flagVersion != "" {
+			this := version.NewDrushVersion(flagVersion)
 			this.Install()
 		} else {
-			cmd.Help()
-			logrus.Fatal("expected 1 argument, 0 found")
+			RootCmd.Help()
 		}
 	},
 }
 
 func init() {
 	RootCmd.AddCommand(installCmd)
+	installCmd.Flags().StringVarP(&flagVersion, "version", "v", "", "Version to target, it does not have a default value.")
 }
