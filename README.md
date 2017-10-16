@@ -69,6 +69,6 @@ Flags:
 * **Install**:  `dvm install --version 7.2.0`
 * **Uninstall**: `dvm uninstall --version 7.2.0`
 * **Reinstall**: `dvm reinstall --version 7.2.0`
-* **Switch**: `dvm use --version ````7.2.0`
+* **Switch**: `dvm use --version 7.2.0`
 * **List Available**: `dvm list --available`
 * **List Installed**: `dvm list --installed`
