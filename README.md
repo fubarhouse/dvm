@@ -15,22 +15,22 @@ DVM will require the following to be available in the system depending on what y
 
 ## Installation
 
-There are three ways to install DVM, but if you're at all familiar with Golang these are very standardized shipping methods.
+There are three ways to install DVM, but if you're at all familiar with Golang these are very standardised shipping methods.
 
-### Option 1
-1. run `go get -u github.com/fubarhouse/dvm/...`
+### Option 1 - As a Go-based binary
+1. run `go get -u github.com/fubarhouse/dvm`
 2. Use like any other Go binary.
 
-### Option 2
-1. run `go get -u github.com/fubarhouse/dvm/...`
+### Option 2 - As an API for use in your Go project
+1. run `go get -u github.com/fubarhouse/dvm`
 2. Build your own Go binary using the API's from the packages downloaded.
 
-### Option 3
-1. Download the [pre-compiled binaries](https://github.com/fubarhouse/dvm/releases).
+### Option 3 - As an executable - perfect if you don't want to install Go.
+1. Download one of the [pre-compiled binaries](https://github.com/fubarhouse/dvm/releases).
 2. Copy to location in $PATH environment variable.
 
 ## Configuration
-Configurations are loaded via Viper, an example is below.
+Configurations are loaded via [Viper](https://github.com/spf13/viper), an example is below.
 
 The default values are in this example and should be overriden in `~/.dvm/config.toml` to suit your system.
 
