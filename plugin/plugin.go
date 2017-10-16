@@ -5,7 +5,6 @@ package plugin
 import (
 	log "github.com/Sirupsen/logrus"
 	"io/ioutil"
-	"net/http/httputil"
 	"os"
 	"os/exec"
 	"os/user"
