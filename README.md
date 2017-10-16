@@ -4,30 +4,30 @@
 
 Drush version control system, to manage a variety of Drush versions and provide the ability to switch to specific versions at any time.
 
-It has been rewritten in Google's Golang as a pilot for the core maintainer to learn a new language and see what it would hold in professional development. It wasn't intended to stick or be released however the pilot program was extremely stable and efficient and it didn't make sense not to release it.
+This project was inspired by `NVM`, and was originally written in Bash. It was rewritten in Go in late-2016 and has been improving since.
+
+It came about when attempting to use multiple Drush versions with the use of CI tooling. It has become more important now as Drupal has essentially abandoned the use of `drush make`.
 
 ## Requirements
 
-DVM will require the following to be available in the system depending on what you're trying to do:
+Drush version manager requires [composer](https://getcomposer.org/), and nothing more.
 * composer
-* unzip
-* wget
 
 ## Installation
 
 There are three ways to install DVM, but if you're at all familiar with Golang these are very standardised shipping methods.
 
-### Option 1 - As a Go-based binary
+**Option 1**: Like any other Go binary
 1. run `go get -u github.com/fubarhouse/dvm`
 2. Use like any other Go binary.
 
-### Option 2 - As an API for use in your Go project
+**Option 2**: Download a precompiled binary!
+1. Download one of the [pre-compiled binaries](https://github.com/fubarhouse/dvm/releases).
+2. Copy to location in `$PATH` environment variable.
+
+**Option 3**: - As an API for use in your Go project
 1. run `go get -u github.com/fubarhouse/dvm`
 2. Build your own Go binary using the API's from the packages downloaded.
-
-### Option 3 - As an executable - perfect if you don't want to install Go.
-1. Download one of the [pre-compiled binaries](https://github.com/fubarhouse/dvm/releases).
-2. Copy to location in $PATH environment variable.
 
 ## Configuration
 Configurations are loaded via [Viper](https://github.com/spf13/viper), an example is below.
@@ -39,45 +39,36 @@ The default values are in this example and should be overriden in `~/.dvm/config
 path = "/usr/local/bin/drush"
 ```
 
-## DVM Usage
+## Usage
 
-### Install
+### General usage
 
-`dvm install 7.2.0`
+````
+Usage:
+  dvm [command] [flags]
 
-### Uninstall
+Available Commands:
+  help        Help about any command
+  install     Install a specific version of Drush
+  list        List available or installed Drush versions.
+  reinstall   Reinstall a specific version of Drush
+  uninstall   Uninstall a specific version of Drush
+  use         Initialise or replace an established symlink to the configured location, for a given version of Drush
 
-`dvm uninstall 7.2.0`
+Flags:
+  --config string      config file (default is $HOME/config.toml)
+  -a, --available      List available versions
+  -h, --help           help for dvm
+  -i, --installed      List installed versions
+  -v, --version string Version to target, it does not have a default value.
 
-### Reinstall
+````
 
-`dvm use 7.2.0`
+### Examples
 
-### List Available Versions
-
-`dvm list available`
-
-### List Installed Versions
-
-`dvm list installed`
-
-### Install Drush Modules
-
-`dvm package install registry_rebuild`
-
-### List Installed Drush Modules (needs work)
-
-`dvm package list`
-
-## Usage in Go Programming
-
-Examples of each module can be found in the test functions of each test file of each package as tests have been written and passed for every function written.
-
-### Package Rundown
-
-#### plugin
-* Drush package management, provides a way to install, reinstall, uninstall and list package objects.
-#### version
-* Drush version management, where a version can be installed, reinstalled, uninstalled and a variety of other utility methods.
-#### versionlist
-* Provides Drush Version Management information, by displaying desired information on particular versions - installed or not.
+* **Install**:  `dvm install --version 7.2.0`
+* **Uninstall**: `dvm uninstall --version 7.2.0`
+* **Reinstall**: `dvm reinstall --version 7.2.0`
+* **Switch**: `dvm use --version ````7.2.0`
+* **List Available**: `dvm list --available`
+* **List Installed**: `dvm list --installed`
