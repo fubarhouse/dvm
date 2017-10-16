@@ -10,6 +10,8 @@ import (
 	"strings"
 )
 
+const sep = string(os.PathSeparator)
+
 // DrushVersionList is a struct to store associated versions in a simple []string.
 // This is used by methods to store and use multiple version data.
 type DrushVersionList struct {
@@ -115,7 +117,7 @@ func (drushVersionList *DrushVersionList) GetInstalled() []string {
 // IsInstalled returns a boolean of the status of an input version.
 func (drushVersionList *DrushVersionList) IsInstalled(version string) bool {
 	usr, _ := user.Current()
-	workingDir := usr.HomeDir + "/.dvm/versions/drush-" + version
+	workingDir := usr.HomeDir + sep + ".dvm" + sep + "versions" + sep + "drush-" + version
 	if _, err := os.Stat(workingDir); err == nil {
 		return true
 	}

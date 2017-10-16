@@ -34,7 +34,7 @@ func NewDrushVersion(version string) DrushVersion {
 // assertFileSystem will ensure the filesystem at ~/.dvm/versions is created for use.
 func assertFileSystem() {
 	usr, _ := user.Current()
-	Directory := usr.HomeDir + "/.dvm/versions/"
+	Directory := usr.HomeDir + sep + ".dvm" + sep + "versions" + sep
 	_, StatErr := os.Stat(Directory)
 	if StatErr != nil {
 		MkdirErr := os.MkdirAll(Directory, 0775)
@@ -69,7 +69,7 @@ func (drushVersion *DrushVersion) Exists() bool {
 // Status will check the installation state of any individual Drush version object.
 func (drushVersion *DrushVersion) Status() bool {
 	usr, _ := user.Current()
-	_, err := os.Stat(usr.HomeDir + "/.dvm/versions/drush-" + drushVersion.version)
+	_, err := os.Stat(usr.HomeDir + sep + ".dvm" + sep + "versions" + sep + "drush-" + drushVersion.version)
 	if err == nil {
 		return true
 	}
@@ -81,18 +81,18 @@ func (drushVersion *DrushVersion) Install() {
 	assertFileSystem()
 	// Installs a version of Drush supported by composer.
 	usr, _ := user.Current()
-	_, err := os.Stat(usr.HomeDir + "/.dvm/versions/drush-" + drushVersion.version)
+	_, err := os.Stat(usr.HomeDir + sep + ".dvm" + sep + "versions" + sep + "drush-" + drushVersion.version)
 	if err != nil {
 		majorVersion := fmt.Sprintf("%c", drushVersion.version[0])
-		workingDir := usr.HomeDir + "/.dvm/versions"
+		workingDir := usr.HomeDir + sep + ".dvm" + sep + "versions"
 		log.Infof("Attempting to install Drush v%v", drushVersion.version)
 
 		if majorVersion == "6" || majorVersion == "7" || majorVersion == "8" || majorVersion == "9" {
-			_, installError := exec.Command("sh", "-c", "cd "+workingDir+"/ && mkdir -p ./drush-"+drushVersion.version+" && cd ./drush-"+drushVersion.version+" && composer require \"drush/drush:"+drushVersion.version+"\"").Output()
+			_, installError := exec.Command("sh", "-c", "cd "+workingDir+sep+" && mkdir -p ."+sep+"drush-"+drushVersion.version+" && cd ."+sep+"drush-"+drushVersion.version+" && composer require \"drush/drush:"+drushVersion.version+"\"").Output()
 			if installError != nil {
 				log.Errorf("Could not install Drush %v, cleaning installation...", drushVersion.version)
 				log.Errorln(installError)
-				exec.Command("sh", "-c", "rm -rf "+workingDir+"/drush-"+drushVersion.version).Output()
+				exec.Command("sh", "-c", "rm -rf "+workingDir+sep+"/drush-"+drushVersion.version).Output()
 			} else {
 				log.Infof("Successfully installed Drush v%v", drushVersion.version)
 			}
@@ -108,9 +108,9 @@ func (drushVersion *DrushVersion) Install() {
 func (drushVersion *DrushVersion) Uninstall() {
 	// Uninstalls a drush version which was installed using DVM convention.
 	usr, _ := user.Current()
-	_, err := os.Stat(usr.HomeDir + "/.dvm/versions/drush-" + drushVersion.version)
+	_, err := os.Stat(usr.HomeDir + sep + ".dvm" + sep + "versions" + sep + "drush-" + drushVersion.version)
 	if err == nil {
-		workingDir := usr.HomeDir + "/.dvm/versions"
+		workingDir := usr.HomeDir + sep + ".dvm" + sep + "versions"
 		log.Infof("Removing installation of Drush v%v", drushVersion.version)
 		_, rmErr := exec.Command("sh", "-c", "rm -rf "+workingDir+"/drush-"+drushVersion.version).Output()
 		if rmErr != nil {
@@ -135,20 +135,20 @@ func (drushVersion *DrushVersion) SetDefault() {
 	Drushes := versionlist.NewDrushVersionList()
 	if Drushes.IsInstalled(drushVersion.version) {
 		usr, _ := user.Current()
-		workingDir := usr.HomeDir + "/.dvm/versions"
+		workingDir := usr.HomeDir + sep + ".dvm" + sep + "versions"
 		majorVersion := fmt.Sprintf("%c", drushVersion.version[0])
 		symlinkSource := ""
 		symlinkDest := ""
 		if majorVersion == "6" || majorVersion == "7" || majorVersion == "8" || majorVersion == "9" {
 			// If the version is supported by composer:
 			symlinkSource = conf.Path()
-			if _, err := os.Stat(workingDir + "/drush-" + drushVersion.version + "/vendor/bin/drush"); err == nil {
-				symlinkDest = workingDir + "/drush-" + drushVersion.version + "/vendor/bin/drush"
+			if _, err := os.Stat(workingDir + sep + "drush-" + drushVersion.version + sep + "vendor" + sep + "bin" + sep + "drush"); err == nil {
+				symlinkDest = workingDir + sep + "drush-" + drushVersion.version + sep + "vendor" + sep + "bin" + sep + "drush"
 			}
 		} else {
 			// If it isn't supported by Composer...
 			symlinkSource = conf.Path()
-			symlinkDest = workingDir + "/drush-" + drushVersion.version + "/drush"
+			symlinkDest = workingDir + sep + "drush-" + drushVersion.version + sep + "drush"
 		}
 
 		if drushVersion.validVersion == true {

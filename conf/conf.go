@@ -3,14 +3,17 @@ package conf
 import (
 	"github.com/spf13/viper"
 	"log"
+	"os"
 	"os/user"
 )
+
+const sep = string(os.PathSeparator)
 
 // Path will retrieve config.path from the config file.
 func Path() string {
 	x, _ := user.Current()
 	y := x.HomeDir
-	cp := y + "/.dvm"
+	cp := y + sep + ".dvm"
 
 	viper.SetConfigName("config")
 	viper.AddConfigPath(cp)
@@ -30,7 +33,7 @@ func Path() string {
 func Set(name, value string) error {
 	x, _ := user.Current()
 	y := x.HomeDir
-	cp := y + "/.dvm"
+	cp := y + sep + ".dvm"
 
 	viper.SetConfigName("config")
 	viper.AddConfigPath(cp)

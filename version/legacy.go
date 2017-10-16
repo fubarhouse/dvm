@@ -2,13 +2,17 @@ package version
 
 import (
 	log "github.com/Sirupsen/logrus"
+	"os"
 	"os/exec"
 	"os/user"
 )
 
+const sep = string(os.PathSeparator)
+
 // LegacyInstall is basically the main() func for Legacy versions which encapsulates
 // the code/dependencies for installing legacy Drush versions.
-// This function is deprecated and unused.
+//
+// Deprecated: Drush version manager no longer supports legacy installs.
 func (drushVersion *DrushVersion) LegacyInstall() {
 	drushVersion.LegacyInstallVersion()
 	drushVersion.LegacyInstallTable()
@@ -16,13 +20,14 @@ func (drushVersion *DrushVersion) LegacyInstall() {
 
 // LegacyInstallTable is essentially always missing from older Drush versions.
 // This ensures the script is available to the legacy version.
-// This function is deprecated and unused.
+//
+// Deprecated: Drush version manager no longer supports legacy installs.
 func (drushVersion *DrushVersion) LegacyInstallTable() {
 	usr, _ := user.Current()
 	log.Infoln("Fixing dependency issue with module Console_Table")
 	ctFileName := "Table.inc"
 	ctRemotePath := "https://raw.githubusercontent.com/pear/Console_Table/master/Table.php"
-	ctPath := usr.HomeDir + "/.dvm/versions/drush-" + drushVersion.version + "/includes/"
+	ctPath := usr.HomeDir + sep + ".dvm" + sep + "versions" + sep + "drush-" + drushVersion.version + sep + "includes" + sep
 	ctFile := ctPath + ctFileName
 	_, wgetErr := exec.Command("sh", "-c", "wget", ctRemotePath).Output()
 	if wgetErr != nil {
@@ -32,13 +37,14 @@ func (drushVersion *DrushVersion) LegacyInstallTable() {
 }
 
 // LegacyInstallVersion will install from a zip file which was located via git tags (manual input see ListLocal()).
-// This function is deprecated and unused.
+//
+// Deprecated: Drush version manager no longer supports legacy installs.
 func (drushVersion *DrushVersion) LegacyInstallVersion() {
 	usr, _ := user.Current()
 	log.Infoln("Downloading and extracting legacy Drush version ", drushVersion.version)
 	zipFileName := drushVersion.version + ".zip"
 	remotePath := "https://github.com/drush-ops/drush/archive/" + zipFileName
-	zipPath := usr.HomeDir + "/.dvm/versions/"
+	zipPath := usr.HomeDir + sep + ".dvm" + sep + "versions" + sep
 	zipFile := zipPath + zipFileName
 	exec.Command("sh", "-c", "mkdir -p "+zipPath).Run()
 	_, wgetErr := exec.Command("sh", "-c", "wget", remotePath).Output()
