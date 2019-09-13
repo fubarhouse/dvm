@@ -29,11 +29,13 @@ func (drushVersion *DrushVersion) LegacyInstallTable() {
 	ctRemotePath := "https://raw.githubusercontent.com/pear/Console_Table/master/Table.php"
 	ctPath := usr.HomeDir + sep + ".dvm" + sep + "versions" + sep + "drush-" + drushVersion.version + sep + "includes" + sep
 	ctFile := ctPath + ctFileName
-	_, wgetErr := exec.Command("sh", "-c", "wget", ctRemotePath).Output()
+
+	_, wgetErr := exec.Command("wget", ctRemotePath).Output()
 	if wgetErr != nil {
 		log.Infoln("wget returned error:", wgetErr)
 	}
-	exec.Command("mv ./" + ctFileName + " " + ctFile).Run()
+	tmpFile := "Table.php"
+	exec.Command("mv", "./" + tmpFile, ctFile).Run()
 }
 
 // LegacyInstallVersion will install from a zip file which was located via git tags (manual input see ListLocal()).
@@ -47,9 +49,10 @@ func (drushVersion *DrushVersion) LegacyInstallVersion() {
 	zipPath := usr.HomeDir + sep + ".dvm" + sep + "versions" + sep
 	zipFile := zipPath + zipFileName
 	exec.Command("sh", "-c", "mkdir -p "+zipPath).Run()
-	_, wgetErr := exec.Command("sh", "-c", "wget", remotePath).Output()
+	_, wgetErr := exec.Command("wget", remotePath).Output()
 	if wgetErr != nil {
 		log.Warnln("wget returned error:", wgetErr)
+		log.Warnln(remotePath)
 	}
 	exec.Command("sh", "-c", "mv "+zipFileName+" "+zipPath).Run()
 	exec.Command("sh", "-c", "cd "+zipPath+" && unzip "+zipFile).Run()
