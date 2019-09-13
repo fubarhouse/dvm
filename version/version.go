@@ -165,6 +165,7 @@ func (drushVersion *DrushVersion) SetDefault() {
 				log.Println("Could not sym "+conf.Path()+": ", rmErr)
 			} else {
 				log.Println("Symlink successfully created.")
+				log.Printf("To use it, run %v or make it available to $PATH", conf.Path())
 			}
 			// Verify version
 			currVer, rmErr := exec.Command("sh", "-c", conf.Path()+" --version").Output()
