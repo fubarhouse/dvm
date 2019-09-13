@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"os/user"
+	"regexp"
 	"strings"
 )
 
@@ -22,6 +23,42 @@ type DrushVersionList struct {
 func NewDrushVersionList() DrushVersionList {
 	retVal := DrushVersionList{}
 	return retVal
+}
+
+func GetVersion() (Version []string) {
+
+	Versions := NewDrushVersionList()
+	Versions.ListLocal()
+
+	for _, v := range Versions.list {
+		Version = append(Version, v)
+	}
+
+	Versions = NewDrushVersionList()
+	Versions.ListRemote()
+
+	appendVersion := true
+
+	for _, v := range Versions.list {
+		for _, x := range Version {
+			if x == v {
+				appendVersion = false
+			}
+		}
+		if appendVersion {
+			Version = append(Version, v)
+		}
+	}
+
+	return
+}
+
+func FindVersion(substring string) {
+	for _, v := range GetVersion() {
+		if ok, _ := regexp.MatchString(substring, v); ok {
+			fmt.Println(v)
+		}
+	}
 }
 
 // ListContents returns a list of all local versions of Command.
