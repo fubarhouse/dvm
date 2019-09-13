@@ -15,13 +15,22 @@ func Path() string {
 	y := x.HomeDir
 	cp := y + sep + ".dvm"
 
+	binDir := cp + sep + "bin"
+	binPath := binDir + sep + "drush"
+	if _, fileErr := os.Stat(binDir); fileErr != nil {
+		e := os.MkdirAll(binDir, 0755)
+		if e != nil {
+			log.Printf("Error, could not create path %v\n", binDir)
+		}
+	}
+
 	viper.SetConfigName("config")
 	viper.AddConfigPath(cp)
 	err := viper.ReadInConfig()
 
 	if err != nil {
 		log.Println("No configuration file loaded - using defaults")
-		viper.SetDefault("config.path", "/usr/local/bin/drush")
+		viper.SetDefault("config.path", binPath)
 	}
 
 	return viper.GetString("config.path")
