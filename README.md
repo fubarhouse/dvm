@@ -32,7 +32,7 @@ There are three ways to install DVM, but if you're at all familiar with Golang t
 ## Configuration
 Configurations are loaded via [Viper](https://github.com/spf13/viper), an example is below.
 
-The default values are in this example and should be overriden in `~/.dvm/config.toml` to suit your system.
+The default symlink path is `$HOME/.dvm/bin/drush`. The default value can be overriden in `~/.dvm/config.toml` to suit your environment.
 
 ```
 [config]
@@ -52,6 +52,7 @@ Available Commands:
   install     Install a specific version of Drush
   list        List available or installed Drush versions.
   reinstall   Reinstall a specific version of Drush
+  search      Search for available Drush versions using a substring.
   uninstall   Uninstall a specific version of Drush
   use         Initialise or replace an established symlink to the configured location, for a given version of Drush
 
@@ -66,9 +67,18 @@ Flags:
 
 ### Examples
 
+#### Operational commands
+
 * **Install**:  `dvm install --version 7.2.0`
 * **Uninstall**: `dvm uninstall --version 7.2.0`
 * **Reinstall**: `dvm reinstall --version 7.2.0`
 * **Switch**: `dvm use --version 7.2.0`
 * **List Available**: `dvm list --available`
 * **List Installed**: `dvm list --installed`
+
+#### Search examples:
+```
+dvm search -s ^9
+dvm search -s 9$
+dvm search -s 9
+```
