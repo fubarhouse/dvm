@@ -8,7 +8,9 @@ import (
 	"os/exec"
 	"os/user"
 	"regexp"
+	"strconv"
 	"strings"
+	"time"
 )
 
 const sep = string(os.PathSeparator)
@@ -86,17 +88,24 @@ func (drushVersionList *DrushVersionList) PrintLocal() {
 // ListRemote will fetch a list of all available versions from composer.
 // Versions must start with integers 6,7,8 or 9 to be returned.
 func (drushVersionList *DrushVersionList) ListRemote() {
-	drushVersionsObj := NewDrushVersionList()
-	drushVersionsCommand, _ := exec.Command("sh", "-c", "composer show drush/drush -a | grep versions | sort | uniq").Output()
-	drushVersions := strings.Split(string(drushVersionsCommand), ", ")
-	drushVersionsObj.list = drushVersions
-	acceptableVersions := []string{}
-	for x := range drushVersions {
-		if strings.HasPrefix(drushVersions[x], "6") || strings.HasPrefix(drushVersions[x], "7") || strings.HasPrefix(drushVersions[x], "8") || strings.HasPrefix(drushVersions[x], "9") {
-			acceptableVersions = append(acceptableVersions, drushVersions[x])
+	drushVersionsCommand, _ := exec.Command("composer", "show", "drush/drush", "-a").Output()
+	time.Sleep(time.Second * 5)
+	
+	for _, v := range strings.Split(string(drushVersionsCommand), "\n") {
+		if strings.HasPrefix(v, "versions") {
+			drushVersions := strings.Split(string(drushVersionsCommand), ", ")
+			var acceptableVersions = make([]string, 0)
+			for x, id := range drushVersions {
+				num := strings.Split(id, ".")[0]
+				if i, e := strconv.ParseInt(num, 10, 10); e == nil {
+					if i >= 6 {
+						acceptableVersions = append(acceptableVersions, drushVersions[x])
+					}
+				}
+			}
+			drushVersionList.list = acceptableVersions
 		}
 	}
-	drushVersionList.list = acceptableVersions
 }
 
 // PrintRemote will print all available remote versions via composer.
