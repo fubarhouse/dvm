@@ -28,6 +28,7 @@ var reinstallCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		if flagVersion != "" {
 			this := version.NewDrushVersion(flagVersion)
+			this.SetVersionIdentifier(flagVersion)
 			this.Reinstall()
 		} else {
 			RootCmd.Help()

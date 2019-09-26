@@ -28,6 +28,7 @@ var useCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		if flagVersion != "" {
 			this := version.NewDrushVersion(flagVersion)
+			this.SetVersionIdentifier(flagVersion)
 			this.SetDefault()
 		} else {
 			cmd.Help()

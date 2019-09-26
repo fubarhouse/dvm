@@ -11,7 +11,7 @@ const LEGACYVERSION = "4.0.0"
 func TestCreateNewVersion(t *testing.T) {
 	// Test the creation of version object
 	y := NewDrushVersion(TESTVERSION)
-	if fmt.Sprint(y.version) != TESTVERSION {
+	if fmt.Sprint(y.majorVersion) != TESTVERSION {
 		t.Error("Test failed")
 	}
 }

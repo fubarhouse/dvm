@@ -27,7 +27,7 @@ func (drushVersion *DrushVersion) LegacyInstallTable() {
 	log.Infoln("Fixing dependency issue with module Console_Table")
 	ctFileName := "Table.inc"
 	ctRemotePath := "https://raw.githubusercontent.com/pear/Console_Table/master/Table.php"
-	ctPath := usr.HomeDir + sep + ".dvm" + sep + "versions" + sep + "drush-" + drushVersion.version + sep + "includes" + sep
+	ctPath := usr.HomeDir + sep + ".dvm" + sep + "versions" + sep + "drush-" + drushVersion.fullVersion + sep + "includes" + sep
 	ctFile := ctPath + ctFileName
 
 	_, wgetErr := exec.Command("wget", ctRemotePath).Output()
@@ -43,8 +43,8 @@ func (drushVersion *DrushVersion) LegacyInstallTable() {
 // Deprecated: Drush version manager no longer supports legacy installs.
 func (drushVersion *DrushVersion) LegacyInstallVersion() {
 	usr, _ := user.Current()
-	log.Infoln("Downloading and extracting legacy Drush version ", drushVersion.version)
-	zipFileName := drushVersion.version + ".zip"
+	log.Infoln("Downloading and extracting legacy Drush version ", drushVersion.majorVersion)
+	zipFileName := drushVersion.fullVersion + ".zip"
 	remotePath := "https://github.com/drush-ops/drush/archive/" + zipFileName
 	zipPath := usr.HomeDir + sep + ".dvm" + sep + "versions" + sep
 	zipFile := zipPath + zipFileName

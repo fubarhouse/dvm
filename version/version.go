@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"os/user"
+	"strconv"
 	"strings"
 )
 
@@ -16,17 +17,22 @@ import (
 type DrushVersion struct {
 	// A struct to store a single version and to identify validity via OOP.
 	// This is used by many methods to process input data.
-	version      string
+	fullVersion  string
+	majorVersion int64
 	validVersion bool
 }
 
 // NewDrushVersion will return a new DrushVersion.
 func NewDrushVersion(version string) DrushVersion {
 	// An API to create/store a Drush version object.
-	retVal := DrushVersion{version, false}
+	retVal := DrushVersion{
+		fullVersion: version,
+		validVersion: false,
+	}
+	retVal.SetVersionIdentifier(version)
 	retVal.validVersion = retVal.Exists()
 	if retVal.validVersion == false {
-		log.Fatalf("Input drush v%v was not found in Git tag history or composer.", retVal.version)
+		log.Fatalf("Input drush v%v was not found in Git tag history or composer.", retVal.fullVersion)
 	}
 	return retVal
 }
@@ -53,13 +59,13 @@ func (drushVersion *DrushVersion) Exists() bool {
 	drushVersions := versionlist.NewDrushVersionList()
 	drushVersions.ListLocal()
 	for _, versionItem := range drushVersions.ListContents() {
-		if drushVersion.version == versionItem {
+		if fmt.Sprint(drushVersion.fullVersion) == versionItem {
 			return true
 		}
 	}
 	drushVersions.ListRemote()
 	for _, versionItem := range drushVersions.ListContents() {
-		if drushVersion.version == versionItem {
+		if fmt.Sprint(drushVersion.fullVersion) == versionItem {
 			return true
 		}
 	}
@@ -69,7 +75,7 @@ func (drushVersion *DrushVersion) Exists() bool {
 // Status will check the installation state of any individual Drush version object.
 func (drushVersion *DrushVersion) Status() bool {
 	usr, _ := user.Current()
-	_, err := os.Stat(usr.HomeDir + sep + ".dvm" + sep + "versions" + sep + "drush-" + drushVersion.version)
+	_, err := os.Stat(usr.HomeDir + sep + ".dvm" + sep + "versions" + sep + "drush-" + fmt.Sprint(drushVersion.fullVersion))
 	if err == nil {
 		return true
 	}
@@ -81,26 +87,26 @@ func (drushVersion *DrushVersion) Install() {
 	assertFileSystem()
 	// Installs a version of Drush supported by composer.
 	usr, _ := user.Current()
-	_, err := os.Stat(usr.HomeDir + sep + ".dvm" + sep + "versions" + sep + "drush-" + drushVersion.version)
+	_, err := os.Stat(usr.HomeDir + sep + ".dvm" + sep + "versions" + sep + "drush-" + fmt.Sprint(drushVersion.fullVersion))
 	if err != nil {
-		majorVersion := fmt.Sprintf("%c", drushVersion.version[0])
-		workingDir := usr.HomeDir + sep + ".dvm" + sep + "versions"
-		log.Infof("Attempting to install Drush v%v", drushVersion.version)
 
-		if majorVersion == "6" || majorVersion == "7" || majorVersion == "8" || majorVersion == "9" {
-			_, installError := exec.Command("sh", "-c", "cd "+workingDir+sep+" && mkdir -p ."+sep+"drush-"+drushVersion.version+" && cd ."+sep+"drush-"+drushVersion.version+" && composer require \"drush/drush:"+drushVersion.version+"\"").Output()
+		workingDir := usr.HomeDir + sep + ".dvm" + sep + "versions"
+		log.Infof("Attempting to install Drush v%v", drushVersion.fullVersion)
+
+		if drushVersion.majorVersion >= 6 {
+			_, installError := exec.Command("sh", "-c", "cd "+workingDir+sep+" && mkdir -p ."+sep+"drush-"+fmt.Sprint(drushVersion.fullVersion)+" && cd ."+sep+"drush-"+fmt.Sprint(drushVersion.fullVersion)+" && composer require \"drush/drush:"+fmt.Sprint(drushVersion.fullVersion)+"\"").Output()
 			if installError != nil {
-				log.Errorf("Could not install Drush %v, cleaning installation...", drushVersion.version)
+				log.Errorf("Could not install Drush %v, cleaning installation...", drushVersion.fullVersion)
 				log.Errorln(installError)
-				exec.Command("sh", "-c", "rm -rf "+workingDir+sep+"/drush-"+drushVersion.version).Output()
+				exec.Command("sh", "-c", "rm -rf "+workingDir+sep+"/drush-"+fmt.Sprint(drushVersion.fullVersion)).Output()
 			} else {
-				log.Infof("Successfully installed Drush v%v", drushVersion.version)
+				log.Infof("Successfully installed Drush v%v", drushVersion.fullVersion)
 			}
 		} else {
 			drushVersion.LegacyInstall()
 		}
 	} else {
-		log.Infof("Drush v%v is already installed.", drushVersion.version)
+		log.Infof("Drush v%v is already installed.", drushVersion.fullVersion)
 	}
 }
 
@@ -108,18 +114,18 @@ func (drushVersion *DrushVersion) Install() {
 func (drushVersion *DrushVersion) Uninstall() {
 	// Uninstalls a drush version which was installed using DVM convention.
 	usr, _ := user.Current()
-	_, err := os.Stat(usr.HomeDir + sep + ".dvm" + sep + "versions" + sep + "drush-" + drushVersion.version)
+	_, err := os.Stat(usr.HomeDir + sep + ".dvm" + sep + "versions" + sep + "drush-" + fmt.Sprint(drushVersion.fullVersion))
 	if err == nil {
 		workingDir := usr.HomeDir + sep + ".dvm" + sep + "versions"
-		log.Infof("Removing installation of Drush v%v", drushVersion.version)
-		_, rmErr := exec.Command("sh", "-c", "rm -rf "+workingDir+"/drush-"+drushVersion.version).Output()
+		log.Infof("Removing installation of Drush v%v", drushVersion.fullVersion)
+		_, rmErr := exec.Command("sh", "-c", "rm -rf "+workingDir+"/drush-"+fmt.Sprint(drushVersion.fullVersion)).Output()
 		if rmErr != nil {
 			log.Errorln(rmErr)
 		} else {
-			log.Infof("Successfully uninstalled Drush v%v", drushVersion.version)
+			log.Infof("Successfully uninstalled Drush v%v", drushVersion.fullVersion)
 		}
 	} else {
-		log.Errorf("Drush v%v is not installed.", drushVersion.version)
+		log.Errorf("Drush v%v is not installed.", drushVersion.fullVersion)
 	}
 }
 
@@ -133,22 +139,21 @@ func (drushVersion *DrushVersion) Reinstall() {
 // SetDefault will remove and add a symlink to an specified installation of drush.
 func (drushVersion *DrushVersion) SetDefault() {
 	Drushes := versionlist.NewDrushVersionList()
-	if Drushes.IsInstalled(drushVersion.version) {
+	if Drushes.IsInstalled(drushVersion.fullVersion) {
 		usr, _ := user.Current()
 		workingDir := usr.HomeDir + sep + ".dvm" + sep + "versions"
-		majorVersion := fmt.Sprintf("%c", drushVersion.version[0])
 		symlinkSource := ""
 		symlinkDest := ""
-		if majorVersion == "6" || majorVersion == "7" || majorVersion == "8" || majorVersion == "9" {
+		if drushVersion.majorVersion > 6 {
 			// If the version is supported by composer:
 			symlinkSource = conf.Path()
-			if _, err := os.Stat(workingDir + sep + "drush-" + drushVersion.version + sep + "vendor" + sep + "bin" + sep + "drush"); err == nil {
-				symlinkDest = workingDir + sep + "drush-" + drushVersion.version + sep + "vendor" + sep + "bin" + sep + "drush"
+			if _, err := os.Stat(workingDir + sep + "drush-" + fmt.Sprint(drushVersion.fullVersion) + sep + "vendor" + sep + "bin" + sep + "drush"); err == nil {
+				symlinkDest = workingDir + sep + "drush-" + fmt.Sprint(drushVersion.fullVersion) + sep + "vendor" + sep + "bin" + sep + "drush"
 			}
 		} else {
 			// If it isn't supported by Composer...
 			symlinkSource = conf.Path()
-			symlinkDest = workingDir + sep + "drush-" + drushVersion.version + sep + "drush"
+			symlinkDest = workingDir + sep + "drush-" + fmt.Sprint(drushVersion.fullVersion) + sep + "drush"
 		}
 
 		if drushVersion.validVersion == true {
@@ -173,16 +178,25 @@ func (drushVersion *DrushVersion) SetDefault() {
 				log.Println("Drush returned error: ", rmErr)
 				os.Exit(1)
 			} else {
-				if string(currVer) == drushVersion.version {
-					log.Printf("Drush is now set to v%v", drushVersion.version)
+				if string(currVer) == fmt.Sprint(drushVersion.fullVersion) {
+					log.Printf("Drush is now set to v%v", drushVersion.fullVersion)
 				}
 			}
 		} else {
 			log.Fatal("Drush version entered is not valid.")
 		}
 	} else {
-		log.Fatalf("Drush version %v is not installed.", drushVersion.version)
+		log.Fatalf("Drush version %v is not installed.", drushVersion.fullVersion)
 	}
+}
+
+
+// SetVersionIdentifier will parse the input fullVersion to identify the major version.
+func (drushVersion *DrushVersion) SetVersionIdentifier(input string) {
+	// Assume semantic versioning conventions.
+	versionParts := strings.Split(input, ".")
+	versionInt, _ := strconv.ParseInt(versionParts[0], 10, 10)
+	drushVersion.majorVersion = versionInt
 }
 
 // GetActiveVersion will return the currently active drush version.
