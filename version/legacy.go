@@ -35,7 +35,7 @@ func (drushVersion *DrushVersion) LegacyInstallTable() {
 		log.Infoln("wget returned error:", wgetErr)
 	}
 	tmpFile := "Table.php"
-	exec.Command("mv", "./" + tmpFile, ctFile).Run()
+	move(tmpFile, ctFile)
 }
 
 // LegacyInstallVersion will install from a zip file which was located via git tags (manual input see ListLocal()).
@@ -48,14 +48,14 @@ func (drushVersion *DrushVersion) LegacyInstallVersion() {
 	remotePath := "https://github.com/drush-ops/drush/archive/" + zipFileName
 	zipPath := usr.HomeDir + sep + ".dvm" + sep + "versions" + sep
 	zipFile := zipPath + zipFileName
-	exec.Command("sh", "-c", "mkdir -p "+zipPath).Run()
+	mkdir(zipPath, 0755)
 	_, wgetErr := exec.Command("wget", remotePath).Output()
 	if wgetErr != nil {
 		log.Warnln("wget returned error:", wgetErr)
 		log.Warnln(remotePath)
 	}
-	exec.Command("sh", "-c", "mv "+zipFileName+" "+zipPath).Run()
+	move(zipFile, zipPath)
 	exec.Command("sh", "-c", "cd "+zipPath+" && unzip "+zipFile).Run()
-	exec.Command("sh", "-c", "rm -f "+zipFile).Run()
+	remove(zipFile)
 	drushVersion.Status()
 }
