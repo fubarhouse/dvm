@@ -2,16 +2,17 @@ package versionlist
 
 import (
 	"fmt"
-	"github.com/fubarhouse/dvm/conf"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"os/user"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/fubarhouse/dvm/commands/composer"
+	"github.com/fubarhouse/dvm/commands/drush"
 )
 
 const sep = string(os.PathSeparator)
@@ -92,7 +93,7 @@ func (drushVersionList *DrushVersionList) PrintLocal() {
 // ListRemote will fetch a list of all available versions from composer.
 // Versions must start with integers 6,7,8 or 9 to be returned.
 func (drushVersionList *DrushVersionList) ListRemote() {
-	drushVersionsCommand, _ := exec.Command("composer", "show", "drush/drush", "-a").Output()
+	drushVersionsCommand, _ := composer.Show("drush/drush -a")
 	time.Sleep(time.Second * 5)
 	
 	for _, v := range strings.Split(string(drushVersionsCommand), "\n") {
@@ -176,7 +177,7 @@ func (drushVersionList *DrushVersionList) IsInstalled(version string) bool {
 
 // GetActiveVersion returns the currently active Command version
 func GetActiveVersion() string {
-	drushOutputVersion, drushOutputError := exec.Command(conf.Path(), "version", "--format=string").Output()
+	drushOutputVersion, drushOutputError := drush.Run("version --format=string")
 	if drushOutputError != nil {
 		fmt.Println(drushOutputError)
 		os.Exit(1)
