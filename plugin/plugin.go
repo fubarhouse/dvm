@@ -3,10 +3,11 @@
 package plugin
 
 import (
+	"fmt"
 	log "github.com/Sirupsen/logrus"
+	"github.com/fubarhouse/dvm/commands/drush"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"os/user"
 )
 
@@ -90,7 +91,7 @@ func (drushPackage *drushPackage) Install() {
 	_, err := os.Stat(workingDir + sep + drushPackage.name + sep)
 	if err != nil {
 		// err
-		drushPackageOut, drushPackageError := exec.Command("drush", "dl", drushPackage.name).Output()
+		drushPackageOut, drushPackageError := drush.Run(fmt.Sprintf("dl %v", drushPackage.name))
 		if drushPackageError == nil {
 			drushPackage.status = drushPackage.Status()
 			log.Printf("Successfully installed Command package %v\n", drushPackage.name)
@@ -111,7 +112,7 @@ func (drushPackage *drushPackage) Uninstall() {
 	workingDir := usr.HomeDir + sep + ".drush"
 	_, err := os.Stat(usr.HomeDir + sep + drushPackage.name + sep)
 	if err != nil {
-		_, drushPackageError := exec.Command("sh", "-c", "rm -rf "+workingDir+sep+drushPackage.name).Output()
+		drushPackageError := os.RemoveAll(fmt.Sprintf("%v%v%v", workingDir, sep, drushPackage.name))
 		if drushPackageError == nil {
 			drushPackage.status = drushPackage.Status()
 			log.Printf("Successfully uninstalled %v\n", drushPackage.name)

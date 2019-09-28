@@ -1,10 +1,12 @@
 package version
 
 import (
-	log "github.com/Sirupsen/logrus"
 	"os"
 	"os/exec"
 	"os/user"
+
+	log "github.com/Sirupsen/logrus"
+	"github.com/fubarhouse/dvm/commands/wget"
 )
 
 const sep = string(os.PathSeparator)
@@ -30,7 +32,7 @@ func (drushVersion *DrushVersion) LegacyInstallTable() {
 	ctPath := usr.HomeDir + sep + ".dvm" + sep + "versions" + sep + "drush-" + drushVersion.fullVersion + sep + "includes" + sep
 	ctFile := ctPath + ctFileName
 
-	_, wgetErr := exec.Command("wget", ctRemotePath).Output()
+	_, wgetErr := wget.Run(ctRemotePath)
 	if wgetErr != nil {
 		log.Infoln("wget returned error:", wgetErr)
 	}
@@ -49,7 +51,7 @@ func (drushVersion *DrushVersion) LegacyInstallVersion() {
 	zipPath := usr.HomeDir + sep + ".dvm" + sep + "versions" + sep
 	zipFile := zipPath + zipFileName
 	mkdir(zipPath, 0755)
-	_, wgetErr := exec.Command("wget", remotePath).Output()
+	_, wgetErr := wget.Run(remotePath)
 	if wgetErr != nil {
 		log.Warnln("wget returned error:", wgetErr)
 		log.Warnln(remotePath)
