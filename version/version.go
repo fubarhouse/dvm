@@ -3,13 +3,13 @@ package version
 
 import (
 	"fmt"
-	log "github.com/Sirupsen/logrus"
 	"os"
 	"os/exec"
 	"os/user"
 	"strconv"
 	"strings"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/fubarhouse/dvm/commands/composer"
 	"github.com/fubarhouse/dvm/commands/drush"
 	"github.com/fubarhouse/dvm/conf"
