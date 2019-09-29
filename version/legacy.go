@@ -1,6 +1,7 @@
 package version
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"os/user"
@@ -26,6 +27,7 @@ func (drushVersion *DrushVersion) LegacyInstall() {
 // Deprecated: Drush version manager no longer supports legacy installs.
 func (drushVersion *DrushVersion) LegacyInstallTable() {
 	usr, _ := user.Current()
+	pwd, _ := os.Getwd()
 	log.Infoln("Fixing dependency issue with module Console_Table")
 	ctFileName := "Table.inc"
 	ctRemotePath := "https://raw.githubusercontent.com/pear/Console_Table/master/Table.php"
@@ -36,7 +38,7 @@ func (drushVersion *DrushVersion) LegacyInstallTable() {
 	if wgetErr != nil {
 		log.Infoln("wget returned error:", wgetErr)
 	}
-	tmpFile := "Table.php"
+	tmpFile := fmt.Sprintf("%v%vTable.php", pwd, sep)
 	move(tmpFile, ctFile)
 }
 
@@ -45,19 +47,20 @@ func (drushVersion *DrushVersion) LegacyInstallTable() {
 // Deprecated: Drush version manager no longer supports legacy installs.
 func (drushVersion *DrushVersion) LegacyInstallVersion() {
 	usr, _ := user.Current()
-	log.Infoln("Downloading and extracting legacy Drush version ", drushVersion.majorVersion)
+	log.Infoln(fmt.Sprintf("Downloading and extracting legacy Drush version %v.", drushVersion.fullVersion))
 	zipFileName := drushVersion.fullVersion + ".zip"
 	remotePath := "https://github.com/drush-ops/drush/archive/" + zipFileName
 	zipPath := usr.HomeDir + sep + ".dvm" + sep + "versions" + sep
 	zipFile := zipPath + zipFileName
+	zipPathFull := fmt.Sprintf("%v%v.dvm%vversions%v%v", usr.HomeDir, sep, sep, sep, zipFileName)
 	mkdir(zipPath, 0755)
 	_, wgetErr := wget.Run(remotePath)
 	if wgetErr != nil {
 		log.Warnln("wget returned error:", wgetErr)
 		log.Warnln(remotePath)
 	}
-	move(zipFile, zipPath)
-	exec.Command("sh", "-c", "cd "+zipPath+" && unzip "+zipFile).Run()
+	move(zipFileName, zipPathFull)
+	exec.Command("sh", "-c", "cd "+zipPath+" && unzip "+zipFileName).Run()
 	remove(zipFile)
 	drushVersion.Status()
 }
