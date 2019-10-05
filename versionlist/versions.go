@@ -129,17 +129,14 @@ func (drushVersionList *DrushVersionList) ListInstalled() DrushVersionList {
 	usr, _ := user.Current()
 	workingDir := usr.HomeDir + "/.dvm/versions"
 	thisDrush := GetActiveVersion()
-	//thisDrush := "7.2.0"
 	files, _ := ioutil.ReadDir(workingDir)
 	installedVersions := NewDrushVersionList()
 	for _, file := range files {
 		if strings.HasPrefix(file.Name(), "drush-") {
 			thisVersion := strings.Replace(file.Name(), "drush-", "", -1)
 			if thisDrush == thisVersion {
-				fmt.Sprintf("%v*\n", thisVersion)
 				installedVersions.list = append(installedVersions.list, fmt.Sprintf("%v (in use)", thisVersion))
 			} else {
-				fmt.Sprintln(thisVersion)
 				installedVersions.list = append(installedVersions.list, thisVersion)
 			}
 		}
@@ -183,5 +180,5 @@ func GetActiveVersion() string {
 		fmt.Println(drushOutputError)
 		os.Exit(1)
 	}
-	return string(strings.Replace(string(drushOutputVersion), "\n", "", -1))
+	return strings.Replace(string(drushOutputVersion), "\n", "", -1)
 }
