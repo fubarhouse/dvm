@@ -15,7 +15,6 @@ import (
 	"github.com/fubarhouse/dvm/commands/drush"
 )
 
-const sep = string(os.PathSeparator)
 const (
 	sep = string(os.PathSeparator)
 )
