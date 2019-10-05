@@ -40,22 +40,6 @@ func GetVersion() (Version []string) {
 		Version = append(Version, v)
 	}
 
-	Versions = NewDrushVersionList()
-	Versions.ListRemote()
-
-	appendVersion := true
-
-	for _, v := range Versions.list {
-		for _, x := range Version {
-			if x == v {
-				appendVersion = false
-			}
-		}
-		if appendVersion {
-			Version = append(Version, v)
-		}
-	}
-
 	sort.Strings(Version)
 
 	return
