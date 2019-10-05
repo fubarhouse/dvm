@@ -137,7 +137,7 @@ func (drushVersionList *DrushVersionList) ListInstalled() DrushVersionList {
 			thisVersion := strings.Replace(file.Name(), "drush-", "", -1)
 			if thisDrush == thisVersion {
 				fmt.Sprintf("%v*\n", thisVersion)
-				installedVersions.list = append(installedVersions.list, thisVersion+"*")
+				installedVersions.list = append(installedVersions.list, fmt.Sprintf("%v (in use)", thisVersion))
 			} else {
 				fmt.Sprintln(thisVersion)
 				installedVersions.list = append(installedVersions.list, thisVersion)
