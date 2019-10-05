@@ -32,7 +32,7 @@ func NewDrushVersionList() DrushVersionList {
 func GetVersion() (Version []string) {
 
 	Versions := NewDrushVersionList()
-	Versions.ListLocal()
+	Versions.ListAll()
 
 	for _, v := range Versions.list {
 		Version = append(Version, v)
@@ -92,7 +92,7 @@ func (drushVersionList *DrushVersionList) PrintLocal() {
 
 // ListRemote will fetch a list of all available versions from composer.
 // Versions must start with integers 6,7,8 or 9 to be returned.
-func (drushVersionList *DrushVersionList) ListRemote() {
+func (drushVersionList *DrushVersionList) ListAll() {
 	drushVersionsCommand, _ := composer.Show("drush/drush -a")
 	time.Sleep(time.Second * 5)
 	
@@ -116,7 +116,7 @@ func (drushVersionList *DrushVersionList) ListRemote() {
 // PrintRemote will print all available remote versions via composer.
 // See ListRemote() for more information.
 func (drushVersionList *DrushVersionList) PrintRemote() {
-	drushVersionList.ListRemote()
+	drushVersionList.ListAll()
 	for _, value := range drushVersionList.list {
 		fmt.Println(value)
 	}
