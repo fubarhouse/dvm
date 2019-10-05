@@ -8,7 +8,11 @@ import (
 
 func run(args []string) ([]byte, error) {
 
-	cmdArgs := []string{}
+	path, _ := exec.LookPath("drush")
+	cmdArgs := []string{
+		path,
+	}
+
 	for _, arg := range args {
 		cmdArgs = append(cmdArgs, arg)
 	}
