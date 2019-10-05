@@ -16,6 +16,9 @@ import (
 )
 
 const sep = string(os.PathSeparator)
+const (
+	sep = string(os.PathSeparator)
+)
 
 // DrushVersionList is a struct to store associated versions in a simple []string.
 // This is used by methods to store and use multiple version data.
