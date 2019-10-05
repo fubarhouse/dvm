@@ -85,13 +85,7 @@ func (drushVersion *DrushVersion) Exists() bool {
 	// Takes in a Drush version object and tests if it exists
 	// in any available Drush version list object.
 	drushVersions := versionlist.NewDrushVersionList()
-	drushVersions.ListLocal()
-	for _, versionItem := range drushVersions.ListContents() {
-		if drushVersion.fullVersion == versionItem {
-			return true
-		}
-	}
-	drushVersions.ListRemote()
+	drushVersions.ListAll()
 	for _, versionItem := range drushVersions.ListContents() {
 		if drushVersion.fullVersion == versionItem {
 			return true
