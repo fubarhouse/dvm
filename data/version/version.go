@@ -127,7 +127,7 @@ func (drushVersion *DrushVersion) Install() {
 			if installError != nil {
 				log.Errorf("Could not install Drush %v, cleaning installation...", drushVersion.fullVersion)
 				log.Errorln(installError)
-				remove(fmt.Sprintf("versions%v/drush-%v", dvmDirectory, sep, drushVersion.fullVersion))
+				remove(fmt.Sprintf("%v%vversions%vdrush-%v", dvmDirectory, sep, sep, drushVersion.fullVersion))
 			} else {
 				log.Infof("Successfully installed Drush v%v", drushVersion.fullVersion)
 			}
