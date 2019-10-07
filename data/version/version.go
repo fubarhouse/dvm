@@ -93,6 +93,18 @@ func (drushVersion *DrushVersion) Exists() bool {
 	// Takes in a Drush version object and tests if it exists
 	// in any available Drush version list object.
 	drushVersions := versions.NewDrushVersionList()
+
+	num := strings.Split(drushVersion.fullVersion, ".")[0]
+	if i, e := strconv.ParseInt(num, 10, 10); e == nil {
+		if i <= 5 {
+			for _, v := range versions.SupportedLegacyVersions {
+				if drushVersion.fullVersion == v {
+					return true
+				}
+			}
+		}
+	}
+
 	drushVersions.ListAll()
 	for _, versionItem := range drushVersions.ListContents() {
 		if drushVersion.fullVersion == versionItem {
