@@ -4,6 +4,7 @@ package version
 import (
 	"fmt"
 	"github.com/fubarhouse/dvm/data/versions"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"os/user"
@@ -36,6 +37,13 @@ type DrushVersion struct {
 // temporary proxy to consolidate functionality.
 func move(oldPath string, newPath string) error {
 	return os.Rename(oldPath, newPath)
+}
+
+// copy will copy a file
+// temporary proxy to consolidate functionality.
+func copy(oldPath string, newPath string) error {
+	data, _ := ioutil.ReadFile(oldPath)
+	return ioutil.WriteFile(newPath, data, 0644)
 }
 
 // remove will remove a path.
