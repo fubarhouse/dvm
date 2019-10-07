@@ -1,4 +1,4 @@
-package versionlist
+package versions
 
 import (
 	"fmt"
@@ -68,8 +68,8 @@ func (drushVersionList *DrushVersionList) ListContents() []string {
 // This is a manually updated array (for performance sake)
 // which stores all valid Command versions for testing.
 func (drushVersionList *DrushVersionList) ListLegacy() {
-	drushVersionList.list = supportedLegacyVersions
 	sort.Strings(drushVersionList.list)
+	drushVersionList.list = supportedLegacyVersions
 }
 
 // PrintLocal prints a list of all local versions, see ListLocal().
@@ -109,6 +109,7 @@ func (drushVersionList *DrushVersionList) ListAll() {
 					}
 				}
 			}
+			sort.Strings(acceptableVersions)
 			drushVersionList.list = acceptableVersions
 		}
 	}

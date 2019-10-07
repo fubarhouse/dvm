@@ -17,7 +17,7 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/fubarhouse/dvm/versionlist"
+	"github.com/fubarhouse/dvm/data/versions"
 )
 
 var searchString = ""
@@ -29,7 +29,7 @@ var searchCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		if searchString != "" {
-			versionlist.FindVersion(searchString)
+			versions.FindVersion(searchString)
 		} else {
 			cmd.Help()
 		}

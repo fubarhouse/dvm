@@ -17,7 +17,7 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/fubarhouse/dvm/versionlist"
+	"github.com/fubarhouse/dvm/data/versions"
 )
 
 var flagAvailable bool
@@ -29,7 +29,7 @@ var listCmd = &cobra.Command{
 	Short: "List available or installed Drush versions.",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		Drushes := versionlist.NewDrushVersionList()
+		Drushes := versions.NewDrushVersionList()
 		if flagAvailable == true {
 			Drushes.PrintRemote()
 		} else if flagInstalled == true {

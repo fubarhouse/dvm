@@ -3,6 +3,7 @@ package version
 
 import (
 	"fmt"
+	"github.com/fubarhouse/dvm/data/versions"
 	"os"
 	"os/exec"
 	"os/user"
@@ -12,8 +13,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/fubarhouse/dvm/commands/composer"
 	"github.com/fubarhouse/dvm/commands/drush"
-	"github.com/fubarhouse/dvm/conf"
-	"github.com/fubarhouse/dvm/versionlist"
+	"github.com/fubarhouse/dvm/config"
 )
 
 var (
@@ -84,7 +84,7 @@ func assertFileSystem() {
 func (drushVersion *DrushVersion) Exists() bool {
 	// Takes in a Drush version object and tests if it exists
 	// in any available Drush version list object.
-	drushVersions := versionlist.NewDrushVersionList()
+	drushVersions := versions.NewDrushVersionList()
 	drushVersions.ListAll()
 	for _, versionItem := range drushVersions.ListContents() {
 		if drushVersion.fullVersion == versionItem {
@@ -157,20 +157,20 @@ func (drushVersion *DrushVersion) Reinstall() {
 
 // SetDefault will remove and add a symlink to an specified installation of drush.
 func (drushVersion *DrushVersion) SetDefault() {
-	Drushes := versionlist.NewDrushVersionList()
+	Drushes := versions.NewDrushVersionList()
 	if Drushes.IsInstalled(drushVersion.fullVersion) {
 		workingDir := dvmDirectory + "versions"
 		symlinkSource := ""
 		symlinkDest := ""
 		if drushVersion.majorVersion > 6 {
 			// If the version is supported by composer:
-			symlinkSource = conf.Path()
+			symlinkSource = config.Path()
 			//if _, err := os.Stat(workingDir + sep + "drush-" + drushVersion.fullVersion + sep + "vendor" + sep + "bin" + sep + "drush"); err == nil {
 				symlinkDest = workingDir + sep + "drush-" + drushVersion.fullVersion + sep + "vendor" + sep + "bin" + sep + "drush"
 			//}
 		} else {
 			// If it isn't supported by Composer...
-			symlinkSource = conf.Path()
+			symlinkSource = config.Path()
 			symlinkDest = workingDir + sep + "drush-" + drushVersion.fullVersion + sep + "drush"
 		}
 
@@ -178,21 +178,21 @@ func (drushVersion *DrushVersion) SetDefault() {
 			// Remove symlink
 			rmErr := remove(symlinkSource)
 			if rmErr != nil {
-				log.Println("Could not remove "+conf.Path()+": ", rmErr)
+				log.Println("Could not remove "+config.Path()+": ", rmErr)
 			} else {
 				log.Println("Symlink successfully removed.")
 			}
 			// Add symlink
 			rmErr = os.Symlink(symlinkDest, symlinkSource)
 			if rmErr != nil {
-				log.Println("Could not sym "+conf.Path()+": ", rmErr)
+				log.Println("Could not sym "+config.Path()+": ", rmErr)
 				log.Println(symlinkDest, "|||", symlinkSource)
 			} else {
 				log.Println("Symlink successfully created.")
-				log.Printf("To use it, run %v or make it available to $PATH", conf.Path())
+				log.Printf("To use it, run %v or make it available to $PATH", config.Path())
 			}
 			// Verify version
-			currVer, rmErr := exec.Command(conf.Path(), "--version").Output()
+			currVer, rmErr := exec.Command(config.Path(), "--version").Output()
 			if rmErr != nil {
 				log.Println("Drush returned error: ", rmErr)
 				os.Exit(1)
