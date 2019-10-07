@@ -17,7 +17,7 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/fubarhouse/dvm/version"
+	"github.com/fubarhouse/dvm/data/version"
 )
 
 // reinstallCmd represents the reinstall command
@@ -28,7 +28,6 @@ var reinstallCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		if flagVersion != "" {
 			this := version.NewDrushVersion(flagVersion)
-			this.SetVersionIdentifier(flagVersion)
 			this.Reinstall()
 		} else {
 			RootCmd.Help()
