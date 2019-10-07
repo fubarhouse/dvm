@@ -84,4 +84,6 @@ func (drushVersion *DrushVersion) LegacyInstallVersion() {
 	copy(zipPathFull, destFile)
 	exec.Command("sh", "-c", "cd "+dest+" && unzip "+zipFileName).Run()
 	drushVersion.Status()
+
+	remove(zipFileName)
 }

@@ -134,7 +134,6 @@ func (drushVersion *DrushVersion) Install() {
 		if drushVersion.majorVersion >= 6 {
 			directory := fmt.Sprintf("%vversions%vdrush-%v", dvmDirectory, sep, drushVersion.fullVersion)
 			mkdir(directory, 0755)
-			fmt.Println(directory)
 			_, installError := composer.Require(fmt.Sprintf("drush/drush:%v --working-dir=%v", drushVersion.fullVersion, directory))
 			if installError != nil {
 				log.Errorf("Could not install Drush %v, cleaning installation...", drushVersion.fullVersion)
